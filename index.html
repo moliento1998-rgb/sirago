@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
-<!-- Firebase App (compat) -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
@@ -25,6 +24,7 @@
   --green: #3ecf8e;
   --red: #e05c5c;
   --blue: #5b9cf6;
+  --purple: #a78bfa;
   --radius: 14px;
   --radius-sm: 8px;
 }
@@ -43,31 +43,22 @@ body {
 /* ── CONFIG SCREEN ── */
 #config-screen {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  text-align: center;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 2rem; text-align: center;
 }
 #config-screen h1 { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--gold2); }
 #config-screen p { color: var(--text2); margin: .5rem 0 2rem; font-size: .95rem; line-height: 1.6; }
 .config-card {
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 420px;
-  margin-bottom: 1rem;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+  width: 100%; max-width: 420px; margin-bottom: 1rem;
 }
 .config-card h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
 .field-label { font-size: .8rem; color: var(--text2); margin-bottom: .4rem; display: block; text-align: left; }
 input[type=text], input[type=password] {
   width: 100%; background: var(--bg3); border: 1px solid var(--border2);
   border-radius: var(--radius-sm); color: var(--text); padding: .75rem 1rem;
-  font-size: .95rem; font-family: 'DM Sans', sans-serif; outline: none;
-  margin-bottom: .75rem;
+  font-size: .95rem; font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: .75rem;
 }
 input:focus { border-color: var(--gold); }
 .btn-gold {
@@ -145,8 +136,12 @@ header {
 }
 .drink-card:hover { border-color: var(--border2); transform: translateY(-1px); }
 .drink-card.in-cart { border-color: var(--gold); background: rgba(212,168,67,.07); }
-.drink-name { font-weight: 500; font-size: .92rem; line-height: 1.3; }
-.drink-emoji { font-size: 1.5rem; margin-bottom: .3rem; display: block; }
+.drink-name { font-weight: 500; font-size: .88rem; line-height: 1.3; }
+.drink-emoji { font-size: 1.4rem; margin-bottom: .25rem; display: block; }
+.drink-price {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem;
+  color: var(--gold); margin-top: .25rem; display: block;
+}
 .drink-qty {
   position: absolute; top: .5rem; right: .5rem;
   background: var(--gold); color: #0d0d0d;
@@ -155,7 +150,7 @@ header {
   display: flex; align-items: center; justify-content: center;
 }
 
-/* ── PANIER ── */
+/* ── PANIER BAR ── */
 #cart-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
   padding: .85rem 1rem; background: var(--bg2);
@@ -166,6 +161,7 @@ header {
 #cart-bar.visible { transform: translateY(0); }
 .cart-info { font-family: 'Syne', sans-serif; font-size: .9rem; }
 .cart-count { color: var(--gold2); font-weight: 700; }
+.cart-total-bar { font-size: .82rem; color: var(--gold); margin-top: .1rem; font-weight: 600; }
 .btn-send {
   background: var(--gold); color: #0d0d0d; border: none;
   border-radius: var(--radius-sm); padding: .65rem 1.4rem;
@@ -186,11 +182,12 @@ header {
   padding: 1.5rem 1rem 2rem; width: 100%;
   border: 1px solid var(--border2);
   transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1);
+  max-height: 92vh; overflow-y: auto;
 }
 .overlay.open .modal { transform: translateY(0); }
 .modal h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; margin-bottom: 1rem; }
 .modal-drag { width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 1.2rem; }
-.cart-items { max-height: 45vh; overflow-y: auto; margin-bottom: 1rem; }
+.cart-items { margin-bottom: .75rem; }
 .cart-item {
   display: flex; align-items: flex-start; gap: .75rem;
   padding: .75rem 0; border-bottom: 1px solid var(--border);
@@ -198,7 +195,7 @@ header {
 .cart-item:last-child { border-bottom: none; }
 .ci-info { flex: 1; }
 .ci-name { font-weight: 500; }
-.ci-comment { font-size: .8rem; color: var(--text2); margin-top: .2rem; }
+.ci-price-line { font-size: .78rem; color: var(--gold); margin-top: .15rem; font-family: 'Syne', sans-serif; font-weight: 600; }
 .ci-actions { display: flex; align-items: center; gap: .5rem; }
 .ci-btn {
   background: var(--bg3); border: 1px solid var(--border2);
@@ -213,6 +210,18 @@ header {
   font-size: .8rem; font-family: 'DM Sans', sans-serif; outline: none; margin-top: .4rem;
 }
 .ci-comment-input:focus { border-color: var(--gold); }
+
+/* ── TOTAL BLOC IN MODAL ── */
+.cart-total-bloc {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); padding: .85rem 1rem;
+  margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;
+}
+.cart-total-label { color: var(--text2); font-size: .9rem; }
+.cart-total-amount {
+  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--gold2);
+}
+
 .table-input-wrap { margin-bottom: 1rem; }
 #table-number {
   width: 100%; background: var(--bg3); border: 1px solid var(--border2);
@@ -220,11 +229,57 @@ header {
   font-size: 1rem; font-family: 'DM Sans', sans-serif; outline: none;
 }
 #table-number:focus { border-color: var(--gold); }
+
+/* ── PAYMENT SELECTOR ── */
+.payment-section { margin-bottom: 1rem; }
+.payment-label {
+  font-size: .8rem; color: var(--text2); margin-bottom: .5rem; display: block;
+  font-family: 'Syne', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+}
+.payment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.pay-btn {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: var(--radius-sm); padding: .75rem .5rem;
+  cursor: pointer; text-align: center; transition: all .18s;
+  display: flex; flex-direction: column; align-items: center; gap: .3rem;
+}
+.pay-btn:hover { border-color: var(--border2); }
+.pay-btn.selected-cash { border-color: var(--green); background: rgba(62,207,142,.08); }
+.pay-btn.selected-card { border-color: var(--blue); background: rgba(91,156,246,.08); }
+.pay-btn.selected-later { border-color: var(--text2); background: rgba(154,149,144,.08); }
+.pay-icon { font-size: 1.4rem; }
+.pay-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: .72rem; }
+.pay-name-cash { color: var(--green); }
+.pay-name-card { color: var(--blue); }
+.pay-name-later { color: var(--text2); }
+
+/* ── PAYMENT REQUEST (send payment alert separately) ── */
+.send-payment-section {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: .85rem 1rem; margin-bottom: 1rem;
+}
+.send-payment-section p { font-size: .82rem; color: var(--text2); margin-bottom: .6rem; }
+.payment-quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.btn-pay-cash {
+  background: rgba(62,207,142,.12); color: var(--green);
+  border: 1px solid rgba(62,207,142,.3); border-radius: var(--radius-sm);
+  padding: .7rem .5rem; font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: .82rem; cursor: pointer; transition: all .2s; text-align: center;
+}
+.btn-pay-cash:hover { background: rgba(62,207,142,.2); }
+.btn-pay-card {
+  background: rgba(91,156,246,.12); color: var(--blue);
+  border: 1px solid rgba(91,156,246,.3); border-radius: var(--radius-sm);
+  padding: .7rem .5rem; font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: .82rem; cursor: pointer; transition: all .2s; text-align: center;
+}
+.btn-pay-card:hover { background: rgba(91,156,246,.2); }
+
 .btn-confirm {
   background: var(--gold); color: #0d0d0d; border: none;
   border-radius: var(--radius-sm); padding: .9rem;
   font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
-  cursor: pointer; width: 100%; transition: background .2s; margin-top: .5rem;
+  cursor: pointer; width: 100%; transition: background .2s; margin-top: .25rem;
 }
 .btn-confirm:hover { background: var(--gold2); }
 .btn-cancel {
@@ -240,10 +295,12 @@ header {
   border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem;
   animation: slideIn .3s ease;
 }
-@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.order-header {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem;
+.order-card.payment-card {
+  border-color: rgba(167,139,250,.4);
+  background: rgba(167,139,250,.05);
 }
+@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
 .order-table { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--gold2); }
 .order-time { font-size: .75rem; color: var(--text2); }
 .order-status {
@@ -252,13 +309,35 @@ header {
 }
 .status-pending { background: rgba(240,192,96,.15); color: var(--gold2); border: 1px solid rgba(240,192,96,.3); }
 .status-done { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
+.status-payment { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.3); }
 .order-items { margin-bottom: .75rem; }
 .oi { display: flex; align-items: baseline; gap: .4rem; padding: .3rem 0; border-bottom: 1px solid var(--border); }
 .oi:last-child { border-bottom: none; }
 .oi-qty { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--gold2); min-width: 24px; }
-.oi-name { font-weight: 500; }
-.oi-comment { font-size: .78rem; color: var(--text2); margin-left: .4rem; }
-.order-comment { font-size: .82rem; color: var(--text2); background: var(--bg3); border-radius: 6px; padding: .5rem .75rem; margin-bottom: .75rem; }
+.oi-name { font-weight: 500; flex: 1; }
+.oi-price { font-size: .78rem; color: var(--gold); font-family: 'Syne', sans-serif; font-weight: 600; }
+.oi-comment { font-size: .78rem; color: var(--text2); }
+
+/* Total line on barman card */
+.order-total-line {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .5rem 0; border-top: 1px solid var(--border2); margin-bottom: .75rem;
+}
+.order-total-label { font-size: .82rem; color: var(--text2); }
+.order-total-amount { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--gold2); font-size: 1.05rem; }
+
+/* Payment badge on barman card */
+.payment-method-badge {
+  display: inline-flex; align-items: center; gap: .35rem;
+  border-radius: 20px; padding: .3rem .8rem;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem;
+  margin-bottom: .75rem;
+}
+.pmb-cash { background: rgba(62,207,142,.12); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
+.pmb-card { background: rgba(91,156,246,.12); color: var(--blue); border: 1px solid rgba(91,156,246,.3); }
+.pmb-later { background: rgba(154,149,144,.12); color: var(--text2); border: 1px solid rgba(154,149,144,.3); }
+.pmb-payment-request { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.4); font-size: .82rem; padding: .4rem 1rem; }
+
 .btn-ready {
   background: var(--green); color: #0d0d0d; border: none;
   border-radius: var(--radius-sm); padding: .75rem 1rem;
@@ -266,16 +345,20 @@ header {
   cursor: pointer; width: 100%; transition: background .2s;
 }
 .btn-ready:hover { background: #55e0a1; }
+.btn-paid {
+  background: rgba(167,139,250,.15); color: var(--purple);
+  border: 1px solid rgba(167,139,250,.3); border-radius: var(--radius-sm);
+  padding: .75rem 1rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem;
+  cursor: pointer; width: 100%; transition: all .2s; margin-bottom: .4rem;
+}
+.btn-paid:hover { background: rgba(167,139,250,.25); }
 .btn-delete {
   background: rgba(224,92,92,.1); color: var(--red);
   border: 1px solid rgba(224,92,92,.2); border-radius: var(--radius-sm);
   padding: .5rem; font-size: .8rem; cursor: pointer; width: 100%; margin-top: .4rem;
   font-family: 'DM Sans', sans-serif;
 }
-.empty-state {
-  text-align: center; padding: 4rem 2rem;
-  color: var(--text2); font-size: .9rem;
-}
+.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text2); font-size: .9rem; }
 .empty-icon { font-size: 3rem; margin-bottom: .75rem; }
 
 /* ── HISTORY ── */
@@ -290,16 +373,22 @@ header {
 .history-item {
   background: var(--bg2); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: .85rem; margin-bottom: .5rem;
-  cursor: pointer; transition: border-color .15s;
+  transition: border-color .15s;
 }
 .history-item:hover { border-color: var(--border2); }
 .hi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
 .hi-table { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; }
 .hi-time { font-size: .75rem; color: var(--text2); }
 .hi-items { font-size: .82rem; color: var(--text2); }
-.hi-count { font-family: 'Syne', sans-serif; font-size: .75rem; color: var(--text2); margin-top: .25rem; }
+.hi-footer { display: flex; justify-content: space-between; align-items: center; margin-top: .35rem; }
+.hi-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; color: var(--gold); }
+.hi-pay { font-size: .72rem; font-family: 'Syne', sans-serif; font-weight: 600; padding: .18rem .55rem; border-radius: 10px; }
+.hi-pay-cash { color: var(--green); background: rgba(62,207,142,.1); }
+.hi-pay-card { color: var(--blue); background: rgba(91,156,246,.1); }
+.hi-pay-later { color: var(--text2); background: rgba(154,149,144,.1); }
+.hi-pay-payment { color: var(--purple); background: rgba(167,139,250,.1); }
 
-/* ── NOTIFICATION TOAST ── */
+/* ── TOAST ── */
 #toast {
   position: fixed; top: 1rem; left: 50%; transform: translateX(-50%) translateY(-80px);
   background: var(--bg2); border: 1px solid var(--gold);
@@ -313,9 +402,7 @@ header {
 .toast-icon { font-size: 1.2rem; }
 
 /* ── RESPONSIVE ── */
-@media (min-width: 480px) {
-  .drinks-grid { grid-template-columns: repeat(3, 1fr); }
-}
+@media (min-width: 480px) { .drinks-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (min-width: 640px) {
   header { padding: .85rem 1.5rem; }
   .panel { padding: 1.25rem 1.5rem; }
@@ -329,7 +416,6 @@ header {
 <div id="config-screen">
   <h1>BarFlow</h1>
   <p>Application de commandes bar.<br>Configurez votre connexion Firebase ci-dessous.</p>
-
   <div class="config-card">
     <h2>🔥 Configuration Firebase</h2>
     <label class="field-label">API Key</label>
@@ -342,7 +428,6 @@ header {
     <input type="text" id="cfg-projectId" placeholder="mon-bar" />
     <p style="font-size:.75rem;color:var(--text2);margin-bottom:1rem">Ces informations se trouvent dans la console Firebase → Paramètres du projet → Vos applications</p>
   </div>
-
   <div class="config-card">
     <h2>Votre rôle</h2>
     <div class="role-grid">
@@ -358,12 +443,9 @@ header {
       </div>
     </div>
   </div>
-
   <div style="width:100%;max-width:420px">
     <button class="btn-gold" onclick="startApp()">Lancer l'application →</button>
-    <p style="font-size:.75rem;color:var(--text2);margin-top:.75rem;text-align:center">
-      Les paramètres sont sauvegardés localement sur votre appareil.
-    </p>
+    <p style="font-size:.75rem;color:var(--text2);margin-top:.75rem;text-align:center">Les paramètres sont sauvegardés localement sur votre appareil.</p>
   </div>
 </div>
 
@@ -377,16 +459,15 @@ header {
       <button onclick="logout()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:.8rem;padding:.3rem .5rem;">⏻</button>
     </div>
   </header>
-
   <div class="tabs" id="tabs-container"></div>
 
-  <!-- SERVEUR PANELS -->
+  <!-- SERVEUR -->
   <div id="order-panel" class="panel">
     <div id="drinks-container"></div>
-    <div style="height:80px"></div>
+    <div style="height:90px"></div>
   </div>
 
-  <!-- BARMAN PANEL -->
+  <!-- BARMAN -->
   <div id="barman-panel" class="panel">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
       <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem">Commandes en attente</div>
@@ -395,12 +476,13 @@ header {
     <div id="orders-list"></div>
   </div>
 
-  <!-- HISTORY PANEL -->
+  <!-- HISTORY -->
   <div id="history-panel" class="panel">
     <div class="history-filters">
       <button class="filter-btn active" onclick="filterHistory('all', this)">Toutes</button>
       <button class="filter-btn" onclick="filterHistory('pending', this)">En attente</button>
       <button class="filter-btn" onclick="filterHistory('done', this)">Terminées</button>
+      <button class="filter-btn" onclick="filterHistory('payment', this)">Paiements</button>
     </div>
     <div id="history-list"></div>
   </div>
@@ -409,8 +491,8 @@ header {
 <!-- ═══════════ CART BAR ═══════════ -->
 <div id="cart-bar">
   <div class="cart-info">
-    <span class="cart-count" id="cart-count-txt">0 boisson(s)</span>
-    <span style="color:var(--text2);font-size:.8rem;margin-left:.4rem">dans le panier</span>
+    <div><span class="cart-count" id="cart-count-txt">0 boisson(s)</span></div>
+    <div class="cart-total-bar" id="cart-total-bar-txt"></div>
   </div>
   <button class="btn-send" onclick="openCartModal()">Valider →</button>
 </div>
@@ -420,12 +502,65 @@ header {
   <div class="modal">
     <div class="modal-drag"></div>
     <h3>Votre commande</h3>
+
     <div class="table-input-wrap">
       <input type="text" id="table-number" placeholder="N° de table (ex: Table 5)" />
     </div>
+
     <div class="cart-items" id="cart-items-list"></div>
+
+    <div class="cart-total-bloc">
+      <span class="cart-total-label">Total de la commande</span>
+      <span class="cart-total-amount" id="modal-total-amount">0,00 €</span>
+    </div>
+
+    <!-- Paiement -->
+    <div class="payment-section">
+      <span class="payment-label">💳 Mode de paiement</span>
+      <div class="payment-grid">
+        <div class="pay-btn" id="pay-cash" onclick="selectPayment('cash')">
+          <span class="pay-icon">💵</span>
+          <span class="pay-name pay-name-cash">Espèces</span>
+        </div>
+        <div class="pay-btn" id="pay-card" onclick="selectPayment('card')">
+          <span class="pay-icon">💳</span>
+          <span class="pay-name pay-name-card">Carte</span>
+        </div>
+        <div class="pay-btn" id="pay-later" onclick="selectPayment('later')">
+          <span class="pay-icon">⏳</span>
+          <span class="pay-name pay-name-later">Plus tard</span>
+        </div>
+      </div>
+    </div>
+
     <button class="btn-confirm" onclick="sendOrder()">📤 Envoyer au barman</button>
     <button class="btn-cancel" onclick="closeCartModal()">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══════════ PAYMENT ALERT MODAL (demande de paiement séparée) ═══════════ -->
+<div class="overlay" id="payment-overlay" onclick="closePaymentModal(event)">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h3>💳 Demander le paiement</h3>
+    <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem">Envoyer une alerte au barman pour encaisser la table.</p>
+
+    <div class="table-input-wrap">
+      <input type="text" id="payment-table-number" placeholder="N° de table (ex: Table 5)" />
+    </div>
+
+    <div id="payment-amount-bloc" style="margin-bottom:1rem;display:none">
+      <div class="cart-total-bloc" style="margin-bottom:0">
+        <span class="cart-total-label">Montant</span>
+        <span class="cart-total-amount" id="payment-amount-display">—</span>
+      </div>
+    </div>
+
+    <div class="payment-quick-grid" style="margin-bottom:.75rem">
+      <button class="btn-pay-cash" onclick="sendPaymentAlert('cash')">💵 Espèces</button>
+      <button class="btn-pay-card" onclick="sendPaymentAlert('card')">💳 Carte bancaire</button>
+    </div>
+    <button class="btn-cancel" onclick="closePaymentModal()">Annuler</button>
   </div>
 </div>
 
@@ -435,85 +570,117 @@ header {
   <span id="toast-msg">Nouvelle commande !</span>
 </div>
 
+<!-- ═══════════ FAB PAYMENT (serveur only) ═══════════ -->
+<button id="fab-payment" onclick="openPaymentModal()"
+  style="display:none;position:fixed;bottom:1rem;right:1rem;z-index:190;
+  background:rgba(167,139,250,.2);color:var(--purple);
+  border:1px solid rgba(167,139,250,.4);border-radius:50px;
+  padding:.65rem 1.1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;
+  cursor:pointer;backdrop-filter:blur(8px);">
+  💳 Paiement
+</button>
+
 <script>
 // ═══════════════════════════════════════════
-// MENU DATA
+// MENU DATA — avec prix (€)
 // ═══════════════════════════════════════════
 const MENU = [
   {
     category: "🥂 Champagne & Vins",
     items: [
-      { name: "Champagne Brut", emoji: "🥂" },
-      { name: "Champagne Rosé", emoji: "🍾" },
-      { name: "Vin rouge", emoji: "🍷" },
-      { name: "Vin blanc", emoji: "🥃" },
-      { name: "Vin rosé", emoji: "🍹" },
+      { name: "Champagne Brut", emoji: "🥂", price: 12.00 },
+      { name: "Champagne Rosé", emoji: "🍾", price: 13.00 },
+      { name: "Vin rouge", emoji: "🍷", price: 6.00 },
+      { name: "Vin blanc", emoji: "🥃", price: 6.00 },
+      { name: "Vin rosé", emoji: "🍹", price: 6.00 },
     ]
   },
   {
     category: "🍺 Bières",
     items: [
-      { name: "Bière pression", emoji: "🍺" },
-      { name: "Bière blonde bouteille", emoji: "🍻" },
-      { name: "Bière brune", emoji: "🍺" },
-      { name: "Bière sans alcool", emoji: "🥤" },
-      { name: "Bière IPA", emoji: "🍻" },
+      { name: "Bière pression", emoji: "🍺", price: 4.50 },
+      { name: "Bière blonde bouteille", emoji: "🍻", price: 5.00 },
+      { name: "Bière brune", emoji: "🍺", price: 5.00 },
+      { name: "Bière sans alcool", emoji: "🥤", price: 4.00 },
+      { name: "Bière IPA", emoji: "🍻", price: 5.50 },
     ]
   },
   {
     category: "🍸 Cocktails",
     items: [
-      { name: "Mojito", emoji: "🍹" },
-      { name: "Spritz", emoji: "🥂" },
-      { name: "Margarita", emoji: "🍸" },
-      { name: "Gin Tonic", emoji: "🥃" },
-      { name: "Cosmopolitan", emoji: "🍸" },
-      { name: "Whisky Sour", emoji: "🥃" },
-      { name: "Negroni", emoji: "🍊" },
-      { name: "Daïquiri", emoji: "🍹" },
+      { name: "Mojito", emoji: "🍹", price: 10.00 },
+      { name: "Spritz", emoji: "🥂", price: 9.00 },
+      { name: "Margarita", emoji: "🍸", price: 10.00 },
+      { name: "Gin Tonic", emoji: "🥃", price: 10.00 },
+      { name: "Cosmopolitan", emoji: "🍸", price: 10.00 },
+      { name: "Whisky Sour", emoji: "🥃", price: 11.00 },
+      { name: "Negroni", emoji: "🍊", price: 11.00 },
+      { name: "Daïquiri", emoji: "🍹", price: 10.00 },
     ]
   },
   {
     category: "🥃 Spiritueux",
     items: [
-      { name: "Whisky on the rocks", emoji: "🥃" },
-      { name: "Cognac", emoji: "🥃" },
-      { name: "Rhum arrangé", emoji: "🍹" },
-      { name: "Vodka", emoji: "🫙" },
-      { name: "Tequila shot", emoji: "🥃" },
+      { name: "Whisky on the rocks", emoji: "🥃", price: 9.00 },
+      { name: "Cognac", emoji: "🥃", price: 10.00 },
+      { name: "Rhum arrangé", emoji: "🍹", price: 8.00 },
+      { name: "Vodka", emoji: "🫙", price: 7.00 },
+      { name: "Tequila shot", emoji: "🥃", price: 5.00 },
     ]
   },
   {
     category: "🧃 Softs & Sans alcool",
     items: [
-      { name: "Coca-Cola", emoji: "🥤" },
-      { name: "Perrier / San Pellegrino", emoji: "💧" },
-      { name: "Jus d'orange frais", emoji: "🍊" },
-      { name: "Limonade", emoji: "🥤" },
-      { name: "Eau plate", emoji: "💧" },
-      { name: "Virgin Mojito", emoji: "🌿" },
+      { name: "Coca-Cola", emoji: "🥤", price: 3.50 },
+      { name: "Perrier / San Pellegrino", emoji: "💧", price: 3.50 },
+      { name: "Jus d'orange frais", emoji: "🍊", price: 4.50 },
+      { name: "Limonade", emoji: "🥤", price: 3.00 },
+      { name: "Eau plate", emoji: "💧", price: 2.50 },
+      { name: "Virgin Mojito", emoji: "🌿", price: 7.00 },
     ]
   },
   {
     category: "☕ Chaud",
     items: [
-      { name: "Espresso", emoji: "☕" },
-      { name: "Cappuccino", emoji: "☕" },
-      { name: "Thé", emoji: "🫖" },
-      { name: "Café au lait", emoji: "☕" },
+      { name: "Espresso", emoji: "☕", price: 2.50 },
+      { name: "Cappuccino", emoji: "☕", price: 3.50 },
+      { name: "Thé", emoji: "🫖", price: 3.00 },
+      { name: "Café au lait", emoji: "☕", price: 3.00 },
     ]
   },
 ];
+
+// Build lookup map name → price
+const PRICE_MAP = {};
+MENU.forEach(cat => cat.items.forEach(item => { PRICE_MAP[item.name] = item.price; }));
 
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
 let db = null;
 let role = null;
-let cart = {}; // { drinkName: { qty, comment } }
+let cart = {};
 let allOrders = {};
 let historyFilter = 'all';
-let lastOrderCount = 0;
+let selectedPayment = null; // 'cash' | 'card' | 'later'
+
+// ═══════════════════════════════════════════
+// HELPERS — Prix
+// ═══════════════════════════════════════════
+function fmt(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+function cartTotal() {
+  return Object.entries(cart).reduce((sum, [name, d]) => {
+    return sum + (PRICE_MAP[name] || 0) * d.qty;
+  }, 0);
+}
+
+function orderTotal(order) {
+  if (!order.items) return 0;
+  return order.items.reduce((sum, item) => {
+    return sum + (item.price || PRICE_MAP[item.name] || 0) * item.qty;
+  }, 0);
+}
 
 // ═══════════════════════════════════════════
 // SOUNDS
@@ -521,9 +688,7 @@ let lastOrderCount = 0;
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
 
-function ensureAudio() {
-  if (!audioCtx) audioCtx = new AudioCtx();
-}
+function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
 
 function playSound(type) {
   ensureAudio();
@@ -531,39 +696,42 @@ function playSound(type) {
   const t = ctx.currentTime;
 
   if (type === 'new_order') {
-    // Ding-dong for barman (new order arrives)
     [0, 0.18, 0.36].forEach((delay, i) => {
       const freqs = [880, 660, 770];
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
+      const o = ctx.createOscillator(); const g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = freqs[i];
-      o.type = 'sine';
+      o.frequency.value = freqs[i]; o.type = 'sine';
       g.gain.setValueAtTime(0, t + delay);
       g.gain.linearRampToValueAtTime(0.3, t + delay + 0.04);
       g.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.35);
       o.start(t + delay); o.stop(t + delay + 0.4);
     });
   } else if (type === 'order_ready') {
-    // Cheerful high notes for serveur (order ready)
     [0, 0.12, 0.24, 0.36].forEach((delay, i) => {
-      const freqs = [523, 659, 784, 1047]; // Do Mi Sol Do
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
+      const freqs = [523, 659, 784, 1047];
+      const o = ctx.createOscillator(); const g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = freqs[i];
-      o.type = 'triangle';
+      o.frequency.value = freqs[i]; o.type = 'triangle';
       g.gain.setValueAtTime(0, t + delay);
       g.gain.linearRampToValueAtTime(0.25, t + delay + 0.04);
       g.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.28);
       o.start(t + delay); o.stop(t + delay + 0.35);
     });
+  } else if (type === 'payment') {
+    // Urgent double beep for payment alert
+    [0, 0.22].forEach((delay) => {
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 1200; o.type = 'square';
+      g.gain.setValueAtTime(0, t + delay);
+      g.gain.linearRampToValueAtTime(0.15, t + delay + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.18);
+      o.start(t + delay); o.stop(t + delay + 0.22);
+    });
   } else if (type === 'sent') {
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
+    const o = ctx.createOscillator(); const g = ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
-    o.frequency.value = 440;
-    o.type = 'sine';
+    o.frequency.value = 440; o.type = 'sine';
     g.gain.setValueAtTime(0, t);
     g.gain.linearRampToValueAtTime(0.2, t + 0.05);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
@@ -582,29 +750,18 @@ function selectRole(r) {
 
 function loadConfig() {
   const saved = localStorage.getItem('barflow_config');
-  if (!saved) return null;
-  return JSON.parse(saved);
+  return saved ? JSON.parse(saved) : null;
 }
 
-function saveConfig(cfg) {
-  localStorage.setItem('barflow_config', JSON.stringify(cfg));
-}
+function saveConfig(cfg) { localStorage.setItem('barflow_config', JSON.stringify(cfg)); }
 
 function startApp() {
   const apiKey = document.getElementById('cfg-apiKey').value.trim();
   const authDomain = document.getElementById('cfg-authDomain').value.trim();
   const dbUrl = document.getElementById('cfg-dbUrl').value.trim();
   const projectId = document.getElementById('cfg-projectId').value.trim();
-
-  if (!apiKey || !dbUrl || !projectId) {
-    alert('Veuillez remplir les champs Firebase obligatoires (API Key, Database URL, Project ID).');
-    return;
-  }
-  if (!role) {
-    alert('Veuillez choisir votre rôle (Serveur ou Barman).');
-    return;
-  }
-
+  if (!apiKey || !dbUrl || !projectId) { alert('Veuillez remplir les champs Firebase obligatoires (API Key, Database URL, Project ID).'); return; }
+  if (!role) { alert('Veuillez choisir votre rôle (Serveur ou Barman).'); return; }
   const cfg = { apiKey, authDomain, dbUrl, projectId, role };
   saveConfig(cfg);
   initFirebase(cfg);
@@ -613,12 +770,7 @@ function startApp() {
 function initFirebase(cfg) {
   try {
     if (firebase.apps.length === 0) {
-      firebase.initializeApp({
-        apiKey: cfg.apiKey,
-        authDomain: cfg.authDomain,
-        databaseURL: cfg.dbUrl,
-        projectId: cfg.projectId,
-      });
+      firebase.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, databaseURL: cfg.dbUrl, projectId: cfg.projectId });
     }
     db = firebase.database();
     role = cfg.role;
@@ -634,7 +786,6 @@ function logout() {
   location.reload();
 }
 
-// Auto-load saved config
 window.addEventListener('load', () => {
   const cfg = loadConfig();
   if (cfg) {
@@ -652,18 +803,11 @@ window.addEventListener('load', () => {
 function launchUI() {
   document.getElementById('config-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-
   const badge = document.getElementById('role-badge');
   badge.textContent = role === 'serveur' ? '🍽️ Serveur' : '🍸 Barman';
   badge.className = 'badge-role badge-' + role;
-
-  if (role === 'serveur') {
-    buildServerTabs();
-    renderMenu();
-  } else {
-    buildBarmanTabs();
-  }
-
+  if (role === 'serveur') { buildServerTabs(); renderMenu(); document.getElementById('fab-payment').style.display = 'block'; }
+  else { buildBarmanTabs(); }
   listenOrders();
 }
 
@@ -671,23 +815,19 @@ function launchUI() {
 // TABS
 // ═══════════════════════════════════════════
 function buildServerTabs() {
-  const tabs = document.getElementById('tabs-container');
-  tabs.innerHTML = `
+  document.getElementById('tabs-container').innerHTML = `
     <div class="tab active" onclick="switchTab('order-panel', this)">📋 Commander</div>
     <div class="tab" onclick="switchTab('history-panel', this)">📜 Historique</div>
   `;
   document.getElementById('order-panel').classList.add('active');
 }
-
 function buildBarmanTabs() {
-  const tabs = document.getElementById('tabs-container');
-  tabs.innerHTML = `
+  document.getElementById('tabs-container').innerHTML = `
     <div class="tab active" onclick="switchTab('barman-panel', this)">🍸 En cours</div>
     <div class="tab" onclick="switchTab('history-panel', this)">📜 Historique</div>
   `;
   document.getElementById('barman-panel').classList.add('active');
 }
-
 function switchTab(panelId, el) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -702,33 +842,31 @@ function switchTab(panelId, el) {
 function renderMenu() {
   const container = document.getElementById('drinks-container');
   let html = '';
-
   MENU.forEach(cat => {
-    html += `<div class="category-title">${cat.category}</div>`;
-    html += `<div class="drinks-grid">`;
+    html += `<div class="category-title">${cat.category}</div><div class="drinks-grid">`;
     cat.items.forEach(item => {
-      const key = item.name;
-      const qty = cart[key] ? cart[key].qty : 0;
+      const qty = cart[item.name] ? cart[item.name].qty : 0;
       const inCart = qty > 0;
+      const safeName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
       html += `
-        <div class="drink-card${inCart ? ' in-cart' : ''}" onclick="addToCart('${key.replace(/'/g, "\\'")}', '${item.emoji}')">
+        <div class="drink-card${inCart ? ' in-cart' : ''}" onclick="addToCart('${safeName}', '${item.emoji}', ${item.price})">
           <span class="drink-emoji">${item.emoji}</span>
           <span class="drink-name">${item.name}</span>
+          <span class="drink-price">${fmt(item.price)}</span>
           ${inCart ? `<span class="drink-qty">${qty}</span>` : ''}
         </div>`;
     });
     html += `</div>`;
   });
-
   container.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════
 // CART
 // ═══════════════════════════════════════════
-function addToCart(name, emoji) {
+function addToCart(name, emoji, price) {
   ensureAudio();
-  if (!cart[name]) cart[name] = { qty: 0, comment: '', emoji };
+  if (!cart[name]) cart[name] = { qty: 0, comment: '', emoji, price };
   cart[name].qty++;
   updateCartBar();
   renderMenu();
@@ -738,12 +876,16 @@ function updateCartBar() {
   const total = Object.values(cart).reduce((s, v) => s + v.qty, 0);
   const bar = document.getElementById('cart-bar');
   document.getElementById('cart-count-txt').textContent = `${total} boisson${total > 1 ? 's' : ''}`;
+  document.getElementById('cart-total-bar-txt').textContent = total > 0 ? fmt(cartTotal()) : '';
   if (total > 0) bar.classList.add('visible');
   else bar.classList.remove('visible');
 }
 
 function openCartModal() {
+  selectedPayment = null;
+  updatePaymentButtons();
   renderCartItems();
+  updateModalTotal();
   document.getElementById('cart-overlay').classList.add('open');
 }
 
@@ -757,20 +899,23 @@ function renderCartItems() {
   const list = document.getElementById('cart-items-list');
   let html = '';
   Object.entries(cart).forEach(([name, data]) => {
+    const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const lineTotal = (data.price || PRICE_MAP[name] || 0) * data.qty;
     html += `
       <div class="cart-item">
         <div class="ci-info">
           <div class="ci-name">${data.emoji} ${name}</div>
+          <div class="ci-price-line">${fmt(data.price || PRICE_MAP[name] || 0)} × ${data.qty} = ${fmt(lineTotal)}</div>
           <input class="ci-comment-input" type="text"
             placeholder="Commentaire (ex: sans glaçons…)"
             value="${data.comment}"
-            onchange="setComment('${name.replace(/'/g, "\\'")}', this.value)"
+            onchange="setComment('${safeName}', this.value)"
           />
         </div>
         <div class="ci-actions">
-          <button class="ci-btn" onclick="changeQty('${name.replace(/'/g, "\\'")}', -1)">−</button>
+          <button class="ci-btn" onclick="changeQty('${safeName}', -1)">−</button>
           <span class="ci-qty">${data.qty}</span>
-          <button class="ci-btn" onclick="changeQty('${name.replace(/'/g, "\\'")}', 1)">+</button>
+          <button class="ci-btn" onclick="changeQty('${safeName}', 1)">+</button>
         </div>
       </div>`;
   });
@@ -778,9 +923,11 @@ function renderCartItems() {
   list.innerHTML = html;
 }
 
-function setComment(name, val) {
-  if (cart[name]) cart[name].comment = val;
+function updateModalTotal() {
+  document.getElementById('modal-total-amount').textContent = fmt(cartTotal());
 }
+
+function setComment(name, val) { if (cart[name]) cart[name].comment = val; }
 
 function changeQty(name, delta) {
   if (!cart[name]) return;
@@ -788,7 +935,25 @@ function changeQty(name, delta) {
   if (cart[name].qty === 0) delete cart[name];
   updateCartBar();
   renderCartItems();
+  updateModalTotal();
   renderMenu();
+}
+
+// ═══════════════════════════════════════════
+// PAYMENT SELECTOR
+// ═══════════════════════════════════════════
+function selectPayment(method) {
+  selectedPayment = method;
+  updatePaymentButtons();
+}
+
+function updatePaymentButtons() {
+  ['cash', 'card', 'later'].forEach(m => {
+    const el = document.getElementById('pay-' + m);
+    if (!el) return;
+    el.className = 'pay-btn';
+    if (selectedPayment === m) el.classList.add('selected-' + m);
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -796,17 +961,18 @@ function changeQty(name, delta) {
 // ═══════════════════════════════════════════
 function sendOrder() {
   const table = document.getElementById('table-number').value.trim();
-  if (!table) {
-    alert('Veuillez indiquer le numéro de table.');
-    return;
-  }
+  if (!table) { alert('Veuillez indiquer le numéro de table.'); return; }
   if (Object.keys(cart).length === 0) return;
 
+  const total = cartTotal();
   const order = {
     table,
     items: Object.entries(cart).map(([name, d]) => ({
-      name, qty: d.qty, comment: d.comment, emoji: d.emoji
+      name, qty: d.qty, comment: d.comment, emoji: d.emoji,
+      price: d.price || PRICE_MAP[name] || 0
     })),
+    total: parseFloat(total.toFixed(2)),
+    payment: selectedPayment || 'later',
     status: 'pending',
     timestamp: Date.now(),
     date: new Date().toLocaleString('fr-FR')
@@ -815,6 +981,8 @@ function sendOrder() {
   db.ref('orders').push(order).then(() => {
     playSound('sent');
     cart = {};
+    selectedPayment = null;
+    updatePaymentButtons();
     updateCartBar();
     renderMenu();
     closeCartModal();
@@ -824,7 +992,45 @@ function sendOrder() {
 }
 
 // ═══════════════════════════════════════════
-// LISTEN ORDERS (Firebase)
+// PAYMENT ALERT (demande paiement séparée)
+// ═══════════════════════════════════════════
+function openPaymentModal() {
+  ensureAudio();
+  // Pre-fill table if known from last order
+  document.getElementById('payment-overlay').classList.add('open');
+}
+
+function closePaymentModal(e) {
+  if (!e || e.target === document.getElementById('payment-overlay')) {
+    document.getElementById('payment-overlay').classList.remove('open');
+  }
+}
+
+function sendPaymentAlert(method) {
+  const table = document.getElementById('payment-table-number').value.trim();
+  if (!table) { alert('Veuillez indiquer le numéro de table.'); return; }
+
+  const alert_data = {
+    table,
+    type: 'payment',
+    payment: method,
+    status: 'pending',
+    timestamp: Date.now(),
+    date: new Date().toLocaleString('fr-FR'),
+    items: [],
+    total: 0
+  };
+
+  db.ref('orders').push(alert_data).then(() => {
+    playSound('sent');
+    closePaymentModal();
+    document.getElementById('payment-table-number').value = '';
+    showToast('💳', `Demande de paiement envoyée — ${table}`);
+  }).catch(err => alert('Erreur : ' + err.message));
+}
+
+// ═══════════════════════════════════════════
+// LISTEN ORDERS
 // ═══════════════════════════════════════════
 function listenOrders() {
   db.ref('orders').on('value', snapshot => {
@@ -834,21 +1040,18 @@ function listenOrders() {
 
     if (role === 'barman') {
       renderBarmanOrders();
-
-      // Detect new pending orders
-      const newPending = Object.entries(data).filter(([k, v]) =>
-        v.status === 'pending' && !prevOrders[k]
-      );
+      const newPending = Object.entries(data).filter(([k, v]) => v.status === 'pending' && !prevOrders[k]);
       if (newPending.length > 0 && Object.keys(prevOrders).length > 0) {
-        playSound('new_order');
-        showToast('🔔', `Nouvelle commande — ${newPending[0][1].table} !`);
+        const isPayment = newPending.some(([, v]) => v.type === 'payment');
+        playSound(isPayment ? 'payment' : 'new_order');
+        const label = newPending[0][1].type === 'payment' ? '💳 Paiement demandé' : '🔔 Nouvelle commande';
+        showToast(isPayment ? '💳' : '🔔', `${label} — ${newPending[0][1].table} !`);
       }
     }
 
     if (role === 'serveur') {
-      // Detect newly-ready orders
       const justDone = Object.entries(data).filter(([k, v]) =>
-        v.status === 'done' && prevOrders[k] && prevOrders[k].status === 'pending'
+        v.status === 'done' && prevOrders[k] && prevOrders[k].status === 'pending' && v.type !== 'payment'
       );
       if (justDone.length > 0) {
         playSound('order_ready');
@@ -856,17 +1059,11 @@ function listenOrders() {
       }
     }
 
-    // Pending count badge
     const pendingCount = Object.values(data).filter(o => o.status === 'pending').length;
     const badge = document.getElementById('pending-count');
-    if (pendingCount > 0) {
-      badge.style.display = 'flex';
-      badge.textContent = pendingCount;
-    } else {
-      badge.style.display = 'none';
-    }
+    if (pendingCount > 0) { badge.style.display = 'flex'; badge.textContent = pendingCount; }
+    else badge.style.display = 'none';
 
-    // Update history if open
     if (document.getElementById('history-panel').classList.contains('active')) renderHistory();
   });
 }
@@ -874,14 +1071,20 @@ function listenOrders() {
 // ═══════════════════════════════════════════
 // BARMAN VIEW
 // ═══════════════════════════════════════════
+const PAY_LABELS = {
+  cash: { icon: '💵', label: 'Espèces', cls: 'pmb-cash' },
+  card: { icon: '💳', label: 'Carte bancaire', cls: 'pmb-card' },
+  later: { icon: '⏳', label: 'À encaisser', cls: 'pmb-later' },
+};
+
 function renderBarmanOrders() {
   const list = document.getElementById('orders-list');
   const pending = Object.entries(allOrders)
     .filter(([, o]) => o.status === 'pending')
     .sort((a, b) => a[1].timestamp - b[1].timestamp);
 
-  const countEl = document.getElementById('orders-count');
-  countEl.textContent = pending.length + (pending.length > 1 ? ' commandes en attente' : ' commande en attente');
+  document.getElementById('orders-count').textContent =
+    pending.length + (pending.length > 1 ? ' commandes en attente' : ' commande en attente');
 
   if (pending.length === 0) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div>Aucune commande en attente</div>`;
@@ -892,6 +1095,32 @@ function renderBarmanOrders() {
   pending.forEach(([key, order]) => {
     const elapsed = Math.floor((Date.now() - order.timestamp) / 60000);
     const timeLabel = elapsed < 1 ? "À l'instant" : `il y a ${elapsed} min`;
+    const isPaymentAlert = order.type === 'payment';
+
+    if (isPaymentAlert) {
+      const pm = PAY_LABELS[order.payment] || PAY_LABELS.cash;
+      html += `<div class="order-card payment-card">
+        <div class="order-header">
+          <div>
+            <div class="order-table">${order.table}</div>
+            <div class="order-time">${timeLabel} — ${order.date}</div>
+          </div>
+          <span class="order-status status-payment">Paiement</span>
+        </div>
+        <div style="margin-bottom:.75rem">
+          <span class="payment-method-badge pmb-payment-request">💳 Le client souhaite payer</span>
+        </div>
+        <div class="payment-method-badge ${pm.cls}" style="margin-bottom:.75rem;font-size:.85rem;padding:.4rem 1rem">
+          ${pm.icon} ${pm.label}
+        </div>
+        <button class="btn-paid" onclick="markReady('${key}')">✅ Paiement encaissé</button>
+        <button class="btn-delete" onclick="deleteOrder('${key}')">Supprimer</button>
+      </div>`;
+      return;
+    }
+
+    const total = orderTotal(order);
+    const pm = order.payment ? (PAY_LABELS[order.payment] || PAY_LABELS.later) : null;
 
     html += `<div class="order-card">
       <div class="order-header">
@@ -903,16 +1132,27 @@ function renderBarmanOrders() {
       </div>
       <div class="order-items">`;
 
-    order.items.forEach(item => {
+    (order.items || []).forEach(item => {
+      const lineTotal = (item.price || 0) * item.qty;
       html += `<div class="oi">
         <span class="oi-qty">×${item.qty}</span>
         <span class="oi-name">${item.emoji} ${item.name}</span>
-        ${item.comment ? `<span class="oi-comment">— ${item.comment}</span>` : ''}
+        <span class="oi-price">${fmt(lineTotal)}</span>
+        ${item.comment ? `<br><span class="oi-comment" style="padding-left:28px">— ${item.comment}</span>` : ''}
       </div>`;
     });
 
     html += `</div>
-      <button class="btn-ready" onclick="markReady('${key}')">✅ Commande prête</button>
+      <div class="order-total-line">
+        <span class="order-total-label">Total commande</span>
+        <span class="order-total-amount">${fmt(total)}</span>
+      </div>`;
+
+    if (pm) {
+      html += `<div class="payment-method-badge ${pm.cls}" style="margin-bottom:.75rem">${pm.icon} ${pm.label}</div>`;
+    }
+
+    html += `<button class="btn-ready" onclick="markReady('${key}')">✅ Commande prête</button>
       <button class="btn-delete" onclick="deleteOrder('${key}')">Supprimer</button>
     </div>`;
   });
@@ -926,9 +1166,7 @@ function markReady(key) {
 }
 
 function deleteOrder(key) {
-  if (confirm('Supprimer cette commande ?')) {
-    db.ref('orders/' + key).remove();
-  }
+  if (confirm('Supprimer cette commande ?')) db.ref('orders/' + key).remove();
 }
 
 // ═══════════════════════════════════════════
@@ -943,11 +1181,11 @@ function filterHistory(f, el) {
 
 function renderHistory() {
   const list = document.getElementById('history-list');
-  let entries = Object.entries(allOrders)
-    .sort((a, b) => b[1].timestamp - a[1].timestamp);
+  let entries = Object.entries(allOrders).sort((a, b) => b[1].timestamp - a[1].timestamp);
 
-  if (historyFilter === 'pending') entries = entries.filter(([, o]) => o.status === 'pending');
-  if (historyFilter === 'done') entries = entries.filter(([, o]) => o.status === 'done');
+  if (historyFilter === 'pending') entries = entries.filter(([, o]) => o.status === 'pending' && o.type !== 'payment');
+  if (historyFilter === 'done') entries = entries.filter(([, o]) => o.status === 'done' && o.type !== 'payment');
+  if (historyFilter === 'payment') entries = entries.filter(([, o]) => o.type === 'payment');
 
   if (entries.length === 0) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div>Aucune commande</div>`;
@@ -956,11 +1194,19 @@ function renderHistory() {
 
   let html = '';
   entries.forEach(([key, order]) => {
+    const isPayment = order.type === 'payment';
     const statusLabel = order.status === 'done'
-      ? `<span style="color:var(--green);font-size:.75rem">✅ Servie</span>`
+      ? `<span style="color:var(--green);font-size:.75rem">✅ Terminée</span>`
       : `<span style="color:var(--gold2);font-size:.75rem">⏳ En attente</span>`;
-    const itemsSummary = order.items.map(i => `×${i.qty} ${i.name}`).join(', ');
-    const totalQty = order.items.reduce((s, i) => s + i.qty, 0);
+
+    const total = isPayment ? null : orderTotal(order);
+    const pm = order.payment ? (PAY_LABELS[order.payment] || null) : null;
+    const payBadgeClass = isPayment ? 'hi-pay-payment' : (order.payment === 'cash' ? 'hi-pay-cash' : order.payment === 'card' ? 'hi-pay-card' : 'hi-pay-later');
+    const payLabel = isPayment ? `💳 Paiement ${pm ? pm.label : ''}` : (pm ? `${pm.icon} ${pm.label}` : '');
+
+    const itemsSummary = isPayment
+      ? '<em>Demande de paiement</em>'
+      : (order.items || []).map(i => `×${i.qty} ${i.name}`).join(', ');
 
     html += `<div class="history-item">
       <div class="hi-header">
@@ -968,7 +1214,10 @@ function renderHistory() {
         <div style="display:flex;align-items:center;gap:.5rem">${statusLabel}<span class="hi-time">${order.date}</span></div>
       </div>
       <div class="hi-items">${itemsSummary}</div>
-      <div class="hi-count">${totalQty} verre${totalQty > 1 ? 's' : ''}</div>
+      <div class="hi-footer">
+        <span class="hi-total">${total !== null ? fmt(total) : '—'}</span>
+        ${payLabel ? `<span class="hi-pay ${payBadgeClass}">${payLabel}</span>` : ''}
+      </div>
     </div>`;
   });
 
