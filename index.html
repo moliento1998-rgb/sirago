@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BarFlow — Commandes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase App (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<style>
+:root {
+  --bg: #0d0d0d;
+  --bg2: #161616;
+  --bg3: #1e1e1e;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --gold: #d4a843;
+  --gold2: #f0c060;
+  --text: #f0ece4;
+  --text2: #9a9590;
+  --green: #3ecf8e;
+  --red: #e05c5c;
+  --blue: #5b9cf6;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  min-height: 100vh;
+  overscroll-behavior: none;
+}
+
+/* ── CONFIG SCREEN ── */
+#config-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+#config-screen h1 { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--gold2); }
+#config-screen p { color: var(--text2); margin: .5rem 0 2rem; font-size: .95rem; line-height: 1.6; }
+.config-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 1rem;
+}
+.config-card h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+.field-label { font-size: .8rem; color: var(--text2); margin-bottom: .4rem; display: block; text-align: left; }
+input[type=text], input[type=password] {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); color: var(--text); padding: .75rem 1rem;
+  font-size: .95rem; font-family: 'DM Sans', sans-serif; outline: none;
+  margin-bottom: .75rem;
+}
+input:focus { border-color: var(--gold); }
+.btn-gold {
+  background: var(--gold); color: #0d0d0d; font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: 1rem; border: none; border-radius: var(--radius-sm);
+  padding: .85rem 2rem; cursor: pointer; width: 100%; transition: background .2s;
+}
+.btn-gold:hover { background: var(--gold2); }
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .25rem; }
+.role-btn {
+  background: var(--bg3); border: 2px solid var(--border);
+  border-radius: var(--radius-sm); padding: 1.2rem .75rem;
+  cursor: pointer; text-align: center; transition: all .2s;
+  display: flex; flex-direction: column; align-items: center; gap: .4rem;
+}
+.role-btn:hover { border-color: var(--gold); }
+.role-btn.selected { border-color: var(--gold); background: rgba(212,168,67,.1); }
+.role-icon { font-size: 2rem; }
+.role-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: .95rem; }
+.role-sub { font-size: .75rem; color: var(--text2); }
+
+/* ── LAYOUT ── */
+#app { display: none; min-height: 100vh; }
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,13,13,.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: .75rem 1rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--gold2); }
+.badge-role {
+  font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700;
+  padding: .3rem .7rem; border-radius: 20px; text-transform: uppercase; letter-spacing: .05em;
+}
+.badge-serveur { background: rgba(212,168,67,.15); color: var(--gold2); border: 1px solid rgba(212,168,67,.3); }
+.badge-barman { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
+.header-right { display: flex; align-items: center; gap: .6rem; }
+#pending-count {
+  background: var(--red); color: #fff; border-radius: 50%;
+  width: 20px; height: 20px; font-size: .7rem; font-weight: 700;
+  display: none; align-items: center; justify-content: center;
+}
+
+/* ── TABS ── */
+.tabs {
+  display: flex; overflow-x: auto; scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2); position: sticky; top: 57px; z-index: 90;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  padding: .85rem 1.25rem; white-space: nowrap; cursor: pointer;
+  font-family: 'Syne', sans-serif; font-weight: 600; font-size: .85rem;
+  color: var(--text2); border-bottom: 2px solid transparent;
+  transition: all .2s; flex-shrink: 0;
+}
+.tab.active { color: var(--gold2); border-bottom-color: var(--gold2); }
+
+/* ── MAIN PANELS ── */
+.panel { display: none; padding: 1rem; max-width: 640px; margin: 0 auto; }
+.panel.active { display: block; }
+
+/* ── DRINKS GRID ── */
+.category-title {
+  font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 700;
+  color: var(--text2); text-transform: uppercase; letter-spacing: .1em;
+  margin: 1.2rem 0 .6rem;
+}
+.drinks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+.drink-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: .85rem;
+  cursor: pointer; transition: all .18s; position: relative; overflow: hidden;
+}
+.drink-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+.drink-card.in-cart { border-color: var(--gold); background: rgba(212,168,67,.07); }
+.drink-name { font-weight: 500; font-size: .92rem; line-height: 1.3; }
+.drink-emoji { font-size: 1.5rem; margin-bottom: .3rem; display: block; }
+.drink-qty {
+  position: absolute; top: .5rem; right: .5rem;
+  background: var(--gold); color: #0d0d0d;
+  border-radius: 50%; width: 22px; height: 22px;
+  font-size: .75rem; font-weight: 800; font-family: 'Syne', sans-serif;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ── PANIER ── */
+#cart-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+  padding: .85rem 1rem; background: var(--bg2);
+  border-top: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: space-between;
+  transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1);
+}
+#cart-bar.visible { transform: translateY(0); }
+.cart-info { font-family: 'Syne', sans-serif; font-size: .9rem; }
+.cart-count { color: var(--gold2); font-weight: 700; }
+.btn-send {
+  background: var(--gold); color: #0d0d0d; border: none;
+  border-radius: var(--radius-sm); padding: .65rem 1.4rem;
+  font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer;
+  font-size: .9rem; transition: background .2s;
+}
+.btn-send:hover { background: var(--gold2); }
+
+/* ── MODAL COMMANDE ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.75);
+  z-index: 300; display: flex; align-items: flex-end;
+  opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--bg2); border-radius: 20px 20px 0 0;
+  padding: 1.5rem 1rem 2rem; width: 100%;
+  border: 1px solid var(--border2);
+  transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1);
+}
+.overlay.open .modal { transform: translateY(0); }
+.modal h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; margin-bottom: 1rem; }
+.modal-drag { width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 1.2rem; }
+.cart-items { max-height: 45vh; overflow-y: auto; margin-bottom: 1rem; }
+.cart-item {
+  display: flex; align-items: flex-start; gap: .75rem;
+  padding: .75rem 0; border-bottom: 1px solid var(--border);
+}
+.cart-item:last-child { border-bottom: none; }
+.ci-info { flex: 1; }
+.ci-name { font-weight: 500; }
+.ci-comment { font-size: .8rem; color: var(--text2); margin-top: .2rem; }
+.ci-actions { display: flex; align-items: center; gap: .5rem; }
+.ci-btn {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 6px; width: 28px; height: 28px;
+  color: var(--text); font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.ci-qty { font-family: 'Syne', sans-serif; font-weight: 700; min-width: 18px; text-align: center; }
+.ci-comment-input {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text); padding: .4rem .6rem;
+  font-size: .8rem; font-family: 'DM Sans', sans-serif; outline: none; margin-top: .4rem;
+}
+.ci-comment-input:focus { border-color: var(--gold); }
+.table-input-wrap { margin-bottom: 1rem; }
+#table-number {
+  width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm); color: var(--text); padding: .75rem 1rem;
+  font-size: 1rem; font-family: 'DM Sans', sans-serif; outline: none;
+}
+#table-number:focus { border-color: var(--gold); }
+.btn-confirm {
+  background: var(--gold); color: #0d0d0d; border: none;
+  border-radius: var(--radius-sm); padding: .9rem;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+  cursor: pointer; width: 100%; transition: background .2s; margin-top: .5rem;
+}
+.btn-confirm:hover { background: var(--gold2); }
+.btn-cancel {
+  background: transparent; color: var(--text2); border: none;
+  padding: .7rem; font-size: .9rem; cursor: pointer; width: 100%;
+  margin-top: .25rem; font-family: 'DM Sans', sans-serif;
+}
+
+/* ── BARMAN VIEW ── */
+#barman-panel { padding-bottom: 2rem; }
+.order-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem;
+  animation: slideIn .3s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.order-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem;
+}
+.order-table { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--gold2); }
+.order-time { font-size: .75rem; color: var(--text2); }
+.order-status {
+  font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700;
+  padding: .25rem .65rem; border-radius: 20px; text-transform: uppercase;
+}
+.status-pending { background: rgba(240,192,96,.15); color: var(--gold2); border: 1px solid rgba(240,192,96,.3); }
+.status-done { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
+.order-items { margin-bottom: .75rem; }
+.oi { display: flex; align-items: baseline; gap: .4rem; padding: .3rem 0; border-bottom: 1px solid var(--border); }
+.oi:last-child { border-bottom: none; }
+.oi-qty { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--gold2); min-width: 24px; }
+.oi-name { font-weight: 500; }
+.oi-comment { font-size: .78rem; color: var(--text2); margin-left: .4rem; }
+.order-comment { font-size: .82rem; color: var(--text2); background: var(--bg3); border-radius: 6px; padding: .5rem .75rem; margin-bottom: .75rem; }
+.btn-ready {
+  background: var(--green); color: #0d0d0d; border: none;
+  border-radius: var(--radius-sm); padding: .75rem 1rem;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem;
+  cursor: pointer; width: 100%; transition: background .2s;
+}
+.btn-ready:hover { background: #55e0a1; }
+.btn-delete {
+  background: rgba(224,92,92,.1); color: var(--red);
+  border: 1px solid rgba(224,92,92,.2); border-radius: var(--radius-sm);
+  padding: .5rem; font-size: .8rem; cursor: pointer; width: 100%; margin-top: .4rem;
+  font-family: 'DM Sans', sans-serif;
+}
+.empty-state {
+  text-align: center; padding: 4rem 2rem;
+  color: var(--text2); font-size: .9rem;
+}
+.empty-icon { font-size: 3rem; margin-bottom: .75rem; }
+
+/* ── HISTORY ── */
+#history-panel { padding-bottom: 2rem; }
+.history-filters { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.filter-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 20px; padding: .35rem .85rem;
+  font-size: .8rem; cursor: pointer; color: var(--text2); transition: all .15s;
+}
+.filter-btn.active { border-color: var(--gold); color: var(--gold2); background: rgba(212,168,67,.1); }
+.history-item {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: .85rem; margin-bottom: .5rem;
+  cursor: pointer; transition: border-color .15s;
+}
+.history-item:hover { border-color: var(--border2); }
+.hi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+.hi-table { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; }
+.hi-time { font-size: .75rem; color: var(--text2); }
+.hi-items { font-size: .82rem; color: var(--text2); }
+.hi-count { font-family: 'Syne', sans-serif; font-size: .75rem; color: var(--text2); margin-top: .25rem; }
+
+/* ── NOTIFICATION TOAST ── */
+#toast {
+  position: fixed; top: 1rem; left: 50%; transform: translateX(-50%) translateY(-80px);
+  background: var(--bg2); border: 1px solid var(--gold);
+  border-radius: var(--radius); padding: .75rem 1.25rem;
+  font-family: 'Syne', sans-serif; font-weight: 600; font-size: .9rem;
+  z-index: 9999; transition: transform .3s cubic-bezier(.4,0,.2,1);
+  display: flex; align-items: center; gap: .6rem; white-space: nowrap;
+  box-shadow: 0 4px 32px rgba(0,0,0,.5);
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+.toast-icon { font-size: 1.2rem; }
+
+/* ── RESPONSIVE ── */
+@media (min-width: 480px) {
+  .drinks-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 640px) {
+  header { padding: .85rem 1.5rem; }
+  .panel { padding: 1.25rem 1.5rem; }
+  #barman-panel, #history-panel { max-width: 640px; margin: 0 auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ CONFIG SCREEN ═══════════ -->
+<div id="config-screen">
+  <h1>BarFlow</h1>
+  <p>Application de commandes bar.<br>Configurez votre connexion Firebase ci-dessous.</p>
+
+  <div class="config-card">
+    <h2>🔥 Configuration Firebase</h2>
+    <label class="field-label">API Key</label>
+    <input type="text" id="cfg-apiKey" placeholder="AIzaSy..." />
+    <label class="field-label">Auth Domain</label>
+    <input type="text" id="cfg-authDomain" placeholder="mon-bar.firebaseapp.com" />
+    <label class="field-label">Database URL</label>
+    <input type="text" id="cfg-dbUrl" placeholder="https://mon-bar-default-rtdb.firebaseio.com" />
+    <label class="field-label">Project ID</label>
+    <input type="text" id="cfg-projectId" placeholder="mon-bar" />
+    <p style="font-size:.75rem;color:var(--text2);margin-bottom:1rem">Ces informations se trouvent dans la console Firebase → Paramètres du projet → Vos applications</p>
+  </div>
+
+  <div class="config-card">
+    <h2>Votre rôle</h2>
+    <div class="role-grid">
+      <div class="role-btn" id="role-serveur" onclick="selectRole('serveur')">
+        <span class="role-icon">🍽️</span>
+        <span class="role-name">Serveur</span>
+        <span class="role-sub">Prise de commande</span>
+      </div>
+      <div class="role-btn" id="role-barman" onclick="selectRole('barman')">
+        <span class="role-icon">🍸</span>
+        <span class="role-name">Barman</span>
+        <span class="role-sub">Préparation</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="width:100%;max-width:420px">
+    <button class="btn-gold" onclick="startApp()">Lancer l'application →</button>
+    <p style="font-size:.75rem;color:var(--text2);margin-top:.75rem;text-align:center">
+      Les paramètres sont sauvegardés localement sur votre appareil.
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+  <header>
+    <span class="brand">🍸 BarFlow</span>
+    <div class="header-right">
+      <div id="pending-count">0</div>
+      <span id="role-badge" class="badge-role"></span>
+      <button onclick="logout()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:.8rem;padding:.3rem .5rem;">⏻</button>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs-container"></div>
+
+  <!-- SERVEUR PANELS -->
+  <div id="order-panel" class="panel">
+    <div id="drinks-container"></div>
+    <div style="height:80px"></div>
+  </div>
+
+  <!-- BARMAN PANEL -->
+  <div id="barman-panel" class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem">Commandes en attente</div>
+      <div id="orders-count" style="font-size:.8rem;color:var(--text2)"></div>
+    </div>
+    <div id="orders-list"></div>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div id="history-panel" class="panel">
+    <div class="history-filters">
+      <button class="filter-btn active" onclick="filterHistory('all', this)">Toutes</button>
+      <button class="filter-btn" onclick="filterHistory('pending', this)">En attente</button>
+      <button class="filter-btn" onclick="filterHistory('done', this)">Terminées</button>
+    </div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════ CART BAR ═══════════ -->
+<div id="cart-bar">
+  <div class="cart-info">
+    <span class="cart-count" id="cart-count-txt">0 boisson(s)</span>
+    <span style="color:var(--text2);font-size:.8rem;margin-left:.4rem">dans le panier</span>
+  </div>
+  <button class="btn-send" onclick="openCartModal()">Valider →</button>
+</div>
+
+<!-- ═══════════ CART MODAL ═══════════ -->
+<div class="overlay" id="cart-overlay" onclick="closeCartModal(event)">
+  <div class="modal">
+    <div class="modal-drag"></div>
+    <h3>Votre commande</h3>
+    <div class="table-input-wrap">
+      <input type="text" id="table-number" placeholder="N° de table (ex: Table 5)" />
+    </div>
+    <div class="cart-items" id="cart-items-list"></div>
+    <button class="btn-confirm" onclick="sendOrder()">📤 Envoyer au barman</button>
+    <button class="btn-cancel" onclick="closeCartModal()">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div id="toast">
+  <span class="toast-icon" id="toast-icon">🔔</span>
+  <span id="toast-msg">Nouvelle commande !</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// MENU DATA
+// ═══════════════════════════════════════════
+const MENU = [
+  {
+    category: "🥂 Champagne & Vins",
+    items: [
+      { name: "Champagne Brut", emoji: "🥂" },
+      { name: "Champagne Rosé", emoji: "🍾" },
+      { name: "Vin rouge", emoji: "🍷" },
+      { name: "Vin blanc", emoji: "🥃" },
+      { name: "Vin rosé", emoji: "🍹" },
+    ]
+  },
+  {
+    category: "🍺 Bières",
+    items: [
+      { name: "Bière pression", emoji: "🍺" },
+      { name: "Bière blonde bouteille", emoji: "🍻" },
+      { name: "Bière brune", emoji: "🍺" },
+      { name: "Bière sans alcool", emoji: "🥤" },
+      { name: "Bière IPA", emoji: "🍻" },
+    ]
+  },
+  {
+    category: "🍸 Cocktails",
+    items: [
+      { name: "Mojito", emoji: "🍹" },
+      { name: "Spritz", emoji: "🥂" },
+      { name: "Margarita", emoji: "🍸" },
+      { name: "Gin Tonic", emoji: "🥃" },
+      { name: "Cosmopolitan", emoji: "🍸" },
+      { name: "Whisky Sour", emoji: "🥃" },
+      { name: "Negroni", emoji: "🍊" },
+      { name: "Daïquiri", emoji: "🍹" },
+    ]
+  },
+  {
+    category: "🥃 Spiritueux",
+    items: [
+      { name: "Whisky on the rocks", emoji: "🥃" },
+      { name: "Cognac", emoji: "🥃" },
+      { name: "Rhum arrangé", emoji: "🍹" },
+      { name: "Vodka", emoji: "🫙" },
+      { name: "Tequila shot", emoji: "🥃" },
+    ]
+  },
+  {
+    category: "🧃 Softs & Sans alcool",
+    items: [
+      { name: "Coca-Cola", emoji: "🥤" },
+      { name: "Perrier / San Pellegrino", emoji: "💧" },
+      { name: "Jus d'orange frais", emoji: "🍊" },
+      { name: "Limonade", emoji: "🥤" },
+      { name: "Eau plate", emoji: "💧" },
+      { name: "Virgin Mojito", emoji: "🌿" },
+    ]
+  },
+  {
+    category: "☕ Chaud",
+    items: [
+      { name: "Espresso", emoji: "☕" },
+      { name: "Cappuccino", emoji: "☕" },
+      { name: "Thé", emoji: "🫖" },
+      { name: "Café au lait", emoji: "☕" },
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let db = null;
+let role = null;
+let cart = {}; // { drinkName: { qty, comment } }
+let allOrders = {};
+let historyFilter = 'all';
+let lastOrderCount = 0;
+
+// ═══════════════════════════════════════════
+// SOUNDS
+// ═══════════════════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+}
+
+function playSound(type) {
+  ensureAudio();
+  const ctx = audioCtx;
+  const t = ctx.currentTime;
+
+  if (type === 'new_order') {
+    // Ding-dong for barman (new order arrives)
+    [0, 0.18, 0.36].forEach((delay, i) => {
+      const freqs = [880, 660, 770];
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freqs[i];
+      o.type = 'sine';
+      g.gain.setValueAtTime(0, t + delay);
+      g.gain.linearRampToValueAtTime(0.3, t + delay + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.35);
+      o.start(t + delay); o.stop(t + delay + 0.4);
+    });
+  } else if (type === 'order_ready') {
+    // Cheerful high notes for serveur (order ready)
+    [0, 0.12, 0.24, 0.36].forEach((delay, i) => {
+      const freqs = [523, 659, 784, 1047]; // Do Mi Sol Do
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = freqs[i];
+      o.type = 'triangle';
+      g.gain.setValueAtTime(0, t + delay);
+      g.gain.linearRampToValueAtTime(0.25, t + delay + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, t + delay + 0.28);
+      o.start(t + delay); o.stop(t + delay + 0.35);
+    });
+  } else if (type === 'sent') {
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 440;
+    o.type = 'sine';
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.2, t + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.start(t); o.stop(t + 0.35);
+  }
+}
+
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
+function selectRole(r) {
+  role = r;
+  document.getElementById('role-serveur').classList.toggle('selected', r === 'serveur');
+  document.getElementById('role-barman').classList.toggle('selected', r === 'barman');
+}
+
+function loadConfig() {
+  const saved = localStorage.getItem('barflow_config');
+  if (!saved) return null;
+  return JSON.parse(saved);
+}
+
+function saveConfig(cfg) {
+  localStorage.setItem('barflow_config', JSON.stringify(cfg));
+}
+
+function startApp() {
+  const apiKey = document.getElementById('cfg-apiKey').value.trim();
+  const authDomain = document.getElementById('cfg-authDomain').value.trim();
+  const dbUrl = document.getElementById('cfg-dbUrl').value.trim();
+  const projectId = document.getElementById('cfg-projectId').value.trim();
+
+  if (!apiKey || !dbUrl || !projectId) {
+    alert('Veuillez remplir les champs Firebase obligatoires (API Key, Database URL, Project ID).');
+    return;
+  }
+  if (!role) {
+    alert('Veuillez choisir votre rôle (Serveur ou Barman).');
+    return;
+  }
+
+  const cfg = { apiKey, authDomain, dbUrl, projectId, role };
+  saveConfig(cfg);
+  initFirebase(cfg);
+}
+
+function initFirebase(cfg) {
+  try {
+    if (firebase.apps.length === 0) {
+      firebase.initializeApp({
+        apiKey: cfg.apiKey,
+        authDomain: cfg.authDomain,
+        databaseURL: cfg.dbUrl,
+        projectId: cfg.projectId,
+      });
+    }
+    db = firebase.database();
+    role = cfg.role;
+    launchUI();
+  } catch (e) {
+    alert('Erreur Firebase : ' + e.message + '\nVérifiez vos paramètres.');
+    console.error(e);
+  }
+}
+
+function logout() {
+  if (!confirm('Changer de rôle / reconfigurer ?')) return;
+  location.reload();
+}
+
+// Auto-load saved config
+window.addEventListener('load', () => {
+  const cfg = loadConfig();
+  if (cfg) {
+    document.getElementById('cfg-apiKey').value = cfg.apiKey || '';
+    document.getElementById('cfg-authDomain').value = cfg.authDomain || '';
+    document.getElementById('cfg-dbUrl').value = cfg.dbUrl || '';
+    document.getElementById('cfg-projectId').value = cfg.projectId || '';
+    if (cfg.role) selectRole(cfg.role);
+  }
+});
+
+// ═══════════════════════════════════════════
+// UI LAUNCH
+// ═══════════════════════════════════════════
+function launchUI() {
+  document.getElementById('config-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  const badge = document.getElementById('role-badge');
+  badge.textContent = role === 'serveur' ? '🍽️ Serveur' : '🍸 Barman';
+  badge.className = 'badge-role badge-' + role;
+
+  if (role === 'serveur') {
+    buildServerTabs();
+    renderMenu();
+  } else {
+    buildBarmanTabs();
+  }
+
+  listenOrders();
+}
+
+// ═══════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════
+function buildServerTabs() {
+  const tabs = document.getElementById('tabs-container');
+  tabs.innerHTML = `
+    <div class="tab active" onclick="switchTab('order-panel', this)">📋 Commander</div>
+    <div class="tab" onclick="switchTab('history-panel', this)">📜 Historique</div>
+  `;
+  document.getElementById('order-panel').classList.add('active');
+}
+
+function buildBarmanTabs() {
+  const tabs = document.getElementById('tabs-container');
+  tabs.innerHTML = `
+    <div class="tab active" onclick="switchTab('barman-panel', this)">🍸 En cours</div>
+    <div class="tab" onclick="switchTab('history-panel', this)">📜 Historique</div>
+  `;
+  document.getElementById('barman-panel').classList.add('active');
+}
+
+function switchTab(panelId, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  el.classList.add('active');
+  if (panelId === 'history-panel') renderHistory();
+}
+
+// ═══════════════════════════════════════════
+// MENU RENDERING
+// ═══════════════════════════════════════════
+function renderMenu() {
+  const container = document.getElementById('drinks-container');
+  let html = '';
+
+  MENU.forEach(cat => {
+    html += `<div class="category-title">${cat.category}</div>`;
+    html += `<div class="drinks-grid">`;
+    cat.items.forEach(item => {
+      const key = item.name;
+      const qty = cart[key] ? cart[key].qty : 0;
+      const inCart = qty > 0;
+      html += `
+        <div class="drink-card${inCart ? ' in-cart' : ''}" onclick="addToCart('${key.replace(/'/g, "\\'")}', '${item.emoji}')">
+          <span class="drink-emoji">${item.emoji}</span>
+          <span class="drink-name">${item.name}</span>
+          ${inCart ? `<span class="drink-qty">${qty}</span>` : ''}
+        </div>`;
+    });
+    html += `</div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+// CART
+// ═══════════════════════════════════════════
+function addToCart(name, emoji) {
+  ensureAudio();
+  if (!cart[name]) cart[name] = { qty: 0, comment: '', emoji };
+  cart[name].qty++;
+  updateCartBar();
+  renderMenu();
+}
+
+function updateCartBar() {
+  const total = Object.values(cart).reduce((s, v) => s + v.qty, 0);
+  const bar = document.getElementById('cart-bar');
+  document.getElementById('cart-count-txt').textContent = `${total} boisson${total > 1 ? 's' : ''}`;
+  if (total > 0) bar.classList.add('visible');
+  else bar.classList.remove('visible');
+}
+
+function openCartModal() {
+  renderCartItems();
+  document.getElementById('cart-overlay').classList.add('open');
+}
+
+function closeCartModal(e) {
+  if (!e || e.target === document.getElementById('cart-overlay')) {
+    document.getElementById('cart-overlay').classList.remove('open');
+  }
+}
+
+function renderCartItems() {
+  const list = document.getElementById('cart-items-list');
+  let html = '';
+  Object.entries(cart).forEach(([name, data]) => {
+    html += `
+      <div class="cart-item">
+        <div class="ci-info">
+          <div class="ci-name">${data.emoji} ${name}</div>
+          <input class="ci-comment-input" type="text"
+            placeholder="Commentaire (ex: sans glaçons…)"
+            value="${data.comment}"
+            onchange="setComment('${name.replace(/'/g, "\\'")}', this.value)"
+          />
+        </div>
+        <div class="ci-actions">
+          <button class="ci-btn" onclick="changeQty('${name.replace(/'/g, "\\'")}', -1)">−</button>
+          <span class="ci-qty">${data.qty}</span>
+          <button class="ci-btn" onclick="changeQty('${name.replace(/'/g, "\\'")}', 1)">+</button>
+        </div>
+      </div>`;
+  });
+  if (!html) html = '<p style="color:var(--text2);text-align:center;padding:1.5rem">Panier vide</p>';
+  list.innerHTML = html;
+}
+
+function setComment(name, val) {
+  if (cart[name]) cart[name].comment = val;
+}
+
+function changeQty(name, delta) {
+  if (!cart[name]) return;
+  cart[name].qty = Math.max(0, cart[name].qty + delta);
+  if (cart[name].qty === 0) delete cart[name];
+  updateCartBar();
+  renderCartItems();
+  renderMenu();
+}
+
+// ═══════════════════════════════════════════
+// SEND ORDER
+// ═══════════════════════════════════════════
+function sendOrder() {
+  const table = document.getElementById('table-number').value.trim();
+  if (!table) {
+    alert('Veuillez indiquer le numéro de table.');
+    return;
+  }
+  if (Object.keys(cart).length === 0) return;
+
+  const order = {
+    table,
+    items: Object.entries(cart).map(([name, d]) => ({
+      name, qty: d.qty, comment: d.comment, emoji: d.emoji
+    })),
+    status: 'pending',
+    timestamp: Date.now(),
+    date: new Date().toLocaleString('fr-FR')
+  };
+
+  db.ref('orders').push(order).then(() => {
+    playSound('sent');
+    cart = {};
+    updateCartBar();
+    renderMenu();
+    closeCartModal();
+    document.getElementById('table-number').value = '';
+    showToast('✅', 'Commande envoyée !');
+  }).catch(err => alert('Erreur envoi : ' + err.message));
+}
+
+// ═══════════════════════════════════════════
+// LISTEN ORDERS (Firebase)
+// ═══════════════════════════════════════════
+function listenOrders() {
+  db.ref('orders').on('value', snapshot => {
+    const data = snapshot.val() || {};
+    const prevOrders = { ...allOrders };
+    allOrders = data;
+
+    if (role === 'barman') {
+      renderBarmanOrders();
+
+      // Detect new pending orders
+      const newPending = Object.entries(data).filter(([k, v]) =>
+        v.status === 'pending' && !prevOrders[k]
+      );
+      if (newPending.length > 0 && Object.keys(prevOrders).length > 0) {
+        playSound('new_order');
+        showToast('🔔', `Nouvelle commande — ${newPending[0][1].table} !`);
+      }
+    }
+
+    if (role === 'serveur') {
+      // Detect newly-ready orders
+      const justDone = Object.entries(data).filter(([k, v]) =>
+        v.status === 'done' && prevOrders[k] && prevOrders[k].status === 'pending'
+      );
+      if (justDone.length > 0) {
+        playSound('order_ready');
+        showToast('🍸', `Commande prête — ${justDone[0][1].table} !`);
+      }
+    }
+
+    // Pending count badge
+    const pendingCount = Object.values(data).filter(o => o.status === 'pending').length;
+    const badge = document.getElementById('pending-count');
+    if (pendingCount > 0) {
+      badge.style.display = 'flex';
+      badge.textContent = pendingCount;
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // Update history if open
+    if (document.getElementById('history-panel').classList.contains('active')) renderHistory();
+  });
+}
+
+// ═══════════════════════════════════════════
+// BARMAN VIEW
+// ═══════════════════════════════════════════
+function renderBarmanOrders() {
+  const list = document.getElementById('orders-list');
+  const pending = Object.entries(allOrders)
+    .filter(([, o]) => o.status === 'pending')
+    .sort((a, b) => a[1].timestamp - b[1].timestamp);
+
+  const countEl = document.getElementById('orders-count');
+  countEl.textContent = pending.length + (pending.length > 1 ? ' commandes en attente' : ' commande en attente');
+
+  if (pending.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div>Aucune commande en attente</div>`;
+    return;
+  }
+
+  let html = '';
+  pending.forEach(([key, order]) => {
+    const elapsed = Math.floor((Date.now() - order.timestamp) / 60000);
+    const timeLabel = elapsed < 1 ? "À l'instant" : `il y a ${elapsed} min`;
+
+    html += `<div class="order-card">
+      <div class="order-header">
+        <div>
+          <div class="order-table">${order.table}</div>
+          <div class="order-time">${timeLabel} — ${order.date}</div>
+        </div>
+        <span class="order-status status-pending">En attente</span>
+      </div>
+      <div class="order-items">`;
+
+    order.items.forEach(item => {
+      html += `<div class="oi">
+        <span class="oi-qty">×${item.qty}</span>
+        <span class="oi-name">${item.emoji} ${item.name}</span>
+        ${item.comment ? `<span class="oi-comment">— ${item.comment}</span>` : ''}
+      </div>`;
+    });
+
+    html += `</div>
+      <button class="btn-ready" onclick="markReady('${key}')">✅ Commande prête</button>
+      <button class="btn-delete" onclick="deleteOrder('${key}')">Supprimer</button>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+function markReady(key) {
+  db.ref('orders/' + key + '/status').set('done');
+  db.ref('orders/' + key + '/readyAt').set(new Date().toLocaleString('fr-FR'));
+}
+
+function deleteOrder(key) {
+  if (confirm('Supprimer cette commande ?')) {
+    db.ref('orders/' + key).remove();
+  }
+}
+
+// ═══════════════════════════════════════════
+// HISTORY
+// ═══════════════════════════════════════════
+function filterHistory(f, el) {
+  historyFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  let entries = Object.entries(allOrders)
+    .sort((a, b) => b[1].timestamp - a[1].timestamp);
+
+  if (historyFilter === 'pending') entries = entries.filter(([, o]) => o.status === 'pending');
+  if (historyFilter === 'done') entries = entries.filter(([, o]) => o.status === 'done');
+
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div>Aucune commande</div>`;
+    return;
+  }
+
+  let html = '';
+  entries.forEach(([key, order]) => {
+    const statusLabel = order.status === 'done'
+      ? `<span style="color:var(--green);font-size:.75rem">✅ Servie</span>`
+      : `<span style="color:var(--gold2);font-size:.75rem">⏳ En attente</span>`;
+    const itemsSummary = order.items.map(i => `×${i.qty} ${i.name}`).join(', ');
+    const totalQty = order.items.reduce((s, i) => s + i.qty, 0);
+
+    html += `<div class="history-item">
+      <div class="hi-header">
+        <span class="hi-table">${order.table}</span>
+        <div style="display:flex;align-items:center;gap:.5rem">${statusLabel}<span class="hi-time">${order.date}</span></div>
+      </div>
+      <div class="hi-items">${itemsSummary}</div>
+      <div class="hi-count">${totalQty} verre${totalQty > 1 ? 's' : ''}</div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let toastTimeout;
+function showToast(icon, msg) {
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
