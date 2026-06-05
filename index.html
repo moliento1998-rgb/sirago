@@ -22,10 +22,10 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; min-height: 100vh; overscroll-behavior: none; }
 
-/* CONFIG */
-#config-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+/* ── CONFIG SCREEN ── */
+#config-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; overflow-y: auto; }
 #config-screen h1 { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--gold2); }
-#config-screen p { color: var(--text2); margin: .5rem 0 2rem; font-size: .95rem; line-height: 1.6; }
+#config-screen > p { color: var(--text2); margin: .5rem 0 2rem; font-size: .95rem; line-height: 1.6; }
 .config-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; width: 100%; max-width: 420px; margin-bottom: 1rem; }
 .config-card h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
 .field-label { font-size: .8rem; color: var(--text2); margin-bottom: .4rem; display: block; text-align: left; }
@@ -41,29 +41,38 @@ input:focus { border-color: var(--gold); }
 .role-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: .95rem; }
 .role-sub { font-size: .75rem; color: var(--text2); }
 
-/* LAYOUT */
+/* ── Champ profil serveur (apparait dynamiquement) ── */
+#serveur-profile-wrap {
+  display: none; margin-top: .75rem;
+  animation: fadeIn .2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+#cfg-profile-hint { font-size: .75rem; color: var(--text2); margin-top: -.5rem; margin-bottom: .75rem; text-align: left; }
+
+/* ── LAYOUT ── */
 #app { display: none; min-height: 100vh; }
 header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: .75rem 1rem; display: flex; align-items: center; justify-content: space-between; }
 .brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--gold2); }
+.header-center { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.header-profile { font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 700; color: var(--gold2); letter-spacing: .04em; }
 .badge-role { font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700; padding: .3rem .7rem; border-radius: 20px; text-transform: uppercase; letter-spacing: .05em; }
 .badge-serveur { background: rgba(212,168,67,.15); color: var(--gold2); border: 1px solid rgba(212,168,67,.3); }
 .badge-barman { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
 .header-right { display: flex; align-items: center; gap: .6rem; }
 #pending-count { background: var(--red); color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: .7rem; font-weight: 700; display: none; align-items: center; justify-content: center; }
 
-/* TABS */
+/* ── TABS ── */
 .tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 57px; z-index: 90; }
 .tabs::-webkit-scrollbar { display: none; }
 .tab { padding: .85rem 1.25rem; white-space: nowrap; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 600; font-size: .85rem; color: var(--text2); border-bottom: 2px solid transparent; transition: all .2s; flex-shrink: 0; }
 .tab.active { color: var(--gold2); border-bottom-color: var(--gold2); }
 
-/* PANELS */
+/* ── PANELS ── */
 .panel { display: none; padding: 1rem; max-width: 640px; margin: 0 auto; }
 .panel.active { display: block; }
 
-/* DRINKS */
+/* ── DRINKS ── */
 .category-title { font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .1em; margin: 1.2rem 0 .6rem; }
-/* Sub-category for beer sizes */
 .subcategory-title { font-family: 'Syne', sans-serif; font-size: .68rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: .08em; margin: .8rem 0 .4rem .15rem; display: flex; align-items: center; gap: .4rem; }
 .subcategory-title::before { content: ''; display: block; width: 16px; height: 1px; background: var(--gold); opacity: .4; }
 .drinks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
@@ -75,7 +84,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 .drink-price { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; color: var(--gold); margin-top: .25rem; display: block; }
 .drink-qty { position: absolute; top: .5rem; right: .5rem; background: var(--gold); color: #0d0d0d; border-radius: 50%; width: 22px; height: 22px; font-size: .75rem; font-weight: 800; font-family: 'Syne', sans-serif; display: flex; align-items: center; justify-content: center; }
 
-/* CART BAR */
+/* ── CART BAR ── */
 #cart-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: .85rem 1rem; background: var(--bg2); border-top: 1px solid var(--border2); display: flex; align-items: center; justify-content: space-between; transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1); }
 #cart-bar.visible { transform: translateY(0); }
 .cart-info { font-family: 'Syne', sans-serif; font-size: .9rem; }
@@ -84,7 +93,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 .btn-send { background: var(--gold); color: #0d0d0d; border: none; border-radius: var(--radius-sm); padding: .65rem 1.4rem; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; font-size: .9rem; transition: background .2s; }
 .btn-send:hover { background: var(--gold2); }
 
-/* MODAL */
+/* ── MODALS ── */
 .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 300; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity .2s; }
 .overlay.open { opacity: 1; pointer-events: all; }
 .modal { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 1.5rem 1rem 2rem; width: 100%; border: 1px solid var(--border2); transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1); max-height: 92vh; overflow-y: auto; }
@@ -130,15 +139,25 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 .btn-confirm:hover { background: var(--gold2); }
 .btn-cancel { background: transparent; color: var(--text2); border: none; padding: .7rem; font-size: .9rem; cursor: pointer; width: 100%; margin-top: .25rem; font-family: 'DM Sans', sans-serif; }
 
-/* BARMAN */
+/* ── BARMAN ── */
 #barman-panel { padding-bottom: 2rem; }
 .order-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem; animation: slideIn .3s ease; }
 .order-card.payment-card { border-color: rgba(167,139,250,.4); background: rgba(167,139,250,.05); }
 @keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
+.order-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: .75rem; gap: .5rem; }
+.order-header-left { flex: 1; }
 .order-table { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--gold2); }
-.order-time { font-size: .75rem; color: var(--text2); }
-.order-status { font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700; padding: .25rem .65rem; border-radius: 20px; text-transform: uppercase; }
+.order-time { font-size: .75rem; color: var(--text2); margin-top: .1rem; }
+/* Serveur badge on barman card */
+.order-serveur-badge {
+  display: inline-flex; align-items: center; gap: .3rem;
+  background: rgba(212,168,67,.1); color: var(--gold);
+  border: 1px solid rgba(212,168,67,.25); border-radius: 20px;
+  padding: .22rem .65rem; font-family: 'Syne', sans-serif;
+  font-weight: 700; font-size: .7rem; margin-top: .3rem;
+  letter-spacing: .02em;
+}
+.order-status { font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700; padding: .25rem .65rem; border-radius: 20px; text-transform: uppercase; flex-shrink: 0; }
 .status-pending { background: rgba(240,192,96,.15); color: var(--gold2); border: 1px solid rgba(240,192,96,.3); }
 .status-done { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
 .status-payment { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.3); }
@@ -165,54 +184,41 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text2); font-size: .9rem; }
 .empty-icon { font-size: 3rem; margin-bottom: .75rem; }
 
-/* ── READY-ORDER BANNER (serveur) ── */
+/* ── READY BANNER (serveur) ── */
 #ready-banner {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,.85); z-index: 9000;
+  position: fixed; inset: 0; background: rgba(0,0,0,.88); z-index: 9000;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 1.5rem;
-  opacity: 0; pointer-events: none;
-  transition: opacity .3s;
+  padding: 1.5rem; opacity: 0; pointer-events: none; transition: opacity .3s;
 }
 #ready-banner.show { opacity: 1; pointer-events: all; }
 #ready-banner-inner {
   background: var(--bg2); border: 2px solid var(--green);
-  border-radius: 20px; padding: 1.75rem 1.5rem; width: 100%; max-width: 400px;
-  text-align: center;
-  box-shadow: 0 0 60px rgba(62,207,142,.25);
+  border-radius: 20px; padding: 1.75rem 1.5rem; width: 100%; max-width: 400px; text-align: center;
   animation: pulseGreen 1.5s ease-in-out infinite;
 }
-@keyframes pulseGreen {
-  0%, 100% { box-shadow: 0 0 30px rgba(62,207,142,.2); }
-  50% { box-shadow: 0 0 60px rgba(62,207,142,.5); }
-}
+@keyframes pulseGreen { 0%,100% { box-shadow: 0 0 30px rgba(62,207,142,.2); } 50% { box-shadow: 0 0 60px rgba(62,207,142,.5); } }
 #ready-banner .big-icon { font-size: 3.5rem; margin-bottom: .75rem; }
 #ready-banner h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); margin-bottom: .3rem; }
-#ready-banner .rb-table { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--gold2); margin-bottom: 1rem; }
 #ready-orders-list { max-height: 40vh; overflow-y: auto; margin-bottom: 1.25rem; }
 .rb-order-item { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .75rem; margin-bottom: .5rem; text-align: left; }
 .rb-order-table { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--gold2); font-size: 1rem; margin-bottom: .3rem; }
 .rb-order-items { font-size: .82rem; color: var(--text2); margin-bottom: .3rem; }
 .rb-order-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; color: var(--gold); }
-.btn-pickup {
-  background: var(--green); color: #0d0d0d; border: none;
-  border-radius: var(--radius-sm); padding: .95rem;
-  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem;
-  cursor: pointer; width: 100%; transition: background .2s; margin-bottom: .5rem;
-}
+.btn-pickup { background: var(--green); color: #0d0d0d; border: none; border-radius: var(--radius-sm); padding: .95rem; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; cursor: pointer; width: 100%; transition: background .2s; margin-bottom: .5rem; }
 .btn-pickup:hover { background: #55e0a1; }
 .btn-pickup-later { background: transparent; color: var(--text2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: .65rem; font-family: 'DM Sans', sans-serif; font-size: .88rem; cursor: pointer; width: 100%; }
 
-/* HISTORY */
+/* ── HISTORY ── */
 #history-panel { padding-bottom: 2rem; }
 .history-filters { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
 .filter-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: .35rem .85rem; font-size: .8rem; cursor: pointer; color: var(--text2); transition: all .15s; }
 .filter-btn.active { border-color: var(--gold); color: var(--gold2); background: rgba(212,168,67,.1); }
 .history-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .85rem; margin-bottom: .5rem; transition: border-color .15s; }
 .history-item:hover { border-color: var(--border2); }
-.hi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
+.hi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .3rem; }
 .hi-table { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; }
 .hi-time { font-size: .75rem; color: var(--text2); }
+.hi-serveur { font-size: .72rem; color: var(--gold); font-family: 'Syne', sans-serif; font-weight: 600; margin-bottom: .35rem; }
 .hi-items { font-size: .82rem; color: var(--text2); }
 .hi-footer { display: flex; justify-content: space-between; align-items: center; margin-top: .35rem; }
 .hi-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; color: var(--gold); }
@@ -222,7 +228,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 .hi-pay-later { color: var(--text2); background: rgba(154,149,144,.1); }
 .hi-pay-payment { color: var(--purple); background: rgba(167,139,250,.1); }
 
-/* TOAST */
+/* ── TOAST ── */
 #toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--bg2); border: 1px solid var(--gold); border-radius: var(--radius); padding: .75rem 1.25rem; font-family: 'Syne', sans-serif; font-weight: 600; font-size: .9rem; z-index: 9999; transition: transform .3s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; gap: .6rem; white-space: nowrap; box-shadow: 0 4px 32px rgba(0,0,0,.5); }
 #toast.show { transform: translateX(-50%) translateY(0); }
 .toast-icon { font-size: 1.2rem; }
@@ -233,10 +239,11 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 </head>
 <body>
 
-<!-- CONFIG -->
+<!-- ═══════════ CONFIG SCREEN ═══════════ -->
 <div id="config-screen">
   <h1>BarFlow</h1>
   <p>Application de commandes bar.<br>Configurez votre connexion Firebase ci-dessous.</p>
+
   <div class="config-card">
     <h2>🔥 Configuration Firebase</h2>
     <label class="field-label">API Key</label>
@@ -249,6 +256,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
     <input type="text" id="cfg-projectId" placeholder="mon-bar" />
     <p style="font-size:.75rem;color:var(--text2);margin-bottom:1rem">Ces informations se trouvent dans la console Firebase → Paramètres du projet → Vos applications</p>
   </div>
+
   <div class="config-card">
     <h2>Votre rôle</h2>
     <div class="role-grid">
@@ -259,14 +267,21 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
         <span class="role-icon">🍸</span><span class="role-name">Barman</span><span class="role-sub">Préparation</span>
       </div>
     </div>
+    <!-- Champ prénom visible uniquement pour Serveur -->
+    <div id="serveur-profile-wrap">
+      <label class="field-label" style="margin-top:.9rem">Votre prénom / pseudo</label>
+      <input type="text" id="cfg-profile" placeholder="ex : Marie, Serveur 1…" style="margin-bottom:.25rem" />
+      <p id="cfg-profile-hint">Ce nom apparaîtra sur chaque commande envoyée au barman et permet de ne recevoir que vos propres notifications.</p>
+    </div>
   </div>
+
   <div style="width:100%;max-width:420px">
     <button class="btn-gold" onclick="startApp()">Lancer l'application →</button>
     <p style="font-size:.75rem;color:var(--text2);margin-top:.75rem;text-align:center">Les paramètres sont sauvegardés localement sur votre appareil.</p>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ═══════════ APP ═══════════ -->
 <div id="app">
   <header>
     <span class="brand">🍸 BarFlow</span>
@@ -302,7 +317,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
   </div>
 </div>
 
-<!-- CART BAR -->
+<!-- ═══════════ CART BAR ═══════════ -->
 <div id="cart-bar">
   <div class="cart-info">
     <div><span class="cart-count" id="cart-count-txt">0 boisson(s)</span></div>
@@ -311,7 +326,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
   <button class="btn-send" onclick="openCartModal()">Valider →</button>
 </div>
 
-<!-- CART MODAL -->
+<!-- ═══════════ CART MODAL ═══════════ -->
 <div class="overlay" id="cart-overlay" onclick="closeCartModal(event)">
   <div class="modal">
     <div class="modal-drag"></div>
@@ -337,7 +352,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
+<!-- ═══════════ PAYMENT MODAL ═══════════ -->
 <div class="overlay" id="payment-overlay" onclick="closePaymentModal(event)">
   <div class="modal">
     <div class="modal-drag"></div>
@@ -354,7 +369,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
   </div>
 </div>
 
-<!-- READY BANNER (serveur) — commandes prêtes, persistant -->
+<!-- ═══════════ READY BANNER (serveur) ═══════════ -->
 <div id="ready-banner">
   <div id="ready-banner-inner">
     <div class="big-icon">🍸</div>
@@ -366,13 +381,13 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ═══════════ TOAST ═══════════ -->
 <div id="toast">
   <span class="toast-icon" id="toast-icon">🔔</span>
   <span id="toast-msg">Nouvelle commande !</span>
 </div>
 
-<!-- FAB PAYMENT -->
+<!-- ═══════════ FAB PAYMENT ═══════════ -->
 <button id="fab-payment" onclick="openPaymentModal()"
   style="display:none;position:fixed;bottom:1rem;right:1rem;z-index:190;
   background:rgba(167,139,250,.2);color:var(--purple);
@@ -384,53 +399,52 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 
 <script>
 // ═══════════════════════════════════════════
-// MENU
+// MENU DATA
 // ═══════════════════════════════════════════
 const MENU = [
   {
     category: "🥂 Champagne & Vins",
     items: [
-      { name: "Champagne Brut", emoji: "🥂", price: 12.00 },
-      { name: "Champagne Rosé", emoji: "🍾", price: 13.00 },
-      { name: "Vin rouge", emoji: "🍷", price: 6.00 },
-      { name: "Vin blanc", emoji: "🥃", price: 6.00 },
-      { name: "Vin rosé", emoji: "🍹", price: 6.00 },
+      { name: "Champagne Brut",  emoji: "🥂", price: 12.00 },
+      { name: "Champagne Rosé",  emoji: "🍾", price: 13.00 },
+      { name: "Vin rouge",       emoji: "🍷", price: 6.00  },
+      { name: "Vin blanc",       emoji: "🥃", price: 6.00  },
+      { name: "Vin rosé",        emoji: "🍹", price: 6.00  },
     ]
   },
   {
     category: "🍺 Bières",
-    // Sous-catégories bière : chaque sous-cat a un label + items
     subcategories: [
       {
         label: "Pressions — 25 cl",
         items: [
-          { name: "Bière pression 25cl", emoji: "🍺", price: 3.00 },
+          { name: "Bière pression 25cl",        emoji: "🍺", price: 3.00 },
           { name: "Bière blanche pression 25cl", emoji: "🍺", price: 3.50 },
-          { name: "Bière IPA pression 25cl", emoji: "🍺", price: 3.50 },
+          { name: "Bière IPA pression 25cl",     emoji: "🍺", price: 3.50 },
         ]
       },
       {
         label: "Pressions — 33 cl",
         items: [
-          { name: "Bière pression 33cl", emoji: "🍺", price: 4.00 },
+          { name: "Bière pression 33cl",        emoji: "🍺", price: 4.00 },
           { name: "Bière blanche pression 33cl", emoji: "🍺", price: 4.50 },
-          { name: "Bière IPA pression 33cl", emoji: "🍺", price: 4.50 },
+          { name: "Bière IPA pression 33cl",     emoji: "🍺", price: 4.50 },
         ]
       },
       {
         label: "Pressions — 50 cl",
         items: [
-          { name: "Bière pression 50cl", emoji: "🍺", price: 5.50 },
+          { name: "Bière pression 50cl",        emoji: "🍺", price: 5.50 },
           { name: "Bière blanche pression 50cl", emoji: "🍺", price: 6.00 },
-          { name: "Bière IPA pression 50cl", emoji: "🍺", price: 6.00 },
+          { name: "Bière IPA pression 50cl",     emoji: "🍺", price: 6.00 },
         ]
       },
       {
         label: "Bouteilles",
         items: [
           { name: "Bière blonde bouteille", emoji: "🍻", price: 5.00 },
-          { name: "Bière brune bouteille", emoji: "🍻", price: 5.00 },
-          { name: "Bière sans alcool", emoji: "🥤", price: 4.00 },
+          { name: "Bière brune bouteille",  emoji: "🍻", price: 5.00 },
+          { name: "Bière sans alcool",      emoji: "🥤", price: 4.00 },
         ]
       },
     ]
@@ -438,70 +452,67 @@ const MENU = [
   {
     category: "🍸 Cocktails",
     items: [
-      { name: "Mojito", emoji: "🍹", price: 10.00 },
-      { name: "Spritz", emoji: "🥂", price: 9.00 },
-      { name: "Margarita", emoji: "🍸", price: 10.00 },
-      { name: "Gin Tonic", emoji: "🥃", price: 10.00 },
+      { name: "Mojito",       emoji: "🍹", price: 10.00 },
+      { name: "Spritz",       emoji: "🥂", price: 9.00  },
+      { name: "Margarita",    emoji: "🍸", price: 10.00 },
+      { name: "Gin Tonic",    emoji: "🥃", price: 10.00 },
       { name: "Cosmopolitan", emoji: "🍸", price: 10.00 },
-      { name: "Whisky Sour", emoji: "🥃", price: 11.00 },
-      { name: "Negroni", emoji: "🍊", price: 11.00 },
-      { name: "Daïquiri", emoji: "🍹", price: 10.00 },
+      { name: "Whisky Sour",  emoji: "🥃", price: 11.00 },
+      { name: "Negroni",      emoji: "🍊", price: 11.00 },
+      { name: "Daïquiri",     emoji: "🍹", price: 10.00 },
     ]
   },
   {
     category: "🥃 Spiritueux",
     items: [
-      { name: "Whisky on the rocks", emoji: "🥃", price: 9.00 },
-      { name: "Cognac", emoji: "🥃", price: 10.00 },
-      { name: "Rhum arrangé", emoji: "🍹", price: 8.00 },
-      { name: "Vodka", emoji: "🫙", price: 7.00 },
-      { name: "Tequila shot", emoji: "🥃", price: 5.00 },
+      { name: "Whisky on the rocks", emoji: "🥃", price: 9.00  },
+      { name: "Cognac",              emoji: "🥃", price: 10.00 },
+      { name: "Rhum arrangé",        emoji: "🍹", price: 8.00  },
+      { name: "Vodka",               emoji: "🫙", price: 7.00  },
+      { name: "Tequila shot",        emoji: "🥃", price: 5.00  },
     ]
   },
   {
     category: "🧃 Softs & Sans alcool",
     items: [
-      { name: "Coca-Cola", emoji: "🥤", price: 3.50 },
-      { name: "Perrier / San Pellegrino", emoji: "💧", price: 3.50 },
-      { name: "Jus d'orange frais", emoji: "🍊", price: 4.50 },
-      { name: "Limonade", emoji: "🥤", price: 3.00 },
-      { name: "Eau plate", emoji: "💧", price: 2.50 },
-      { name: "Virgin Mojito", emoji: "🌿", price: 7.00 },
+      { name: "Coca-Cola",              emoji: "🥤", price: 3.50 },
+      { name: "Perrier / San Pellegrino",emoji: "💧", price: 3.50 },
+      { name: "Jus d'orange frais",     emoji: "🍊", price: 4.50 },
+      { name: "Limonade",               emoji: "🥤", price: 3.00 },
+      { name: "Eau plate",              emoji: "💧", price: 2.50 },
+      { name: "Virgin Mojito",          emoji: "🌿", price: 7.00 },
     ]
   },
   {
     category: "☕ Chaud",
     items: [
-      { name: "Espresso", emoji: "☕", price: 2.50 },
-      { name: "Cappuccino", emoji: "☕", price: 3.50 },
-      { name: "Thé", emoji: "🫖", price: 3.00 },
-      { name: "Café au lait", emoji: "☕", price: 3.00 },
+      { name: "Espresso",    emoji: "☕", price: 2.50 },
+      { name: "Cappuccino",  emoji: "☕", price: 3.50 },
+      { name: "Thé",         emoji: "🫖", price: 3.00 },
+      { name: "Café au lait",emoji: "☕", price: 3.00 },
     ]
   },
 ];
 
 // Build price lookup
 const PRICE_MAP = {};
-function buildPriceMap(menu) {
-  menu.forEach(cat => {
-    if (cat.items) cat.items.forEach(i => { PRICE_MAP[i.name] = i.price; });
-    if (cat.subcategories) cat.subcategories.forEach(sub => sub.items.forEach(i => { PRICE_MAP[i.name] = i.price; }));
-  });
-}
-buildPriceMap(MENU);
+MENU.forEach(cat => {
+  if (cat.items) cat.items.forEach(i => { PRICE_MAP[i.name] = i.price; });
+  if (cat.subcategories) cat.subcategories.forEach(sub => sub.items.forEach(i => { PRICE_MAP[i.name] = i.price; }));
+});
 
 // ═══════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════
-let db = null;
-let role = null;
-let cart = {};
-let allOrders = {};
-let historyFilter = 'all';
+let db             = null;
+let role           = null;
+let serverProfile  = '';   // prénom/pseudo du serveur courant
+let cart           = {};
+let allOrders      = {};
+let historyFilter  = 'all';
 let selectedPayment = null;
-// Track which "done" orders the serveur has seen but not yet acknowledged
-let pendingPickupKeys = []; // keys of orders with status=done not yet picked up
-let bannerDismissed = false; // if serveur dismissed temporarily
+let pendingPickupKeys = [];
+let bannerDismissed   = false;
 
 // ═══════════════════════════════════════════
 // HELPERS
@@ -509,6 +520,9 @@ let bannerDismissed = false; // if serveur dismissed temporarily
 function fmt(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
 function cartTotal() { return Object.entries(cart).reduce((s, [name, d]) => s + (PRICE_MAP[name] || 0) * d.qty, 0); }
 function orderTotal(order) { return (order.items || []).reduce((s, i) => s + (i.price || PRICE_MAP[i.name] || 0) * i.qty, 0); }
+
+// Sanitize a string for use as a Firebase path key
+function safeFbKey(str) { return str.replace(/[.#$\[\]/]/g, '_'); }
 
 // ═══════════════════════════════════════════
 // SOUNDS
@@ -530,7 +544,6 @@ function playSound(type) {
       o.start(t+delay); o.stop(t+delay+0.4);
     });
   } else if (type === 'order_ready') {
-    // Repeated cheerful arpeggio to grab attention
     [0, 0.12, 0.24, 0.36, 0.55, 0.67, 0.79, 0.91].forEach((delay, i) => {
       const freqs = [523, 659, 784, 1047, 523, 659, 784, 1047];
       const o = ctx.createOscillator(), g = ctx.createGain();
@@ -557,31 +570,41 @@ function playSound(type) {
 }
 
 // ═══════════════════════════════════════════
-// CONFIG / FIREBASE
+// CONFIG — montrer le champ profil si serveur
 // ═══════════════════════════════════════════
 function selectRole(r) {
   role = r;
   document.getElementById('role-serveur').classList.toggle('selected', r === 'serveur');
   document.getElementById('role-barman').classList.toggle('selected', r === 'barman');
+  document.getElementById('serveur-profile-wrap').style.display = r === 'serveur' ? 'block' : 'none';
 }
+
 function loadConfig() { const s = localStorage.getItem('barflow_config'); return s ? JSON.parse(s) : null; }
 function saveConfig(cfg) { localStorage.setItem('barflow_config', JSON.stringify(cfg)); }
 
 function startApp() {
-  const apiKey = document.getElementById('cfg-apiKey').value.trim();
-  const authDomain = document.getElementById('cfg-authDomain').value.trim();
-  const dbUrl = document.getElementById('cfg-dbUrl').value.trim();
+  const apiKey    = document.getElementById('cfg-apiKey').value.trim();
+  const authDomain= document.getElementById('cfg-authDomain').value.trim();
+  const dbUrl     = document.getElementById('cfg-dbUrl').value.trim();
   const projectId = document.getElementById('cfg-projectId').value.trim();
+  const profile   = document.getElementById('cfg-profile').value.trim();
+
   if (!apiKey || !dbUrl || !projectId) { alert('Veuillez remplir les champs Firebase obligatoires.'); return; }
   if (!role) { alert('Veuillez choisir votre rôle.'); return; }
-  const cfg = { apiKey, authDomain, dbUrl, projectId, role };
-  saveConfig(cfg); initFirebase(cfg);
+  if (role === 'serveur' && !profile) { alert('Veuillez entrer votre prénom ou pseudo.'); return; }
+
+  const cfg = { apiKey, authDomain, dbUrl, projectId, role, profile };
+  saveConfig(cfg);
+  initFirebase(cfg);
 }
 
 function initFirebase(cfg) {
   try {
     if (firebase.apps.length === 0) firebase.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, databaseURL: cfg.dbUrl, projectId: cfg.projectId });
-    db = firebase.database(); role = cfg.role; launchUI();
+    db = firebase.database();
+    role = cfg.role;
+    serverProfile = cfg.profile || '';
+    launchUI();
   } catch (e) { alert('Erreur Firebase : ' + e.message); console.error(e); }
 }
 
@@ -590,10 +613,11 @@ function logout() { if (!confirm('Changer de rôle / reconfigurer ?')) return; l
 window.addEventListener('load', () => {
   const cfg = loadConfig();
   if (cfg) {
-    document.getElementById('cfg-apiKey').value = cfg.apiKey || '';
-    document.getElementById('cfg-authDomain').value = cfg.authDomain || '';
-    document.getElementById('cfg-dbUrl').value = cfg.dbUrl || '';
+    document.getElementById('cfg-apiKey').value    = cfg.apiKey    || '';
+    document.getElementById('cfg-authDomain').value= cfg.authDomain|| '';
+    document.getElementById('cfg-dbUrl').value     = cfg.dbUrl     || '';
     document.getElementById('cfg-projectId').value = cfg.projectId || '';
+    document.getElementById('cfg-profile').value   = cfg.profile   || '';
     if (cfg.role) selectRole(cfg.role);
   }
 });
@@ -604,11 +628,18 @@ window.addEventListener('load', () => {
 function launchUI() {
   document.getElementById('config-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+
   const badge = document.getElementById('role-badge');
-  badge.textContent = role === 'serveur' ? '🍽️ Serveur' : '🍸 Barman';
-  badge.className = 'badge-role badge-' + role;
-  if (role === 'serveur') { buildServerTabs(); renderMenu(); document.getElementById('fab-payment').style.display = 'block'; }
-  else buildBarmanTabs();
+  if (role === 'serveur') {
+    badge.textContent = `🍽️ ${serverProfile}`;
+    badge.className = 'badge-role badge-serveur';
+    buildServerTabs(); renderMenu();
+    document.getElementById('fab-payment').style.display = 'block';
+  } else {
+    badge.textContent = '🍸 Barman';
+    badge.className = 'badge-role badge-barman';
+    buildBarmanTabs();
+  }
   listenOrders();
 }
 
@@ -631,7 +662,7 @@ function switchTab(panelId, el) {
 }
 
 // ═══════════════════════════════════════════
-// MENU RENDERING — with beer subcategories
+// MENU RENDERING
 // ═══════════════════════════════════════════
 function renderMenu() {
   const container = document.getElementById('drinks-container');
@@ -640,36 +671,46 @@ function renderMenu() {
     html += `<div class="category-title">${cat.category}</div>`;
     if (cat.subcategories) {
       cat.subcategories.forEach(sub => {
-        html += `<div class="subcategory-title">${sub.label}</div>`;
-        html += `<div class="drinks-grid">`;
-        sub.items.forEach(item => {
-          const qty = cart[item.name] ? cart[item.name].qty : 0;
-          const safeName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-          html += `<div class="drink-card${qty > 0 ? ' in-cart' : ''}" onclick="addToCart('${safeName}','${item.emoji}',${item.price})">
-            <span class="drink-emoji">${item.emoji}</span>
-            <span class="drink-name">${item.name}</span>
-            <span class="drink-price">${fmt(item.price)}</span>
-            ${qty > 0 ? `<span class="drink-qty">${qty}</span>` : ''}
-          </div>`;
-        });
+        html += `<div class="subcategory-title">${sub.label}</div><div class="drinks-grid">`;
+        sub.items.forEach(item => drinkCard(item, html => { html += html; }));
+        // rebuild inline to avoid closure issue
+        sub.items.forEach(item => { html += buildDrinkCard(item); });
         html += `</div>`;
       });
     } else {
       html += `<div class="drinks-grid">`;
-      cat.items.forEach(item => {
-        const qty = cart[item.name] ? cart[item.name].qty : 0;
-        const safeName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        html += `<div class="drink-card${qty > 0 ? ' in-cart' : ''}" onclick="addToCart('${safeName}','${item.emoji}',${item.price})">
-          <span class="drink-emoji">${item.emoji}</span>
-          <span class="drink-name">${item.name}</span>
-          <span class="drink-price">${fmt(item.price)}</span>
-          ${qty > 0 ? `<span class="drink-qty">${qty}</span>` : ''}
-        </div>`;
+      cat.items.forEach(item => { html += buildDrinkCard(item); });
+      html += `</div>`;
+    }
+  });
+  // fix above pattern — re-build cleanly
+  html = '';
+  MENU.forEach(cat => {
+    html += `<div class="category-title">${cat.category}</div>`;
+    if (cat.subcategories) {
+      cat.subcategories.forEach(sub => {
+        html += `<div class="subcategory-title">${sub.label}</div><div class="drinks-grid">`;
+        sub.items.forEach(item => { html += buildDrinkCard(item); });
+        html += `</div>`;
       });
+    } else {
+      html += `<div class="drinks-grid">`;
+      cat.items.forEach(item => { html += buildDrinkCard(item); });
       html += `</div>`;
     }
   });
   container.innerHTML = html;
+}
+
+function buildDrinkCard(item) {
+  const qty = cart[item.name] ? cart[item.name].qty : 0;
+  const safeName = item.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  return `<div class="drink-card${qty > 0 ? ' in-cart' : ''}" onclick="addToCart('${safeName}','${item.emoji}',${item.price})">
+    <span class="drink-emoji">${item.emoji}</span>
+    <span class="drink-name">${item.name}</span>
+    <span class="drink-price">${fmt(item.price)}</span>
+    ${qty > 0 ? `<span class="drink-qty">${qty}</span>` : ''}
+  </div>`;
 }
 
 // ═══════════════════════════════════════════
@@ -702,7 +743,7 @@ function renderCartItems() {
   const list = document.getElementById('cart-items-list');
   let html = '';
   Object.entries(cart).forEach(([name, data]) => {
-    const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    const safeName = name.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
     const lineTotal = (data.price || PRICE_MAP[name] || 0) * data.qty;
     html += `<div class="cart-item">
       <div class="ci-info">
@@ -732,7 +773,7 @@ function changeQty(name, delta) {
 }
 
 // ═══════════════════════════════════════════
-// PAYMENT
+// PAYMENT MODAL
 // ═══════════════════════════════════════════
 function selectPayment(method) { selectedPayment = method; updatePaymentButtons(); }
 function updatePaymentButtons() {
@@ -741,7 +782,6 @@ function updatePaymentButtons() {
     if (el) { el.className = 'pay-btn'; if (selectedPayment === m) el.classList.add('selected-' + m); }
   });
 }
-
 function openPaymentModal() { ensureAudio(); document.getElementById('payment-overlay').classList.add('open'); }
 function closePaymentModal(e) {
   if (!e || e.target === document.getElementById('payment-overlay')) document.getElementById('payment-overlay').classList.remove('open');
@@ -749,14 +789,19 @@ function closePaymentModal(e) {
 function sendPaymentAlert(method) {
   const table = document.getElementById('payment-table-number').value.trim();
   if (!table) { alert('Veuillez indiquer le numéro de table.'); return; }
-  db.ref('orders').push({ table, type: 'payment', payment: method, status: 'pending', timestamp: Date.now(), date: new Date().toLocaleString('fr-FR'), items: [], total: 0 }).then(() => {
+  db.ref('orders').push({
+    table, type: 'payment', payment: method, status: 'pending',
+    serveur: serverProfile,                  // ← profil serveur attaché
+    timestamp: Date.now(), date: new Date().toLocaleString('fr-FR'),
+    items: [], total: 0
+  }).then(() => {
     playSound('sent'); closePaymentModal(); document.getElementById('payment-table-number').value = '';
     showToast('💳', `Demande de paiement envoyée — ${table}`);
   }).catch(err => alert('Erreur : ' + err.message));
 }
 
 // ═══════════════════════════════════════════
-// SEND ORDER
+// SEND ORDER — with serveur profile
 // ═══════════════════════════════════════════
 function sendOrder() {
   const table = document.getElementById('table-number').value.trim();
@@ -764,10 +809,17 @@ function sendOrder() {
   if (Object.keys(cart).length === 0) return;
   const total = cartTotal();
   const order = {
-    table, total: parseFloat(total.toFixed(2)),
-    payment: selectedPayment || 'later', status: 'pending',
-    timestamp: Date.now(), date: new Date().toLocaleString('fr-FR'),
-    items: Object.entries(cart).map(([name, d]) => ({ name, qty: d.qty, comment: d.comment, emoji: d.emoji, price: d.price || PRICE_MAP[name] || 0 }))
+    table,
+    serveur: serverProfile,                  // ← prénom/pseudo du serveur
+    total: parseFloat(total.toFixed(2)),
+    payment: selectedPayment || 'later',
+    status: 'pending',
+    timestamp: Date.now(),
+    date: new Date().toLocaleString('fr-FR'),
+    items: Object.entries(cart).map(([name, d]) => ({
+      name, qty: d.qty, comment: d.comment, emoji: d.emoji,
+      price: d.price || PRICE_MAP[name] || 0
+    }))
   };
   db.ref('orders').push(order).then(() => {
     playSound('sent'); cart = {}; selectedPayment = null; updatePaymentButtons();
@@ -787,6 +839,7 @@ function listenOrders() {
 
     if (role === 'barman') {
       renderBarmanOrders();
+      // Alert barman on ALL new pending orders regardless of serveur
       const newPending = Object.entries(data).filter(([k, v]) => v.status === 'pending' && !prevOrders[k]);
       if (newPending.length > 0 && Object.keys(prevOrders).length > 0) {
         const isPayment = newPending.some(([, v]) => v.type === 'payment');
@@ -796,9 +849,12 @@ function listenOrders() {
     }
 
     if (role === 'serveur') {
-      // Detect orders that just became "done" — add to pendingPickup
+      // ▶ Only react to orders belonging to THIS serveur
       const justDone = Object.entries(data).filter(([k, v]) =>
-        v.status === 'done' && v.type !== 'payment' && v.type !== 'picked' &&
+        v.status === 'done' &&
+        v.type !== 'payment' &&
+        v.type !== 'picked' &&
+        v.serveur === serverProfile &&        // ← filtre par profil
         (!prevOrders[k] || prevOrders[k].status === 'pending')
       );
       justDone.forEach(([k]) => { if (!pendingPickupKeys.includes(k)) pendingPickupKeys.push(k); });
@@ -811,7 +867,13 @@ function listenOrders() {
       }
     }
 
-    const pendingCount = Object.values(data).filter(o => o.status === 'pending').length;
+    // Pending count badge — only show orders of THIS serveur (or all for barman)
+    let pendingCount;
+    if (role === 'barman') {
+      pendingCount = Object.values(data).filter(o => o.status === 'pending').length;
+    } else {
+      pendingCount = pendingPickupKeys.length; // commandes prêtes non-récupérées
+    }
     const badge = document.getElementById('pending-count');
     if (pendingCount > 0) { badge.style.display = 'flex'; badge.textContent = pendingCount; }
     else badge.style.display = 'none';
@@ -824,7 +886,6 @@ function listenOrders() {
 // READY BANNER (serveur)
 // ═══════════════════════════════════════════
 function showReadyBanner() {
-  const banner = document.getElementById('ready-banner');
   const list = document.getElementById('ready-orders-list');
   let html = '';
   pendingPickupKeys.forEach(k => {
@@ -839,23 +900,19 @@ function showReadyBanner() {
     </div>`;
   });
   list.innerHTML = html || '<p style="color:var(--text2);font-size:.85rem">Aucun détail disponible.</p>';
-  banner.classList.add('show');
+  document.getElementById('ready-banner').classList.add('show');
 }
 
-function hideReadyBanner() {
-  document.getElementById('ready-banner').classList.remove('show');
-}
+function hideReadyBanner() { document.getElementById('ready-banner').classList.remove('show'); }
 
 function confirmPickup() {
-  // Mark all pending-pickup orders as 'picked' in Firebase (final status)
   const updates = {};
   pendingPickupKeys.forEach(k => {
     updates[k + '/status'] = 'picked';
     updates[k + '/pickedAt'] = new Date().toLocaleString('fr-FR');
   });
   db.ref('orders').update(updates).then(() => {
-    pendingPickupKeys = [];
-    bannerDismissed = false;
+    pendingPickupKeys = []; bannerDismissed = false;
     hideReadyBanner();
     showToast('🎉', 'Commande(s) récupérée(s) !');
   }).catch(err => console.error(err));
@@ -864,8 +921,7 @@ function confirmPickup() {
 function dismissBanner() {
   bannerDismissed = true;
   hideReadyBanner();
-  showToast('🍸', `${pendingPickupKeys.length} commande(s) en attente de récupération`);
-  // Re-show after 60 seconds if still not picked
+  showToast('🍸', `${pendingPickupKeys.length} commande(s) en attente`);
   setTimeout(() => {
     if (pendingPickupKeys.length > 0) { bannerDismissed = false; playSound('order_ready'); showReadyBanner(); }
   }, 60000);
@@ -875,27 +931,45 @@ function dismissBanner() {
 // BARMAN VIEW
 // ═══════════════════════════════════════════
 const PAY_LABELS = {
-  cash: { icon: '💵', label: 'Espèces', cls: 'pmb-cash' },
-  card: { icon: '💳', label: 'Carte bancaire', cls: 'pmb-card' },
-  later: { icon: '⏳', label: 'À encaisser', cls: 'pmb-later' },
+  cash:  { icon: '💵', label: 'Espèces',       cls: 'pmb-cash'  },
+  card:  { icon: '💳', label: 'Carte bancaire', cls: 'pmb-card'  },
+  later: { icon: '⏳', label: 'À encaisser',    cls: 'pmb-later' },
 };
 
 function renderBarmanOrders() {
   const list = document.getElementById('orders-list');
-  const pending = Object.entries(allOrders).filter(([, o]) => o.status === 'pending').sort((a, b) => a[1].timestamp - b[1].timestamp);
-  document.getElementById('orders-count').textContent = pending.length + (pending.length > 1 ? ' commandes en attente' : ' commande en attente');
-  if (pending.length === 0) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div>Aucune commande en attente</div>`; return; }
+  const pending = Object.entries(allOrders)
+    .filter(([, o]) => o.status === 'pending')
+    .sort((a, b) => a[1].timestamp - b[1].timestamp);
+
+  document.getElementById('orders-count').textContent =
+    pending.length + (pending.length > 1 ? ' commandes en attente' : ' commande en attente');
+
+  if (pending.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div>Aucune commande en attente</div>`;
+    return;
+  }
 
   let html = '';
   pending.forEach(([key, order]) => {
     const elapsed = Math.floor((Date.now() - order.timestamp) / 60000);
     const timeLabel = elapsed < 1 ? "À l'instant" : `il y a ${elapsed} min`;
+    const serveurBadge = order.serveur
+      ? `<div class="order-serveur-badge">🍽️ ${order.serveur}</div>`
+      : '';
     const isPaymentAlert = order.type === 'payment';
 
     if (isPaymentAlert) {
       const pm = PAY_LABELS[order.payment] || PAY_LABELS.cash;
       html += `<div class="order-card payment-card">
-        <div class="order-header"><div><div class="order-table">${order.table}</div><div class="order-time">${timeLabel} — ${order.date}</div></div><span class="order-status status-payment">Paiement</span></div>
+        <div class="order-header">
+          <div class="order-header-left">
+            <div class="order-table">${order.table}</div>
+            <div class="order-time">${timeLabel} — ${order.date}</div>
+            ${serveurBadge}
+          </div>
+          <span class="order-status status-payment">Paiement</span>
+        </div>
         <div style="margin-bottom:.75rem"><span class="payment-method-badge pmb-payment-request">💳 Le client souhaite payer</span></div>
         <div class="payment-method-badge ${pm.cls}" style="margin-bottom:.75rem;font-size:.85rem;padding:.4rem 1rem">${pm.icon} ${pm.label}</div>
         <button class="btn-paid" onclick="markReady('${key}')">✅ Paiement encaissé</button>
@@ -906,15 +980,33 @@ function renderBarmanOrders() {
 
     const total = orderTotal(order);
     const pm = order.payment ? (PAY_LABELS[order.payment] || PAY_LABELS.later) : null;
+
     html += `<div class="order-card">
-      <div class="order-header"><div><div class="order-table">${order.table}</div><div class="order-time">${timeLabel} — ${order.date}</div></div><span class="order-status status-pending">En attente</span></div>
+      <div class="order-header">
+        <div class="order-header-left">
+          <div class="order-table">${order.table}</div>
+          <div class="order-time">${timeLabel} — ${order.date}</div>
+          ${serveurBadge}
+        </div>
+        <span class="order-status status-pending">En attente</span>
+      </div>
       <div class="order-items">`;
+
     (order.items || []).forEach(item => {
       const lineTotal = (item.price || 0) * item.qty;
-      html += `<div class="oi"><span class="oi-qty">×${item.qty}</span><span class="oi-name">${item.emoji} ${item.name}</span><span class="oi-price">${fmt(lineTotal)}</span>${item.comment ? `<br><span class="oi-comment" style="padding-left:28px">— ${item.comment}</span>` : ''}</div>`;
+      html += `<div class="oi">
+        <span class="oi-qty">×${item.qty}</span>
+        <span class="oi-name">${item.emoji} ${item.name}</span>
+        <span class="oi-price">${fmt(lineTotal)}</span>
+        ${item.comment ? `<br><span class="oi-comment" style="padding-left:28px">— ${item.comment}</span>` : ''}
+      </div>`;
     });
+
     html += `</div>
-      <div class="order-total-line"><span class="order-total-label">Total commande</span><span class="order-total-amount">${fmt(total)}</span></div>
+      <div class="order-total-line">
+        <span class="order-total-label">Total commande</span>
+        <span class="order-total-amount">${fmt(total)}</span>
+      </div>
       ${pm ? `<div class="payment-method-badge ${pm.cls}" style="margin-bottom:.75rem">${pm.icon} ${pm.label}</div>` : ''}
       <button class="btn-ready" onclick="markReady('${key}')">✅ Commande prête</button>
       <button class="btn-delete" onclick="deleteOrder('${key}')">Supprimer</button>
@@ -927,7 +1019,6 @@ function markReady(key) {
   db.ref('orders/' + key + '/status').set('done');
   db.ref('orders/' + key + '/readyAt').set(new Date().toLocaleString('fr-FR'));
 }
-
 function deleteOrder(key) { if (confirm('Supprimer cette commande ?')) db.ref('orders/' + key).remove(); }
 
 // ═══════════════════════════════════════════
@@ -942,8 +1033,14 @@ function filterHistory(f, el) {
 function renderHistory() {
   const list = document.getElementById('history-list');
   let entries = Object.entries(allOrders).sort((a, b) => b[1].timestamp - a[1].timestamp);
+
+  // Serveur : only show their own orders
+  if (role === 'serveur') {
+    entries = entries.filter(([, o]) => !o.serveur || o.serveur === serverProfile);
+  }
+
   if (historyFilter === 'pending') entries = entries.filter(([, o]) => o.status === 'pending' && o.type !== 'payment');
-  if (historyFilter === 'done') entries = entries.filter(([, o]) => (o.status === 'done' || o.status === 'picked') && o.type !== 'payment');
+  if (historyFilter === 'done')    entries = entries.filter(([, o]) => (o.status === 'done' || o.status === 'picked') && o.type !== 'payment');
   if (historyFilter === 'payment') entries = entries.filter(([, o]) => o.type === 'payment');
 
   if (entries.length === 0) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div>Aucune commande</div>`; return; }
@@ -952,18 +1049,24 @@ function renderHistory() {
   entries.forEach(([key, order]) => {
     const isPayment = order.type === 'payment';
     let statusLabel;
-    if (order.status === 'picked') statusLabel = `<span style="color:var(--green);font-size:.75rem">✅ Récupérée</span>`;
-    else if (order.status === 'done') statusLabel = `<span style="color:var(--blue);font-size:.75rem">🍸 Prête</span>`;
-    else statusLabel = `<span style="color:var(--gold2);font-size:.75rem">⏳ En attente</span>`;
+    if (order.status === 'picked')     statusLabel = `<span style="color:var(--green);font-size:.75rem">✅ Récupérée</span>`;
+    else if (order.status === 'done')  statusLabel = `<span style="color:var(--blue);font-size:.75rem">🍸 Prête</span>`;
+    else                               statusLabel = `<span style="color:var(--gold2);font-size:.75rem">⏳ En attente</span>`;
 
     const total = isPayment ? null : orderTotal(order);
     const pm = order.payment ? (PAY_LABELS[order.payment] || null) : null;
     const payBadgeClass = isPayment ? 'hi-pay-payment' : (order.payment === 'cash' ? 'hi-pay-cash' : order.payment === 'card' ? 'hi-pay-card' : 'hi-pay-later');
     const payLabel = isPayment ? `💳 Paiement ${pm ? pm.label : ''}` : (pm ? `${pm.icon} ${pm.label}` : '');
     const itemsSummary = isPayment ? '<em>Demande de paiement</em>' : (order.items || []).map(i => `×${i.qty} ${i.name}`).join(', ');
+    // Serveur tag (shown in barman history)
+    const serveurLine = (role === 'barman' && order.serveur) ? `<div class="hi-serveur">🍽️ ${order.serveur}</div>` : '';
 
     html += `<div class="history-item">
-      <div class="hi-header"><span class="hi-table">${order.table}</span><div style="display:flex;align-items:center;gap:.5rem">${statusLabel}<span class="hi-time">${order.date}</span></div></div>
+      <div class="hi-header">
+        <span class="hi-table">${order.table}</span>
+        <div style="display:flex;align-items:center;gap:.5rem">${statusLabel}<span class="hi-time">${order.date}</span></div>
+      </div>
+      ${serveurLine}
       <div class="hi-items">${itemsSummary}</div>
       <div class="hi-footer">
         <span class="hi-total">${total !== null ? fmt(total) : '—'}</span>
