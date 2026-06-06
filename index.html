@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>BarFlow — Commandes</title>
+<title>SiraGo — Commandes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 
@@ -236,7 +236,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 <!-- CONFIG -->
 <div id="config-screen">
   <h1>BarFlow</h1>
-  <p>Application de commandes bar.<br>Configurez votre connexion Firebase ci-dessous.</p>
+  <p>Commandes Sirableu.<br>Configurez votre connexion Firebase ci-dessous.</p>
   <div class="config-card">
     <h2>🔥 Configuration Firebase</h2>
     <label class="field-label">API Key</label>
@@ -269,7 +269,7 @@ header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92);
 <!-- APP -->
 <div id="app">
   <header>
-    <span class="brand">🍸 BarFlow</span>
+    <span class="brand">🍸 SiraGo</span>
     <div class="header-right">
       <div id="pending-count">0</div>
       <span id="role-badge" class="badge-role"></span>
@@ -390,11 +390,11 @@ const MENU = [
   {
     category: "🥂 Champagne & Vins",
     items: [
-      { name: "Champagne Brut", emoji: "🥂", price: 12.00 },
-      { name: "Champagne Rosé", emoji: "🍾", price: 13.00 },
-      { name: "Vin rouge", emoji: "🍷", price: 6.00 },
-      { name: "Vin blanc", emoji: "🥃", price: 6.00 },
-      { name: "Vin rosé", emoji: "🍹", price: 6.00 },
+      { name: "Champagne", emoji: "🥂", price: 7.00 },
+      { name: "Coupe Methode", emoji: "🍾", price: 3.00 },
+      { name: "Vin rouge", emoji: "🍷", price: 2.00 },
+      { name: "Vin blanc", emoji: "🥃", price: 2.00 },
+      { name: "Vin rosé", emoji: "🍹", price: 2.00 },
     ]
   },
   {
@@ -404,33 +404,65 @@ const MENU = [
       {
         label: "Pressions — 25 cl",
         items: [
-          { name: "Bière pression 25cl", emoji: "🍺", price: 3.00 },
-          { name: "Bière blanche pression 25cl", emoji: "🍺", price: 3.50 },
-          { name: "Bière IPA pression 25cl", emoji: "🍺", price: 3.50 },
+          { name: "St Omen 25cl", emoji: "🍺", price: 2.50 },
+          { name: "Goudale Blonde 25cl", emoji: "🍺", price: 3.30 },
+          { name: "Goudale Ambre 25cl", emoji: "🍺", price: 3.30 },
+          { name: "Goudale Ruby 25cl", emoji: "🍺", price: 3.50 },
+          { name: "Triple Secret Moine 25cl", emoji: "🍺", price: 3.80 },
+          { name: "Chouffe 25cl", emoji: "🍺", price: 3.80 },
+          { name: "Bon Secours 25cl", emoji: "🍺", price: 4.00 },
+          { name: "Paix Dieu 25cl", emoji: "🍺", price: 4.20 },
+          { name: "Sans Alcool 25cl", emoji: "🍺", price: 2.50 },
+          { name: "Bière Sirop 25cl", emoji: "🍺", price: 3.50 },
+          { name: "Panache 25cl", emoji: "🍺", price: 3.00 },
+          { name: "Monaco 25cl", emoji: "🍺", price: 3.50 },
+          { name: "Picon Bière 25cl", emoji: "🍺", price: 3.00 },
         ]
       },
       {
         label: "Pressions — 33 cl",
         items: [
-          { name: "Bière pression 33cl", emoji: "🍺", price: 4.00 },
-          { name: "Bière blanche pression 33cl", emoji: "🍺", price: 4.50 },
-          { name: "Bière IPA pression 33cl", emoji: "🍺", price: 4.50 },
+          { name: "St Omen 33cl", emoji: "🍺", price: 2.50 },
+          { name: "Goudale Blonde 33cl", emoji: "🍺", price: 5.00 },
+          { name: "Goudale Ambre 33cl", emoji: "🍺", price: 5.00 },
+          { name: "Goudale Ruby 33cl", emoji: "🍺", price: 5.50 },
+          { name: "Triple Secret Moine 33cl", emoji: "🍺", price: 5.70 },
+          { name: "Chouffe 33cl", emoji: "🍺", price: 5.70 },
+          { name: "Bon Secours 33cl", emoji: "🍺", price: 5.70 },
+          { name: "Paix Dieu 33cl", emoji: "🍺", price: 5.70 },
+          { name: "Sans Alcool 33cl", emoji: "🍺", price: 2.50 },
+          { name: "Bière Sirop 33cl", emoji: "🍺", price: 3.50 },
+          { name: "Panache 33cl", emoji: "🍺", price: 3.00 },
+          { name: "Monaco 33cl", emoji: "🍺", price: 3.50 },
+          { name: "Picon Bière 33cl", emoji: "🍺", price: 3.50 },
         ]
       },
       {
         label: "Pressions — 50 cl",
         items: [
-          { name: "Bière pression 50cl", emoji: "🍺", price: 5.50 },
-          { name: "Bière blanche pression 50cl", emoji: "🍺", price: 6.00 },
-          { name: "Bière IPA pression 50cl", emoji: "🍺", price: 6.00 },
+          { name: "St Omen 50cl", emoji: "🍺", price: 5.00 },
+          { name: "Goudale Blonde 50cl", emoji: "🍺", price: 6.50 },
+          { name: "Goudale Ambre 50cl", emoji: "🍺", price: 6.50 },
+          { name: "Goudale Ruby 50cl", emoji: "🍺", price: 7.00 },
+          { name: "Triple Secret Moine 50cl", emoji: "🍺", price: 8.00 },
+          { name: "Chouffe 50cl", emoji: "🍺", price: 8.00 },
+          { name: "Bon Secours 50cl", emoji: "🍺", price: 8.00 },
+          { name: "Paix Dieu 50cl", emoji: "🍺", price: 8.00 },
+          { name: "Sans Alcool 50cl", emoji: "🍺", price: 5.00 },
+          { name: "Bière Sirop 50cl", emoji: "🍺", price: 5.50 },
+          { name: "Panache 50cl", emoji: "🍺", price: 3.00 },
+          { name: "Monaco 50cl", emoji: "🍺", price: 3.50 },
+          { name: "Picon Bière 50cl", emoji: "🍺", price: 3.50 },
         ]
       },
       {
         label: "Bouteilles",
         items: [
-          { name: "Bière blonde bouteille", emoji: "🍻", price: 5.00 },
-          { name: "Bière brune bouteille", emoji: "🍻", price: 5.00 },
-          { name: "Bière sans alcool", emoji: "🥤", price: 4.00 },
+          { name: "Heineken", emoji: "🍻", price: 2.80 },
+          { name: "1664", emoji: "🍻", price: 3.00 },
+          { name: "Desperados", emoji: "🍺", price: 4.00 },
+          { name: "Duvel", emoji: "🍺", price: 5.50 },
+          { name: "Chimay Brune", emoji: "🥤", price: 5.50 },
         ]
       },
     ]
