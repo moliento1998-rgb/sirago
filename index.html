@@ -950,7 +950,7 @@ function listenForPushNotifs(){
     snap.ref.remove();
     // Show browser notification if permission granted
     if(Notification.permission==='granted'){
-      const n=new Notification('🍸 BarFlow — Commande prête !',{
+      const n=new Notification('🍸 Sirableu — Commande prête !',{
         body:`Votre commande pour ${notif.table||'une table'} est prête. Allez la récupérer !`,
         icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
         badge:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
@@ -1058,7 +1058,7 @@ async function toggleNotif(on){
 
 function sendTestNotif(){
   if(Notification.permission!=='granted'){alert('Autorisez les notifications d\'abord.');return;}
-  new Notification('🍸 BarFlow — Test',{
+  new Notification('🍸 Sirableu — Test',{
     body:'Notification de test ! Tout fonctionne correctement.',
     icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
     requireInteraction:false
