@@ -3,1062 +3,1191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>SiraGo — Commandes</title>
+<title>BarFlow</title>
+<link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 <style>
-:root {
-  --bg: #0d0d0d; --bg2: #161616; --bg3: #1e1e1e;
-  --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.15);
-  --gold: #d4a843; --gold2: #f0c060;
-  --text: #f0ece4; --text2: #9a9590;
-  --green: #3ecf8e; --red: #e05c5c; --blue: #5b9cf6; --purple: #a78bfa;
-  --radius: 14px; --radius-sm: 8px;
+:root{
+  --bg:#0d0d0d;--bg2:#161616;--bg3:#1e1e1e;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --gold:#d4a843;--gold2:#f0c060;
+  --text:#f0ece4;--text2:#9a9590;
+  --green:#3ecf8e;--red:#e05c5c;--blue:#5b9cf6;--purple:#a78bfa;
+  --r:14px;--rs:8px;
 }
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; min-height: 100vh; overscroll-behavior: none; }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh;overscroll-behavior:none}
 
-/* CONFIG */
-#config-screen { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
-#config-screen h1 { font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800; letter-spacing: -0.02em; color: var(--gold2); }
-#config-screen p { color: var(--text2); margin: .5rem 0 2rem; font-size: .95rem; line-height: 1.6; }
-.config-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; width: 100%; max-width: 420px; margin-bottom: 1rem; }
-.config-card h2 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
-.field-label { font-size: .8rem; color: var(--text2); margin-bottom: .4rem; display: block; text-align: left; }
-input[type=text], input[type=password] { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); padding: .75rem 1rem; font-size: .95rem; font-family: 'DM Sans', sans-serif; outline: none; margin-bottom: .75rem; }
-input:focus { border-color: var(--gold); }
-.btn-gold { background: var(--gold); color: #0d0d0d; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: var(--radius-sm); padding: .85rem 2rem; cursor: pointer; width: 100%; transition: background .2s; }
-.btn-gold:hover { background: var(--gold2); }
-.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; margin-top: .25rem; }
-.role-btn { background: var(--bg3); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 1.2rem .75rem; cursor: pointer; text-align: center; transition: all .2s; display: flex; flex-direction: column; align-items: center; gap: .4rem; }
-.role-btn:hover { border-color: var(--gold); }
-.role-btn.selected { border-color: var(--gold); background: rgba(212,168,67,.1); }
-.role-icon { font-size: 2rem; }
-.role-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: .95rem; }
-.role-sub { font-size: .75rem; color: var(--text2); }
+/* ═ CONFIG ═ */
+#cfg{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;overflow-y:auto}
+#cfg h1{font-family:'Syne',sans-serif;font-size:2.6rem;font-weight:800;letter-spacing:-.02em;color:var(--gold2)}
+#cfg>p{color:var(--text2);margin:.5rem 0 1.5rem;font-size:.9rem;line-height:1.6}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.4rem;width:100%;max-width:420px;margin-bottom:1rem}
+.card h2{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:1rem}
+.lbl{font-size:.78rem;color:var(--text2);margin-bottom:.35rem;display:block;text-align:left}
+input[type=text]{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);padding:.7rem 1rem;font-size:.92rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:.7rem}
+input:focus{border-color:var(--gold)}
+.btn-gold{background:var(--gold);color:#0d0d0d;font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;border:none;border-radius:var(--rs);padding:.85rem 2rem;cursor:pointer;width:100%;transition:background .2s}
+.btn-gold:hover{background:var(--gold2)}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.25rem}
+.role-btn{background:var(--bg3);border:2px solid var(--border);border-radius:var(--rs);padding:1.1rem .65rem;cursor:pointer;text-align:center;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:.35rem}
+.role-btn.selected{border-color:var(--gold);background:rgba(212,168,67,.1)}
+.role-icon{font-size:1.9rem}
+.role-name{font-family:'Syne',sans-serif;font-weight:600;font-size:.9rem}
+.role-sub{font-size:.72rem;color:var(--text2)}
+#profile-wrap{display:none;margin-top:.75rem;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.hint{font-size:.73rem;color:var(--text2);text-align:left;margin-top:-.45rem;margin-bottom:.7rem}
 
-/* LAYOUT */
-#app { display: none; min-height: 100vh; }
-header { position: sticky; top: 0; z-index: 100; background: rgba(13,13,13,.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); padding: .75rem 1rem; display: flex; align-items: center; justify-content: space-between; }
-.brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--gold2); }
-.badge-role { font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700; padding: .3rem .7rem; border-radius: 20px; text-transform: uppercase; letter-spacing: .05em; }
-.badge-serveur { background: rgba(212,168,67,.15); color: var(--gold2); border: 1px solid rgba(212,168,67,.3); }
-.badge-barman { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
-.header-right { display: flex; align-items: center; gap: .6rem; }
-#pending-count { background: var(--red); color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: .7rem; font-weight: 700; display: none; align-items: center; justify-content: center; }
+/* ═ APP SHELL ═ */
+#app{display:none;min-height:100vh}
+header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.72rem 1rem;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--gold2)}
+.hright{display:flex;align-items:center;gap:.55rem}
+.badge{font-size:.68rem;font-family:'Syne',sans-serif;font-weight:700;padding:.28rem .65rem;border-radius:20px;text-transform:uppercase;letter-spacing:.05em}
+.badge-s{background:rgba(212,168,67,.15);color:var(--gold2);border:1px solid rgba(212,168,67,.3)}
+.badge-b{background:rgba(62,207,142,.15);color:var(--green);border:1px solid rgba(62,207,142,.3)}
+#notif-dot{width:8px;height:8px;border-radius:50%;background:var(--red);display:none}
+#pcount{background:var(--red);color:#fff;border-radius:50%;width:20px;height:20px;font-size:.68rem;font-weight:700;display:none;align-items:center;justify-content:center}
 
-/* TABS */
-.tabs { display: flex; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); background: var(--bg2); position: sticky; top: 57px; z-index: 90; }
-.tabs::-webkit-scrollbar { display: none; }
-.tab { padding: .85rem 1.25rem; white-space: nowrap; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 600; font-size: .85rem; color: var(--text2); border-bottom: 2px solid transparent; transition: all .2s; flex-shrink: 0; }
-.tab.active { color: var(--gold2); border-bottom-color: var(--gold2); }
+/* ═ TABS ═ */
+.tabs{display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:53px;z-index:90}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:.82rem 1.2rem;white-space:nowrap;cursor:pointer;font-family:'Syne',sans-serif;font-weight:600;font-size:.83rem;color:var(--text2);border-bottom:2px solid transparent;transition:all .2s;flex-shrink:0}
+.tab.active{color:var(--gold2);border-bottom-color:var(--gold2)}
 
-/* PANELS */
-.panel { display: none; padding: 1rem; max-width: 640px; margin: 0 auto; }
-.panel.active { display: block; }
+/* ═ PANELS ═ */
+.panel{display:none;padding:1rem;max-width:640px;margin:0 auto}
+.panel.active{display:block}
 
-/* DRINKS */
-.category-title { font-family: 'Syne', sans-serif; font-size: .75rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: .1em; margin: 1.2rem 0 .6rem; }
-/* Sub-category for beer sizes */
-.subcategory-title { font-family: 'Syne', sans-serif; font-size: .68rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: .08em; margin: .8rem 0 .4rem .15rem; display: flex; align-items: center; gap: .4rem; }
-.subcategory-title::before { content: ''; display: block; width: 16px; height: 1px; background: var(--gold); opacity: .4; }
-.drinks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
-.drink-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .85rem; cursor: pointer; transition: all .18s; position: relative; overflow: hidden; }
-.drink-card:hover { border-color: var(--border2); transform: translateY(-1px); }
-.drink-card.in-cart { border-color: var(--gold); background: rgba(212,168,67,.07); }
-.drink-name { font-weight: 500; font-size: .88rem; line-height: 1.3; }
-.drink-emoji { font-size: 1.4rem; margin-bottom: .25rem; display: block; }
-.drink-price { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; color: var(--gold); margin-top: .25rem; display: block; }
-.drink-qty { position: absolute; top: .5rem; right: .5rem; background: var(--gold); color: #0d0d0d; border-radius: 50%; width: 22px; height: 22px; font-size: .75rem; font-weight: 800; font-family: 'Syne', sans-serif; display: flex; align-items: center; justify-content: center; }
+/* ═ MENU ═ */
+.cat-title{font-family:'Syne',sans-serif;font-size:.73rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin:1.1rem 0 .55rem}
+.subcat-title{font-family:'Syne',sans-serif;font-size:.66rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin:.75rem 0 .38rem .1rem;display:flex;align-items:center;gap:.35rem}
+.subcat-title::before{content:'';display:block;width:14px;height:1px;background:var(--gold);opacity:.4}
+.dgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:.55rem}
+.dcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:.8rem;cursor:pointer;transition:all .18s;position:relative;overflow:hidden}
+.dcard:hover{border-color:var(--border2);transform:translateY(-1px)}
+.dcard.ic{border-color:var(--gold);background:rgba(212,168,67,.07)}
+.d-emoji{font-size:1.35rem;margin-bottom:.22rem;display:block}
+.d-name{font-weight:500;font-size:.85rem;line-height:1.3}
+.d-price{font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;color:var(--gold);margin-top:.22rem;display:block}
+.d-qty{position:absolute;top:.45rem;right:.45rem;background:var(--gold);color:#0d0d0d;border-radius:50%;width:21px;height:21px;font-size:.72rem;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center}
 
-/* CART BAR */
-#cart-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 200; padding: .85rem 1rem; background: var(--bg2); border-top: 1px solid var(--border2); display: flex; align-items: center; justify-content: space-between; transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1); }
-#cart-bar.visible { transform: translateY(0); }
-.cart-info { font-family: 'Syne', sans-serif; font-size: .9rem; }
-.cart-count { color: var(--gold2); font-weight: 700; }
-.cart-total-bar { font-size: .82rem; color: var(--gold); margin-top: .1rem; font-weight: 600; }
-.btn-send { background: var(--gold); color: #0d0d0d; border: none; border-radius: var(--radius-sm); padding: .65rem 1.4rem; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; font-size: .9rem; transition: background .2s; }
-.btn-send:hover { background: var(--gold2); }
+/* ═ CART BAR ═ */
+#cbar{position:fixed;bottom:0;left:0;right:0;z-index:200;padding:.82rem 1rem;background:var(--bg2);border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)}
+#cbar.vis{transform:translateY(0)}
+.ci-lbl{font-family:'Syne',sans-serif;font-size:.88rem}
+.ci-cnt{color:var(--gold2);font-weight:700}
+.ci-tot{font-size:.8rem;color:var(--gold);margin-top:.08rem;font-weight:600}
+.btn-send{background:var(--gold);color:#0d0d0d;border:none;border-radius:var(--rs);padding:.62rem 1.35rem;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;font-size:.88rem;transition:background .2s}
+.btn-send:hover{background:var(--gold2)}
 
-/* MODAL */
-.overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 300; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity .2s; }
-.overlay.open { opacity: 1; pointer-events: all; }
-.modal { background: var(--bg2); border-radius: 20px 20px 0 0; padding: 1.5rem 1rem 2rem; width: 100%; border: 1px solid var(--border2); transform: translateY(100%); transition: transform .25s cubic-bezier(.4,0,.2,1); max-height: 92vh; overflow-y: auto; }
-.overlay.open .modal { transform: translateY(0); }
-.modal h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; margin-bottom: 1rem; }
-.modal-drag { width: 40px; height: 4px; background: var(--border2); border-radius: 2px; margin: 0 auto 1.2rem; }
-.cart-items { margin-bottom: .75rem; }
-.cart-item { display: flex; align-items: flex-start; gap: .75rem; padding: .75rem 0; border-bottom: 1px solid var(--border); }
-.cart-item:last-child { border-bottom: none; }
-.ci-info { flex: 1; }
-.ci-name { font-weight: 500; }
-.ci-price-line { font-size: .78rem; color: var(--gold); margin-top: .15rem; font-family: 'Syne', sans-serif; font-weight: 600; }
-.ci-actions { display: flex; align-items: center; gap: .5rem; }
-.ci-btn { background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px; width: 28px; height: 28px; color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.ci-qty { font-family: 'Syne', sans-serif; font-weight: 700; min-width: 18px; text-align: center; }
-.ci-comment-input { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: .4rem .6rem; font-size: .8rem; font-family: 'DM Sans', sans-serif; outline: none; margin-top: .4rem; }
-.ci-comment-input:focus { border-color: var(--gold); }
-.cart-total-bloc { background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: .85rem 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
-.cart-total-label { color: var(--text2); font-size: .9rem; }
-.cart-total-amount { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; color: var(--gold2); }
-.table-input-wrap { margin-bottom: 1rem; }
-#table-number, #payment-table-number { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--radius-sm); color: var(--text); padding: .75rem 1rem; font-size: 1rem; font-family: 'DM Sans', sans-serif; outline: none; }
-#table-number:focus, #payment-table-number:focus { border-color: var(--gold); }
-.payment-section { margin-bottom: 1rem; }
-.payment-label { font-size: .8rem; color: var(--text2); margin-bottom: .5rem; display: block; font-family: 'Syne', sans-serif; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-.payment-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
-.pay-btn { background: var(--bg3); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: .75rem .5rem; cursor: pointer; text-align: center; transition: all .18s; display: flex; flex-direction: column; align-items: center; gap: .3rem; }
-.pay-btn:hover { border-color: var(--border2); }
-.pay-btn.selected-cash { border-color: var(--green); background: rgba(62,207,142,.08); }
-.pay-btn.selected-card { border-color: var(--blue); background: rgba(91,156,246,.08); }
-.pay-btn.selected-later { border-color: var(--text2); background: rgba(154,149,144,.08); }
-.pay-icon { font-size: 1.4rem; }
-.pay-name { font-family: 'Syne', sans-serif; font-weight: 600; font-size: .72rem; }
-.pay-name-cash { color: var(--green); }
-.pay-name-card { color: var(--blue); }
-.pay-name-later { color: var(--text2); }
-.payment-quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-.btn-pay-cash { background: rgba(62,207,142,.12); color: var(--green); border: 1px solid rgba(62,207,142,.3); border-radius: var(--radius-sm); padding: .7rem .5rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; cursor: pointer; transition: all .2s; text-align: center; }
-.btn-pay-cash:hover { background: rgba(62,207,142,.2); }
-.btn-pay-card { background: rgba(91,156,246,.12); color: var(--blue); border: 1px solid rgba(91,156,246,.3); border-radius: var(--radius-sm); padding: .7rem .5rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; cursor: pointer; transition: all .2s; text-align: center; }
-.btn-pay-card:hover { background: rgba(91,156,246,.2); }
-.btn-confirm { background: var(--gold); color: #0d0d0d; border: none; border-radius: var(--radius-sm); padding: .9rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%; transition: background .2s; margin-top: .25rem; }
-.btn-confirm:hover { background: var(--gold2); }
-.btn-cancel { background: transparent; color: var(--text2); border: none; padding: .7rem; font-size: .9rem; cursor: pointer; width: 100%; margin-top: .25rem; font-family: 'DM Sans', sans-serif; }
+/* ═ OVERLAYS / MODALS ═ */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:300;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.open{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:1.4rem 1rem 2rem;width:100%;border:1px solid var(--border2);transform:translateY(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto}
+.ov.open .modal{transform:translateY(0)}
+.modal h3{font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.9rem}
+.drag{width:38px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 1.1rem}
+.citems{margin-bottom:.7rem}
+.citem{display:flex;align-items:flex-start;gap:.7rem;padding:.7rem 0;border-bottom:1px solid var(--border)}
+.citem:last-child{border-bottom:none}
+.ci-inf{flex:1}
+.ci-n{font-weight:500}
+.ci-pl{font-size:.76rem;color:var(--gold);margin-top:.13rem;font-family:'Syne',sans-serif;font-weight:600}
+.ci-act{display:flex;align-items:center;gap:.45rem}
+.cibtn{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;width:27px;height:27px;color:var(--text);font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.ciq{font-family:'Syne',sans-serif;font-weight:700;min-width:17px;text-align:center}
+.ci-comm{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:.38rem .58rem;font-size:.78rem;font-family:'DM Sans',sans-serif;outline:none;margin-top:.38rem}
+.ci-comm:focus{border-color:var(--gold)}
+.tot-bloc{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:.82rem 1rem;margin-bottom:.9rem;display:flex;justify-content:space-between;align-items:center}
+.tot-lbl{color:var(--text2);font-size:.88rem}
+.tot-amt{font-family:'Syne',sans-serif;font-weight:800;font-size:1.35rem;color:var(--gold2)}
+.ti{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);padding:.72rem 1rem;font-size:.98rem;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:.9rem}
+.ti:focus{border-color:var(--gold)}
+.pay-lbl{font-size:.78rem;color:var(--text2);margin-bottom:.48rem;display:block;font-family:'Syne',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.48rem;margin-bottom:.9rem}
+.pbtn{background:var(--bg3);border:2px solid var(--border);border-radius:var(--rs);padding:.72rem .48rem;cursor:pointer;text-align:center;transition:all .18s;display:flex;flex-direction:column;align-items:center;gap:.28rem}
+.pbtn.sel-cash{border-color:var(--green);background:rgba(62,207,142,.08)}
+.pbtn.sel-card{border-color:var(--blue);background:rgba(91,156,246,.08)}
+.pbtn.sel-later{border-color:var(--text2);background:rgba(154,149,144,.08)}
+.pi{font-size:1.35rem}
+.pn{font-family:'Syne',sans-serif;font-weight:600;font-size:.7rem}
+.pn-c{color:var(--green)}.pn-k{color:var(--blue)}.pn-l{color:var(--text2)}
+.pqgrid{display:grid;grid-template-columns:1fr 1fr;gap:.48rem;margin-bottom:.72rem}
+.pbcash{background:rgba(62,207,142,.12);color:var(--green);border:1px solid rgba(62,207,142,.3);border-radius:var(--rs);padding:.68rem .48rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center}
+.pbcard{background:rgba(91,156,246,.12);color:var(--blue);border:1px solid rgba(91,156,246,.3);border-radius:var(--rs);padding:.68rem .48rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center}
+.btn-ok{background:var(--gold);color:#0d0d0d;border:none;border-radius:var(--rs);padding:.88rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.98rem;cursor:pointer;width:100%;transition:background .2s;margin-top:.22rem}
+.btn-ok:hover{background:var(--gold2)}
+.btn-no{background:transparent;color:var(--text2);border:none;padding:.68rem;font-size:.88rem;cursor:pointer;width:100%;margin-top:.22rem;font-family:'DM Sans',sans-serif}
 
-/* BARMAN */
-#barman-panel { padding-bottom: 2rem; }
-.order-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem; animation: slideIn .3s ease; }
-.order-card.payment-card { border-color: rgba(167,139,250,.4); background: rgba(167,139,250,.05); }
-@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.order-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .75rem; }
-.order-table { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--gold2); }
-.order-time { font-size: .75rem; color: var(--text2); }
-.order-status { font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700; padding: .25rem .65rem; border-radius: 20px; text-transform: uppercase; }
-.status-pending { background: rgba(240,192,96,.15); color: var(--gold2); border: 1px solid rgba(240,192,96,.3); }
-.status-done { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
-.status-payment { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.3); }
-.order-items { margin-bottom: .75rem; }
-.oi { display: flex; align-items: baseline; gap: .4rem; padding: .3rem 0; border-bottom: 1px solid var(--border); }
-.oi:last-child { border-bottom: none; }
-.oi-qty { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--gold2); min-width: 24px; }
-.oi-name { font-weight: 500; flex: 1; }
-.oi-price { font-size: .78rem; color: var(--gold); font-family: 'Syne', sans-serif; font-weight: 600; }
-.oi-comment { font-size: .78rem; color: var(--text2); }
-.order-total-line { display: flex; justify-content: space-between; align-items: center; padding: .5rem 0; border-top: 1px solid var(--border2); margin-bottom: .75rem; }
-.order-total-label { font-size: .82rem; color: var(--text2); }
-.order-total-amount { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--gold2); font-size: 1.05rem; }
-.payment-method-badge { display: inline-flex; align-items: center; gap: .35rem; border-radius: 20px; padding: .3rem .8rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .75rem; margin-bottom: .75rem; }
-.pmb-cash { background: rgba(62,207,142,.12); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
-.pmb-card { background: rgba(91,156,246,.12); color: var(--blue); border: 1px solid rgba(91,156,246,.3); }
-.pmb-later { background: rgba(154,149,144,.12); color: var(--text2); border: 1px solid rgba(154,149,144,.3); }
-.pmb-payment-request { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.4); font-size: .82rem; padding: .4rem 1rem; }
-.btn-ready { background: var(--green); color: #0d0d0d; border: none; border-radius: var(--radius-sm); padding: .75rem 1rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; cursor: pointer; width: 100%; transition: background .2s; }
-.btn-ready:hover { background: #55e0a1; }
-.btn-paid { background: rgba(167,139,250,.15); color: var(--purple); border: 1px solid rgba(167,139,250,.3); border-radius: var(--radius-sm); padding: .75rem 1rem; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; cursor: pointer; width: 100%; transition: all .2s; margin-bottom: .4rem; }
-.btn-paid:hover { background: rgba(167,139,250,.25); }
-.btn-delete { background: rgba(224,92,92,.1); color: var(--red); border: 1px solid rgba(224,92,92,.2); border-radius: var(--radius-sm); padding: .5rem; font-size: .8rem; cursor: pointer; width: 100%; margin-top: .4rem; font-family: 'DM Sans', sans-serif; }
-.empty-state { text-align: center; padding: 4rem 2rem; color: var(--text2); font-size: .9rem; }
-.empty-icon { font-size: 3rem; margin-bottom: .75rem; }
+/* ═ BARMAN ═ */
+#bp{padding-bottom:2rem}
+.ocard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:.95rem;margin-bottom:.72rem;animation:sIn .3s ease}
+.ocard.pay-card{border-color:rgba(167,139,250,.4);background:rgba(167,139,250,.05)}
+@keyframes sIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.oh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.72rem;gap:.45rem}
+.oh-l{flex:1}
+.o-table{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--gold2)}
+.o-time{font-size:.73rem;color:var(--text2);margin-top:.08rem}
+.o-srv{display:inline-flex;align-items:center;gap:.28rem;background:rgba(212,168,67,.1);color:var(--gold);border:1px solid rgba(212,168,67,.22);border-radius:20px;padding:.2rem .6rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;margin-top:.28rem;letter-spacing:.02em}
+.os{font-size:.68rem;font-family:'Syne',sans-serif;font-weight:700;padding:.23rem .62rem;border-radius:20px;text-transform:uppercase;flex-shrink:0}
+.os-p{background:rgba(240,192,96,.15);color:var(--gold2);border:1px solid rgba(240,192,96,.3)}
+.os-d{background:rgba(62,207,142,.15);color:var(--green);border:1px solid rgba(62,207,142,.3)}
+.os-pay{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3)}
+.oitems{margin-bottom:.72rem}
+.oi{display:flex;align-items:baseline;gap:.38rem;padding:.28rem 0;border-bottom:1px solid var(--border)}
+.oi:last-child{border-bottom:none}
+.oiq{font-family:'Syne',sans-serif;font-weight:700;color:var(--gold2);min-width:23px}
+.oin{font-weight:500;flex:1}
+.oip{font-size:.76rem;color:var(--gold);font-family:'Syne',sans-serif;font-weight:600}
+.oic{font-size:.76rem;color:var(--text2)}
+.otl{display:flex;justify-content:space-between;align-items:center;padding:.48rem 0;border-top:1px solid var(--border2);margin-bottom:.72rem}
+.otl-l{font-size:.8rem;color:var(--text2)}
+.otl-a{font-family:'Syne',sans-serif;font-weight:800;color:var(--gold2);font-size:1rem}
+.pmb{display:inline-flex;align-items:center;gap:.32rem;border-radius:20px;padding:.28rem .75rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.73rem;margin-bottom:.72rem}
+.pmb-c{background:rgba(62,207,142,.12);color:var(--green);border:1px solid rgba(62,207,142,.3)}
+.pmb-k{background:rgba(91,156,246,.12);color:var(--blue);border:1px solid rgba(91,156,246,.3)}
+.pmb-l{background:rgba(154,149,144,.12);color:var(--text2);border:1px solid rgba(154,149,144,.3)}
+.pmb-req{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.4);font-size:.8rem;padding:.38rem .95rem}
+.btn-rdy{background:var(--green);color:#0d0d0d;border:none;border-radius:var(--rs);padding:.72rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;width:100%;transition:background .2s}
+.btn-rdy:hover{background:#55e0a1}
+.btn-paid{background:rgba(167,139,250,.15);color:var(--purple);border:1px solid rgba(167,139,250,.3);border-radius:var(--rs);padding:.72rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;width:100%;transition:all .2s;margin-bottom:.38rem}
+.btn-del{background:rgba(224,92,92,.1);color:var(--red);border:1px solid rgba(224,92,92,.2);border-radius:var(--rs);padding:.48rem;font-size:.78rem;cursor:pointer;width:100%;margin-top:.38rem;font-family:'DM Sans',sans-serif}
+.empty{text-align:center;padding:3.5rem 2rem;color:var(--text2);font-size:.88rem}
+.empty-ico{font-size:2.8rem;margin-bottom:.65rem}
 
-/* ── READY-ORDER BANNER (serveur) ── */
-#ready-banner {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,.85); z-index: 9000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 1.5rem;
-  opacity: 0; pointer-events: none;
-  transition: opacity .3s;
-}
-#ready-banner.show { opacity: 1; pointer-events: all; }
-#ready-banner-inner {
-  background: var(--bg2); border: 2px solid var(--green);
-  border-radius: 20px; padding: 1.75rem 1.5rem; width: 100%; max-width: 400px;
-  text-align: center;
-  box-shadow: 0 0 60px rgba(62,207,142,.25);
-  animation: pulseGreen 1.5s ease-in-out infinite;
-}
-@keyframes pulseGreen {
-  0%, 100% { box-shadow: 0 0 30px rgba(62,207,142,.2); }
-  50% { box-shadow: 0 0 60px rgba(62,207,142,.5); }
-}
-#ready-banner .big-icon { font-size: 3.5rem; margin-bottom: .75rem; }
-#ready-banner h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5rem; color: var(--green); margin-bottom: .3rem; }
-#ready-banner .rb-table { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--gold2); margin-bottom: 1rem; }
-#ready-orders-list { max-height: 40vh; overflow-y: auto; margin-bottom: 1.25rem; }
-.rb-order-item { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .75rem; margin-bottom: .5rem; text-align: left; }
-.rb-order-table { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--gold2); font-size: 1rem; margin-bottom: .3rem; }
-.rb-order-items { font-size: .82rem; color: var(--text2); margin-bottom: .3rem; }
-.rb-order-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; color: var(--gold); }
-.btn-pickup {
-  background: var(--green); color: #0d0d0d; border: none;
-  border-radius: var(--radius-sm); padding: .95rem;
-  font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem;
-  cursor: pointer; width: 100%; transition: background .2s; margin-bottom: .5rem;
-}
-.btn-pickup:hover { background: #55e0a1; }
-.btn-pickup-later { background: transparent; color: var(--text2); border: 1px solid var(--border2); border-radius: var(--radius-sm); padding: .65rem; font-family: 'DM Sans', sans-serif; font-size: .88rem; cursor: pointer; width: 100%; }
+/* ═ READY BANNER ═ */
+#rb{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:9000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.4rem;opacity:0;pointer-events:none;transition:opacity .3s}
+#rb.show{opacity:1;pointer-events:all}
+#rb-inner{background:var(--bg2);border:2px solid var(--green);border-radius:20px;padding:1.6rem 1.4rem;width:100%;max-width:400px;text-align:center;animation:pg 1.5s ease-in-out infinite}
+@keyframes pg{0%,100%{box-shadow:0 0 28px rgba(62,207,142,.2)}50%{box-shadow:0 0 58px rgba(62,207,142,.5)}}
+#rb .bico{font-size:3.2rem;margin-bottom:.65rem}
+#rb h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.42rem;color:var(--green);margin-bottom:.28rem}
+#rbl{max-height:40vh;overflow-y:auto;margin-bottom:1.1rem}
+.rb-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.7rem;margin-bottom:.45rem;text-align:left}
+.rb-tbl{font-family:'Syne',sans-serif;font-weight:800;color:var(--gold2);font-size:.95rem;margin-bottom:.25rem}
+.rb-its{font-size:.8rem;color:var(--text2);margin-bottom:.25rem}
+.rb-tot{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--gold)}
+.btn-pick{background:var(--green);color:#0d0d0d;border:none;border-radius:var(--rs);padding:.9rem;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;width:100%;transition:background .2s;margin-bottom:.45rem}
+.btn-pick:hover{background:#55e0a1}
+.btn-later{background:transparent;color:var(--text2);border:1px solid var(--border2);border-radius:var(--rs);padding:.6rem;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;width:100%}
 
-/* HISTORY */
-#history-panel { padding-bottom: 2rem; }
-.history-filters { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.filter-btn { background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: .35rem .85rem; font-size: .8rem; cursor: pointer; color: var(--text2); transition: all .15s; }
-.filter-btn.active { border-color: var(--gold); color: var(--gold2); background: rgba(212,168,67,.1); }
-.history-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .85rem; margin-bottom: .5rem; transition: border-color .15s; }
-.history-item:hover { border-color: var(--border2); }
-.hi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .4rem; }
-.hi-table { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; }
-.hi-time { font-size: .75rem; color: var(--text2); }
-.hi-items { font-size: .82rem; color: var(--text2); }
-.hi-footer { display: flex; justify-content: space-between; align-items: center; margin-top: .35rem; }
-.hi-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .85rem; color: var(--gold); }
-.hi-pay { font-size: .72rem; font-family: 'Syne', sans-serif; font-weight: 600; padding: .18rem .55rem; border-radius: 10px; }
-.hi-pay-cash { color: var(--green); background: rgba(62,207,142,.1); }
-.hi-pay-card { color: var(--blue); background: rgba(91,156,246,.1); }
-.hi-pay-later { color: var(--text2); background: rgba(154,149,144,.1); }
-.hi-pay-payment { color: var(--purple); background: rgba(167,139,250,.1); }
+/* ═ SETTINGS PANEL ═ */
+#settings-panel{padding-bottom:2rem}
+.set-section{margin-bottom:1.5rem}
+.set-title{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.65rem}
+.set-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1rem;margin-bottom:.65rem}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.set-row-info{flex:1}
+.set-row-title{font-weight:500;font-size:.9rem}
+.set-row-sub{font-size:.75rem;color:var(--text2);margin-top:.15rem;line-height:1.4}
+.toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;inset:0;background:var(--bg3);border-radius:12px;cursor:pointer;transition:.3s;border:1px solid var(--border2)}
+.slider::before{content:'';position:absolute;width:18px;height:18px;left:2px;bottom:2px;background:var(--text2);border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--green);border-color:var(--green)}
+.toggle input:checked+.slider::before{transform:translateX(20px);background:#fff}
+.set-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:.65rem 1rem;font-family:'Syne',sans-serif;font-weight:600;font-size:.82rem;color:var(--text);cursor:pointer;transition:all .2s;width:100%;margin-top:.5rem;text-align:center}
+.set-btn:hover{border-color:var(--gold);color:var(--gold2)}
+.set-btn.active-btn{border-color:var(--green);color:var(--green);background:rgba(62,207,142,.07)}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-green{background:var(--green)}
+.dot-grey{background:var(--text2)}
+.dot-red{background:var(--red)}
+.set-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);color:var(--text);padding:.65rem .9rem;font-size:.88rem;font-family:'DM Sans',sans-serif;outline:none;margin-top:.5rem}
+.set-input:focus{border-color:var(--gold)}
+#print-status{font-size:.75rem;color:var(--text2);margin-top:.4rem;min-height:1rem}
+.info-box{background:rgba(91,156,246,.08);border:1px solid rgba(91,156,246,.2);border-radius:var(--rs);padding:.75rem 1rem;font-size:.78rem;color:var(--blue);line-height:1.5;margin-top:.5rem}
 
-/* TOAST */
-#toast { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--bg2); border: 1px solid var(--gold); border-radius: var(--radius); padding: .75rem 1.25rem; font-family: 'Syne', sans-serif; font-weight: 600; font-size: .9rem; z-index: 9999; transition: transform .3s cubic-bezier(.4,0,.2,1); display: flex; align-items: center; gap: .6rem; white-space: nowrap; box-shadow: 0 4px 32px rgba(0,0,0,.5); }
-#toast.show { transform: translateX(-50%) translateY(0); }
-.toast-icon { font-size: 1.2rem; }
+/* ═ HISTORY ═ */
+#hp{padding-bottom:2rem}
+.hfilts{display:flex;gap:.45rem;margin-bottom:.9rem;flex-wrap:wrap}
+.hfbtn{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:.32rem .82rem;font-size:.78rem;cursor:pointer;color:var(--text2);transition:all .15s}
+.hfbtn.active{border-color:var(--gold);color:var(--gold2);background:rgba(212,168,67,.1)}
+.hi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:.82rem;margin-bottom:.45rem;transition:border-color .15s}
+.hi:hover{border-color:var(--border2)}
+.hi-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:.28rem}
+.hi-t{font-family:'Syne',sans-serif;font-weight:700;font-size:.92rem}
+.hi-dt{font-size:.73rem;color:var(--text2)}
+.hi-srv{font-size:.7rem;color:var(--gold);font-family:'Syne',sans-serif;font-weight:600;margin-bottom:.3rem}
+.hi-its{font-size:.8rem;color:var(--text2)}
+.hi-ft{display:flex;justify-content:space-between;align-items:center;margin-top:.32rem}
+.hi-tot{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--gold)}
+.hp-tag{font-size:.7rem;font-family:'Syne',sans-serif;font-weight:600;padding:.16rem .52rem;border-radius:10px}
+.tag-c{color:var(--green);background:rgba(62,207,142,.1)}
+.tag-k{color:var(--blue);background:rgba(91,156,246,.1)}
+.tag-l{color:var(--text2);background:rgba(154,149,144,.1)}
+.tag-p{color:var(--purple);background:rgba(167,139,250,.1)}
 
-@media (min-width: 480px) { .drinks-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 640px) { header { padding: .85rem 1.5rem; } .panel { padding: 1.25rem 1.5rem; } #barman-panel, #history-panel { max-width: 640px; margin: 0 auto; } }
+/* ═ TOAST ═ */
+#toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:1px solid var(--gold);border-radius:var(--r);padding:.72rem 1.2rem;font-family:'Syne',sans-serif;font-weight:600;font-size:.88rem;z-index:9999;transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:.55rem;white-space:nowrap;box-shadow:0 4px 28px rgba(0,0,0,.5)}
+#toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(min-width:480px){.dgrid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:640px){header{padding:.82rem 1.4rem}.panel{padding:1.2rem 1.4rem}#bp,#hp,#settings-panel{max-width:640px;margin:0 auto}}
 </style>
 </head>
 <body>
 
-<!-- CONFIG -->
-<div id="config-screen">
-  <h1>SiraGo</h1>
-  <p>Commandes Sirableu.<br>Configurez votre connexion Firebase ci-dessous.</p>
-  <div class="config-card">
+<!-- ═══ CONFIG ═══ -->
+<div id="cfg">
+  <h1>BarFlow</h1>
+  <p>Application de commandes bar.<br>Configurez votre connexion Firebase ci-dessous.</p>
+
+  <div class="card">
     <h2>🔥 Configuration Firebase</h2>
-    <label class="field-label">API Key</label>
-    <input type="text" id="cfg-apiKey" placeholder="AIzaSy..." />
-    <label class="field-label">Auth Domain</label>
-    <input type="text" id="cfg-authDomain" placeholder="mon-bar.firebaseapp.com" />
-    <label class="field-label">Database URL</label>
-    <input type="text" id="cfg-dbUrl" placeholder="https://mon-bar-default-rtdb.firebaseio.com" />
-    <label class="field-label">Project ID</label>
-    <input type="text" id="cfg-projectId" placeholder="mon-bar" />
-    <p style="font-size:.75rem;color:var(--text2);margin-bottom:1rem">Ces informations se trouvent dans la console Firebase → Paramètres du projet → Vos applications</p>
+    <label class="lbl">API Key</label>
+    <input type="text" id="c-api" placeholder="AIzaSy...">
+    <label class="lbl">Auth Domain</label>
+    <input type="text" id="c-auth" placeholder="mon-bar.firebaseapp.com">
+    <label class="lbl">Database URL</label>
+    <input type="text" id="c-db" placeholder="https://mon-bar-default-rtdb.firebaseio.com">
+    <label class="lbl">Project ID</label>
+    <input type="text" id="c-pid" placeholder="mon-bar">
+    <label class="lbl">VAPID Key (notifications push)</label>
+    <input type="text" id="c-vapid" placeholder="BxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxI">
+    <p class="hint">Console Firebase → Project Settings → Cloud Messaging → Web Push certificates → Key pair</p>
   </div>
-  <div class="config-card">
+
+  <div class="card">
     <h2>Votre rôle</h2>
     <div class="role-grid">
-      <div class="role-btn" id="role-serveur" onclick="selectRole('serveur')">
+      <div class="role-btn" id="r-srv" onclick="selRole('serveur')">
         <span class="role-icon">🍽️</span><span class="role-name">Serveur</span><span class="role-sub">Prise de commande</span>
       </div>
-      <div class="role-btn" id="role-barman" onclick="selectRole('barman')">
+      <div class="role-btn" id="r-bar" onclick="selRole('barman')">
         <span class="role-icon">🍸</span><span class="role-name">Barman</span><span class="role-sub">Préparation</span>
       </div>
     </div>
+    <div id="profile-wrap">
+      <label class="lbl" style="margin-top:.85rem">Votre prénom / pseudo</label>
+      <input type="text" id="c-name" placeholder="ex : Marie, Jean…" style="margin-bottom:.25rem">
+      <p class="hint">Ce nom identifie vos commandes. Chaque serveur ne reçoit que ses propres notifications.</p>
+    </div>
   </div>
+
   <div style="width:100%;max-width:420px">
     <button class="btn-gold" onclick="startApp()">Lancer l'application →</button>
-    <p style="font-size:.75rem;color:var(--text2);margin-top:.75rem;text-align:center">Les paramètres sont sauvegardés localement sur votre appareil.</p>
+    <p style="font-size:.73rem;color:var(--text2);margin-top:.72rem;text-align:center">Les paramètres sont sauvegardés sur cet appareil.</p>
   </div>
 </div>
 
-<!-- APP -->
+<!-- ═══ APP ═══ -->
 <div id="app">
   <header>
-    <span class="brand">🍸 SiraGo</span>
-    <div class="header-right">
-      <div id="pending-count">0</div>
-      <span id="role-badge" class="badge-role"></span>
-      <button onclick="logout()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:.8rem;padding:.3rem .5rem;">⏻</button>
+    <span class="brand">🍸 BarFlow</span>
+    <div class="hright">
+      <div id="pcount">0</div>
+      <span id="role-badge" class="badge"></span>
+      <button onclick="logout()" style="background:none;border:none;color:var(--text2);cursor:pointer;font-size:.8rem;padding:.28rem .48rem">⏻</button>
     </div>
   </header>
-  <div class="tabs" id="tabs-container"></div>
+  <div class="tabs" id="tabs"></div>
 
   <div id="order-panel" class="panel">
-    <div id="drinks-container"></div>
-    <div style="height:90px"></div>
+    <div id="menu-container"></div>
+    <div style="height:88px"></div>
   </div>
 
-  <div id="barman-panel" class="panel">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
-      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem">Commandes en attente</div>
-      <div id="orders-count" style="font-size:.8rem;color:var(--text2)"></div>
+  <div id="bp" class="panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem">Commandes en attente</div>
+      <div id="orders-cnt" style="font-size:.78rem;color:var(--text2)"></div>
     </div>
     <div id="orders-list"></div>
   </div>
 
-  <div id="history-panel" class="panel">
-    <div class="history-filters">
-      <button class="filter-btn active" onclick="filterHistory('all', this)">Toutes</button>
-      <button class="filter-btn" onclick="filterHistory('pending', this)">En attente</button>
-      <button class="filter-btn" onclick="filterHistory('done', this)">Terminées</button>
-      <button class="filter-btn" onclick="filterHistory('payment', this)">Paiements</button>
+  <div id="hp" class="panel">
+    <div class="hfilts">
+      <button class="hfbtn active" onclick="filtHist('all',this)">Toutes</button>
+      <button class="hfbtn" onclick="filtHist('pending',this)">En attente</button>
+      <button class="hfbtn" onclick="filtHist('done',this)">Terminées</button>
+      <button class="hfbtn" onclick="filtHist('payment',this)">Paiements</button>
     </div>
-    <div id="history-list"></div>
+    <div id="hist-list"></div>
   </div>
-</div>
 
-<!-- CART BAR -->
-<div id="cart-bar">
-  <div class="cart-info">
-    <div><span class="cart-count" id="cart-count-txt">0 boisson(s)</span></div>
-    <div class="cart-total-bar" id="cart-total-bar-txt"></div>
-  </div>
-  <button class="btn-send" onclick="openCartModal()">Valider →</button>
-</div>
-
-<!-- CART MODAL -->
-<div class="overlay" id="cart-overlay" onclick="closeCartModal(event)">
-  <div class="modal">
-    <div class="modal-drag"></div>
-    <h3>Votre commande</h3>
-    <div class="table-input-wrap">
-      <input type="text" id="table-number" placeholder="N° de table (ex: Table 5)" />
-    </div>
-    <div class="cart-items" id="cart-items-list"></div>
-    <div class="cart-total-bloc">
-      <span class="cart-total-label">Total de la commande</span>
-      <span class="cart-total-amount" id="modal-total-amount">0,00 €</span>
-    </div>
-    <div class="payment-section">
-      <span class="payment-label">💳 Mode de paiement</span>
-      <div class="payment-grid">
-        <div class="pay-btn" id="pay-cash" onclick="selectPayment('cash')"><span class="pay-icon">💵</span><span class="pay-name pay-name-cash">Espèces</span></div>
-        <div class="pay-btn" id="pay-card" onclick="selectPayment('card')"><span class="pay-icon">💳</span><span class="pay-name pay-name-card">Carte</span></div>
-        <div class="pay-btn" id="pay-later" onclick="selectPayment('later')"><span class="pay-icon">⏳</span><span class="pay-name pay-name-later">Plus tard</span></div>
+  <div id="settings-panel" class="panel">
+    <!-- Notifications push -->
+    <div class="set-section">
+      <div class="set-title">🔔 Notifications push</div>
+      <div class="set-card">
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-title">Activer les notifications</div>
+            <div class="set-row-sub" id="notif-sub">Recevez une alerte même si le téléphone est en veille.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="notif-toggle" onchange="toggleNotif(this.checked)"><span class="slider"></span></label>
+        </div>
+        <button class="set-btn" id="notif-test-btn" onclick="sendTestNotif()" style="display:none">📲 Envoyer une notification test</button>
+        <div class="info-box" id="notif-info" style="display:none">
+          Pour recevoir des notifications en veille, ajoutez cette page à votre écran d'accueil (iOS : Partager → Sur l'écran d'accueil / Android : Chrome → Ajouter à l'écran d'accueil).
+        </div>
       </div>
     </div>
-    <button class="btn-confirm" onclick="sendOrder()">📤 Envoyer au barman</button>
-    <button class="btn-cancel" onclick="closeCartModal()">Annuler</button>
+
+    <!-- Impression -->
+    <div class="set-section">
+      <div class="set-title">🖨️ Impression automatique</div>
+      <div class="set-card">
+        <div class="set-row">
+          <div class="set-row-info">
+            <div class="set-row-title">Imprimer les bons de commande</div>
+            <div class="set-row-sub">Impression automatique à chaque nouvelle commande reçue par le barman.</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="print-toggle" onchange="togglePrint(this.checked)"><span class="slider"></span></label>
+        </div>
+        <div id="print-options" style="display:none;margin-top:.8rem">
+          <label class="lbl">Méthode d'impression</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-bottom:.6rem">
+            <div class="pbtn" id="pm-browser" onclick="selPrintMethod('browser')" style="border:2px solid var(--border)">
+              <span style="font-size:1.3rem">🖥️</span>
+              <span style="font-family:'Syne',sans-serif;font-weight:600;font-size:.72rem;color:var(--text2)">Navigateur</span>
+            </div>
+            <div class="pbtn" id="pm-network" onclick="selPrintMethod('network')" style="border:2px solid var(--border)">
+              <span style="font-size:1.3rem">📡</span>
+              <span style="font-family:'Syne',sans-serif;font-weight:600;font-size:.72rem;color:var(--text2)">Imprimante réseau</span>
+            </div>
+          </div>
+          <div id="print-browser-info" style="display:none">
+            <div class="info-box">Le navigateur affichera une fenêtre d'impression à chaque commande. Compatible avec toutes les imprimantes connectées à l'ordinateur ou à la tablette.</div>
+            <button class="set-btn" onclick="testPrint()">🧾 Imprimer un bon test</button>
+          </div>
+          <div id="print-network-info" style="display:none">
+            <div class="info-box" style="margin-bottom:.5rem">
+              Entrez l'adresse IP de votre imprimante réseau (Epson TM, Star Micronics…). Elle doit être sur le même WiFi que cette tablette.
+            </div>
+            <label class="lbl">Adresse IP de l'imprimante</label>
+            <input type="text" class="set-input" id="printer-ip" placeholder="192.168.1.50" oninput="savePrinterIp()">
+            <label class="lbl" style="margin-top:.5rem">Port (défaut : 9100)</label>
+            <input type="text" class="set-input" id="printer-port" placeholder="9100" oninput="savePrinterIp()">
+            <div id="print-status"></div>
+            <button class="set-btn" onclick="testPrintNetwork()">🧾 Tester l'impression réseau</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profil -->
+    <div class="set-section" id="profile-section" style="display:none">
+      <div class="set-title">🍽️ Mon profil</div>
+      <div class="set-card">
+        <div class="set-row-info">
+          <div class="set-row-title" id="profile-name-display"></div>
+          <div class="set-row-sub">Identifiant unique : <span id="profile-id-display" style="font-family:monospace;font-size:.7rem"></span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
-<div class="overlay" id="payment-overlay" onclick="closePaymentModal(event)">
+<!-- ═══ CART BAR ═══ -->
+<div id="cbar">
+  <div class="ci-lbl">
+    <div><span class="ci-cnt" id="cart-cnt">0</span><span style="color:var(--text2);font-size:.78rem;margin-left:.35rem">boisson(s)</span></div>
+    <div class="ci-tot" id="cart-tot"></div>
+  </div>
+  <button class="btn-send" onclick="openCart()">Valider →</button>
+</div>
+
+<!-- ═══ CART MODAL ═══ -->
+<div class="ov" id="ov-cart" onclick="closeCart(event)">
   <div class="modal">
-    <div class="modal-drag"></div>
+    <div class="drag"></div>
+    <h3>Votre commande</h3>
+    <input type="text" class="ti" id="table-in" placeholder="N° de table (ex: Table 5)">
+    <div class="citems" id="cart-items"></div>
+    <div class="tot-bloc">
+      <span class="tot-lbl">Total</span>
+      <span class="tot-amt" id="modal-tot">0,00 €</span>
+    </div>
+    <span class="pay-lbl">💳 Mode de paiement</span>
+    <div class="pgrid">
+      <div class="pbtn" id="pb-cash" onclick="selPay('cash')"><span class="pi">💵</span><span class="pn pn-c">Espèces</span></div>
+      <div class="pbtn" id="pb-card" onclick="selPay('card')"><span class="pi">💳</span><span class="pn pn-k">Carte</span></div>
+      <div class="pbtn" id="pb-later" onclick="selPay('later')"><span class="pi">⏳</span><span class="pn pn-l">Plus tard</span></div>
+    </div>
+    <button class="btn-ok" onclick="sendOrder()">📤 Envoyer au barman</button>
+    <button class="btn-no" onclick="closeCart()">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ PAYMENT MODAL ═══ -->
+<div class="ov" id="ov-pay" onclick="closePayMod(event)">
+  <div class="modal">
+    <div class="drag"></div>
     <h3>💳 Demander le paiement</h3>
-    <p style="color:var(--text2);font-size:.88rem;margin-bottom:1rem">Envoyer une alerte au barman pour encaisser la table.</p>
-    <div class="table-input-wrap">
-      <input type="text" id="payment-table-number" placeholder="N° de table (ex: Table 5)" />
+    <p style="color:var(--text2);font-size:.86rem;margin-bottom:.9rem">Envoyer une alerte au barman pour encaisser la table.</p>
+    <input type="text" class="ti" id="pay-table" placeholder="N° de table">
+    <div class="pqgrid">
+      <button class="pbcash" onclick="sendPayAlert('cash')">💵 Espèces</button>
+      <button class="pbcard" onclick="sendPayAlert('card')">💳 Carte</button>
     </div>
-    <div class="payment-quick-grid" style="margin-bottom:.75rem">
-      <button class="btn-pay-cash" onclick="sendPaymentAlert('cash')">💵 Espèces</button>
-      <button class="btn-pay-card" onclick="sendPaymentAlert('card')">💳 Carte bancaire</button>
-    </div>
-    <button class="btn-cancel" onclick="closePaymentModal()">Annuler</button>
+    <button class="btn-no" onclick="closePayMod()">Annuler</button>
   </div>
 </div>
 
-<!-- READY BANNER (serveur) — commandes prêtes, persistant -->
-<div id="ready-banner">
-  <div id="ready-banner-inner">
-    <div class="big-icon">🍸</div>
+<!-- ═══ READY BANNER ═══ -->
+<div id="rb">
+  <div id="rb-inner">
+    <div class="bico">🍸</div>
     <h2>Commande(s) prête(s) !</h2>
-    <p style="color:var(--text2);font-size:.85rem;margin-bottom:1rem">Récupérez les boissons et confirmez.</p>
-    <div id="ready-orders-list"></div>
-    <button class="btn-pickup" onclick="confirmPickup()">✅ Commande(s) récupérée(s)</button>
-    <button class="btn-pickup-later" onclick="dismissBanner()">Rappel plus tard</button>
+    <p style="color:var(--text2);font-size:.83rem;margin-bottom:.9rem">Récupérez les boissons et confirmez.</p>
+    <div id="rbl"></div>
+    <button class="btn-pick" onclick="confirmPickup()">✅ Commande(s) récupérée(s)</button>
+    <button class="btn-later" onclick="dismissBanner()">Rappel dans 1 minute</button>
   </div>
 </div>
 
-<!-- TOAST -->
-<div id="toast">
-  <span class="toast-icon" id="toast-icon">🔔</span>
-  <span id="toast-msg">Nouvelle commande !</span>
-</div>
+<!-- ═══ TOAST ═══ -->
+<div id="toast"><span id="t-ico">🔔</span><span id="t-msg"></span></div>
 
-<!-- FAB PAYMENT -->
-<button id="fab-payment" onclick="openPaymentModal()"
+<!-- ═══ FAB PAYMENT ═══ -->
+<button id="fab-pay" onclick="openPayMod()"
   style="display:none;position:fixed;bottom:1rem;right:1rem;z-index:190;
-  background:rgba(167,139,250,.2);color:var(--purple);
-  border:1px solid rgba(167,139,250,.4);border-radius:50px;
-  padding:.65rem 1.1rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.8rem;
-  cursor:pointer;backdrop-filter:blur(8px);">
-  💳 Paiement
-</button>
+  background:rgba(167,139,250,.2);color:var(--purple);border:1px solid rgba(167,139,250,.4);
+  border-radius:50px;padding:.62rem 1.05rem;font-family:'Syne',sans-serif;font-weight:700;
+  font-size:.78rem;cursor:pointer;backdrop-filter:blur(8px)">💳 Paiement</button>
 
 <script>
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 // MENU
-// ═══════════════════════════════════════════
-const MENU = [
-  {
-    category: "🥂 Champagne & Vins",
-    items: [
-      { name: "Vin Rouge", emoji: "🍷", price: 2.00 },
-      { name: "Vin Blanc", emoji: "🍷", price: 2.00 },
-      { name: "Vin Rosé", emoji: "🍷", price: 2.00 },
-      { name: "Givurst", emoji: "🍷", price: 2.50 },
-      { name: "Muscat", emoji: "🍷", price: 2.50 },
-      { name: "Porto Rouge", emoji: "🍷", price: 3.00 },
-      { name: "Porto Blanc", emoji: "🍷", price: 3.00 },
-      { name: "Picon Vin Blanc", emoji: "🍷", price: 3.00 },
-      { name: "Kir", emoji: "🍷", price: 3.00 },
-      { name: "Coupe Methode", emoji: "🍾", price: 3.00 },
-      { name: "Coupe Champagne", emoji: "🥂", price: 7.00 },
-    ]
-  },
-  {
-    category: "🍺 Bières",
-    // Sous-catégories bière : chaque sous-cat a un label + items
-    subcategories: [
-      {
-        label: "Pressions — 25 cl",
-        items: [
-          { name: "Galopin 15cl", emoji: "🍺", price: 2.00 },
-          { name: "St Omer 25cl", emoji: "🍺", price: 2.50 },
-          { name: "Goudale Blonde 25cl", emoji: "🍺", price: 3.30 },
-          { name: "Goudale Ambre 25cl", emoji: "🍺", price: 3.30 },
-          { name: "Goudale Ruby 25cl", emoji: "🍺", price: 3.50 },
-          { name: "Triple Secret Moine 25cl", emoji: "🍺", price: 3.80 },
-          { name: "Chouffe 25cl", emoji: "🍺", price: 3.80 },
-          { name: "Bon Secours 25cl", emoji: "🍺", price: 4.00 },
-          { name: "Paix Dieu 25cl", emoji: "🍺", price: 4.20 },
-          { name: "Sans Alcool 25cl", emoji: "🍺", price: 2.50 },
-          { name: "Bière Sirop 25cl", emoji: "🍺", price: 3.00 },
-          { name: "Panache 25cl", emoji: "🍺", price: 2.60 },
-          { name: "Monaco 25cl", emoji: "🍺", price: 3.00 },
-          { name: "Picon Bière 25cl", emoji: "🍺", price: 3.00 },
-        ]
-      },
-      {
-        label: "Pressions — 33 cl",
-        items: [
-          { name: "St Omer 33cl", emoji: "🍺", price: 3.50 },
-          { name: "Goudale Blonde 33cl", emoji: "🍺", price: 5.00 },
-          { name: "Goudale Ambre 33cl", emoji: "🍺", price: 5.00 },
-          { name: "Goudale Ruby 33cl", emoji: "🍺", price: 5.50 },
-          { name: "Triple Secret Moine 33cl", emoji: "🍺", price: 5.70 },
-          { name: "Chouffe 33cl", emoji: "🍺", price: 5.70 },
-          { name: "Bon Secours 33cl", emoji: "🍺", price: 5.70 },
-          { name: "Paix Dieu 33cl", emoji: "🍺", price: 5.70 },
-          { name: "Sans Alcool 33cl", emoji: "🍺", price: 3.50 },
-          { name: "Bière Sirop 33cl", emoji: "🍺", price: 3.50 },
-          { name: "Panache 33cl", emoji: "🍺", price: 3.70 },
-          { name: "Monaco 33cl", emoji: "🍺", price: 3.70 },
-          { name: "Picon Bière 33cl", emoji: "🍺", price: 4.70 },
-        ]
-      },
-      {
-        label: "Pressions — 50 cl",
-        items: [
-          { name: "St Omer 50cl", emoji: "🍺", price: 5.00 },
-          { name: "Goudale Blonde 50cl", emoji: "🍺", price: 6.50 },
-          { name: "Goudale Ambre 50cl", emoji: "🍺", price: 6.50 },
-          { name: "Goudale Ruby 50cl", emoji: "🍺", price: 7.00 },
-          { name: "Triple Secret Moine 50cl", emoji: "🍺", price: 8.00 },
-          { name: "Chouffe 50cl", emoji: "🍺", price: 8.00 },
-          { name: "Bon Secours 50cl", emoji: "🍺", price: 8.00 },
-          { name: "Paix Dieu 50cl", emoji: "🍺", price: 8.00 },
-          { name: "Sans Alcool 50cl", emoji: "🍺", price: 5.00 },
-          { name: "Bière Sirop 50cl", emoji: "🍺", price: 5.00 },
-          { name: "Panache 50cl", emoji: "🍺", price: 5.20 },
-          { name: "Monaco 50cl", emoji: "🍺", price: 5.20 },
-          { name: "Picon Bière 50cl", emoji: "🍺", price: 7.00 },
-        ]
-      },
-      {
-        label: "Bouteilles",
-        items: [
-          { name: "Heineken", emoji: "🍻", price: 2.80 },
-          { name: "1664", emoji: "🍻", price: 3.00 },
-          { name: "Desperados", emoji: "🍺", price: 4.00 },
-          { name: "Duvel", emoji: "🍺", price: 5.50 },
-          { name: "Chimay Brune", emoji: "🥤", price: 5.50 },
-        ]
-      },
-    ]
-  },
-  {
-    category: "🧃 Softs & Sans alcool",
-    items: [
-      { name: "Eau plate", emoji: "💧", price: 1.00 },
-      { name: "Eau Sirop", emoji: "💧", price: 1.50 },
-      { name: "Limonade", emoji: "🥤", price: 1.50 },
-      { name: "Diabolo", emoji: "🥤", price: 2.00 },
-      { name: "Coca", emoji: "🥤", price: 2.50 },
-      { name: "Coca Cherry", emoji: "🥤", price: 2.50 },
-      { name: "Coca Zero", emoji: "🥤", price: 2.50 },
-      { name: "Ice Tea", emoji: "🥤", price: 2.50 },
-      { name: "Oasis", emoji: "🥤", price: 2.50 },
-      { name: "Orangina", emoji: "🥤", price: 2.50 },
-      { name: "Fanta Citron", emoji: "🥤", price: 2.50 },
-      { name: "Sweppes Agrumes", emoji: "🥤", price: 2.50 },
-      { name: "Sweppes Tonic", emoji: "🥤", price: 2.50 },
-      { name: "Perrier", emoji: "💧", price: 2.50 },
-      { name: "Redbull", emoji: "🥤", price: 3.00 },
-      { name: "Jus d'Orange", emoji: "🍊", price: 2.50 },
-      { name: "Jus d'Abricot", emoji: "🍊", price: 2.50 },
-      { name: "Jus d'Ananas", emoji: "🍊", price: 2.50 },
-      { name: "Jus de Pomme", emoji: "🍊", price: 2.50 },
-      { name: "Jus de Tomate", emoji: "🍊", price: 2.50 },
-    ]
-  },
-  {
-    category: "🍸 Cocktails",
-    items: [
-      { name: "Mojito", emoji: "🍹", price: 7.00 },
-      { name: "Spritz", emoji: "🍹", price: 6.50 },
-      { name: "Sunrise sans alcool", emoji: "🍹", price: 6.50 },
-    ]
-  },
-  {
-    category: "🥃 Alcool",
-    items: [
-      { name: "Ricard", emoji: "🥃", price: 2.30 },
-      { name: "Martini Blanc", emoji: "🥃", price: 3.00 },
-      { name: "Martini Rouge", emoji: "🥃", price: 3.00 },
-      { name: "Suze", emoji: "🥃", price: 3.00 },
-      { name: "Vodka Pure", emoji: "🥃", price: 4.50 },
-      { name: "Vodka Supp", emoji: "🥃", price: 5.00 },
-      { name: "Jager Bomb", emoji: "🥃", price: 5.00 },
-      { name: "Whisky Coca", emoji: "🥃", price: 5.00 },
-      { name: "Captain Morgan", emoji: "🥃", price: 6.00 },
-      { name: "Clan Campbell", emoji: "🥃", price: 4.50 },
-      { name: "Ballantine's", emoji: "🥃", price: 5.00 },
-      { name: "Jack Daniel", emoji: "🥃", price: 7.00 },
-      { name: "Chivas", emoji: "🥃", price: 7.00 },
-      { name: "Aberlour", emoji: "🥃", price: 7.00 },
-      { name: "FourRoses", emoji: "🥃", price: 7.00 },
-      { name: "Rhum Supp", emoji: "🥃", price: 5.00 },
-      { name: "Rhum Don Papa", emoji: "🥃", price: 6.50 },
-      { name: "Rhum Arrangé", emoji: "🥃", price: 6.50 },
-      { name: "Gin", emoji: "🥃", price: 5.00 },
-      { name: "Gin Tonic", emoji: "🥃", price: 5.50 },
-      { name: "Get 27", emoji: "🥃", price: 5.00 },
-      { name: "Get 31", emoji: "🥃", price: 5.00 },
-      { name: "Get Perrier", emoji: "🥃", price: 5.50 },
-      { name: "Cognac", emoji: "🥃", price: 5.00 },
-      { name: "Armaniac", emoji: "🥃", price: 5.00 },
-      { name: "Calvados", emoji: "🥃", price: 5.00 },
-      { name: "Limoncello", emoji: "🥃", price: 5.00 },
-      { name: "Bailey's", emoji: "🥃", price: 5.00 },
-    ]
-  },
-  {
-    category: "☕ Chaud",
-    items: [
-      { name: "Espresso", emoji: "☕", price: 1.50 },
-      { name: "Café au lait", emoji: "☕", price: 1.60 },
-      { name: "Allongé", emoji: "☕", price: 1.60 },
-      { name: "Allongé au lait", emoji: "☕", price: 1.60 },
-      { name: "Grand café", emoji: "☕", price: 3.00 },
-      { name: "Grand café crème", emoji: "☕", price: 3.00 },
-      { name: "Chocolat chaud", emoji: "☕", price: 3.00 },
-      { name: "Thé", emoji: "🫖", price: 3.00 },
-    ]
-  },
+// ══════════════════════════════════════════════════════════
+const MENU=[
+  {cat:"🥂 Champagne & Vins",items:[
+    {n:"Champagne Brut",e:"🥂",p:12},{n:"Champagne Rosé",e:"🍾",p:13},
+    {n:"Vin rouge",e:"🍷",p:6},{n:"Vin blanc",e:"🥃",p:6},{n:"Vin rosé",e:"🍹",p:6}]},
+  {cat:"🍺 Bières",subs:[
+    {lbl:"Pressions — 25 cl",items:[
+      {n:"Pression 25cl",e:"🍺",p:3},{n:"Blanche pression 25cl",e:"🍺",p:3.5},{n:"IPA pression 25cl",e:"🍺",p:3.5}]},
+    {lbl:"Pressions — 33 cl",items:[
+      {n:"Pression 33cl",e:"🍺",p:4},{n:"Blanche pression 33cl",e:"🍺",p:4.5},{n:"IPA pression 33cl",e:"🍺",p:4.5}]},
+    {lbl:"Pressions — 50 cl",items:[
+      {n:"Pression 50cl",e:"🍺",p:5.5},{n:"Blanche pression 50cl",e:"🍺",p:6},{n:"IPA pression 50cl",e:"🍺",p:6}]},
+    {lbl:"Bouteilles",items:[
+      {n:"Bière blonde bouteille",e:"🍻",p:5},{n:"Bière brune bouteille",e:"🍻",p:5},{n:"Bière sans alcool",e:"🥤",p:4}]}]},
+  {cat:"🍸 Cocktails",items:[
+    {n:"Mojito",e:"🍹",p:10},{n:"Spritz",e:"🥂",p:9},{n:"Margarita",e:"🍸",p:10},
+    {n:"Gin Tonic",e:"🥃",p:10},{n:"Cosmopolitan",e:"🍸",p:10},{n:"Whisky Sour",e:"🥃",p:11},
+    {n:"Negroni",e:"🍊",p:11},{n:"Daïquiri",e:"🍹",p:10}]},
+  {cat:"🥃 Spiritueux",items:[
+    {n:"Whisky on the rocks",e:"🥃",p:9},{n:"Cognac",e:"🥃",p:10},
+    {n:"Rhum arrangé",e:"🍹",p:8},{n:"Vodka",e:"🫙",p:7},{n:"Tequila shot",e:"🥃",p:5}]},
+  {cat:"🧃 Softs & Sans alcool",items:[
+    {n:"Coca-Cola",e:"🥤",p:3.5},{n:"Perrier",e:"💧",p:3.5},{n:"Jus d'orange",e:"🍊",p:4.5},
+    {n:"Limonade",e:"🥤",p:3},{n:"Eau plate",e:"💧",p:2.5},{n:"Virgin Mojito",e:"🌿",p:7}]},
+  {cat:"☕ Chaud",items:[
+    {n:"Espresso",e:"☕",p:2.5},{n:"Cappuccino",e:"☕",p:3.5},{n:"Thé",e:"🫖",p:3},{n:"Café au lait",e:"☕",p:3}]}
 ];
-
-// Build price lookup
-const PRICE_MAP = {};
-function buildPriceMap(menu) {
-  menu.forEach(cat => {
-    if (cat.items) cat.items.forEach(i => { PRICE_MAP[i.name] = i.price; });
-    if (cat.subcategories) cat.subcategories.forEach(sub => sub.items.forEach(i => { PRICE_MAP[i.name] = i.price; }));
-  });
-}
-buildPriceMap(MENU);
-
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let db = null;
-let role = null;
-let cart = {};
-let allOrders = {};
-let historyFilter = 'all';
-let selectedPayment = null;
-// Track which "done" orders the serveur has seen but not yet acknowledged
-let pendingPickupKeys = []; // keys of orders with status=done not yet picked up
-let bannerDismissed = false; // if serveur dismissed temporarily
-
-// ═══════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════
-function fmt(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
-function cartTotal() { return Object.entries(cart).reduce((s, [name, d]) => s + (PRICE_MAP[name] || 0) * d.qty, 0); }
-function orderTotal(order) { return (order.items || []).reduce((s, i) => s + (i.price || PRICE_MAP[i.name] || 0) * i.qty, 0); }
-
-// ═══════════════════════════════════════════
-// SOUNDS
-// ═══════════════════════════════════════════
-const AudioCtx = window.AudioContext || window.webkitAudioContext;
-let audioCtx;
-function ensureAudio() { if (!audioCtx) audioCtx = new AudioCtx(); }
-
-function playSound(type) {
-  ensureAudio();
-  const ctx = audioCtx, t = ctx.currentTime;
-  if (type === 'new_order') {
-    [0, 0.18, 0.36].forEach((delay, i) => {
-      const freqs = [880, 660, 770];
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = freqs[i]; o.type = 'sine';
-      g.gain.setValueAtTime(0, t+delay); g.gain.linearRampToValueAtTime(0.3, t+delay+0.04); g.gain.exponentialRampToValueAtTime(0.001, t+delay+0.35);
-      o.start(t+delay); o.stop(t+delay+0.4);
-    });
-  } else if (type === 'order_ready') {
-    // Repeated cheerful arpeggio to grab attention
-    [0, 0.12, 0.24, 0.36, 0.55, 0.67, 0.79, 0.91].forEach((delay, i) => {
-      const freqs = [523, 659, 784, 1047, 523, 659, 784, 1047];
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = freqs[i]; o.type = 'triangle';
-      g.gain.setValueAtTime(0, t+delay); g.gain.linearRampToValueAtTime(0.25, t+delay+0.04); g.gain.exponentialRampToValueAtTime(0.001, t+delay+0.28);
-      o.start(t+delay); o.stop(t+delay+0.35);
-    });
-  } else if (type === 'payment') {
-    [0, 0.22].forEach(delay => {
-      const o = ctx.createOscillator(), g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.frequency.value = 1200; o.type = 'square';
-      g.gain.setValueAtTime(0, t+delay); g.gain.linearRampToValueAtTime(0.15, t+delay+0.03); g.gain.exponentialRampToValueAtTime(0.001, t+delay+0.18);
-      o.start(t+delay); o.stop(t+delay+0.22);
-    });
-  } else if (type === 'sent') {
-    const o = ctx.createOscillator(), g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.frequency.value = 440; o.type = 'sine';
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.2, t+0.05); g.gain.exponentialRampToValueAtTime(0.001, t+0.3);
-    o.start(t); o.stop(t+0.35);
-  }
-}
-
-// ═══════════════════════════════════════════
-// CONFIG / FIREBASE
-// ═══════════════════════════════════════════
-function selectRole(r) {
-  role = r;
-  document.getElementById('role-serveur').classList.toggle('selected', r === 'serveur');
-  document.getElementById('role-barman').classList.toggle('selected', r === 'barman');
-}
-function loadConfig() { const s = localStorage.getItem('barflow_config'); return s ? JSON.parse(s) : null; }
-function saveConfig(cfg) { localStorage.setItem('barflow_config', JSON.stringify(cfg)); }
-
-function startApp() {
-  const apiKey = document.getElementById('cfg-apiKey').value.trim();
-  const authDomain = document.getElementById('cfg-authDomain').value.trim();
-  const dbUrl = document.getElementById('cfg-dbUrl').value.trim();
-  const projectId = document.getElementById('cfg-projectId').value.trim();
-  if (!apiKey || !dbUrl || !projectId) { alert('Veuillez remplir les champs Firebase obligatoires.'); return; }
-  if (!role) { alert('Veuillez choisir votre rôle.'); return; }
-  const cfg = { apiKey, authDomain, dbUrl, projectId, role };
-  saveConfig(cfg); initFirebase(cfg);
-}
-
-function initFirebase(cfg) {
-  try {
-    if (firebase.apps.length === 0) firebase.initializeApp({ apiKey: cfg.apiKey, authDomain: cfg.authDomain, databaseURL: cfg.dbUrl, projectId: cfg.projectId });
-    db = firebase.database(); role = cfg.role; launchUI();
-  } catch (e) { alert('Erreur Firebase : ' + e.message); console.error(e); }
-}
-
-function logout() { if (!confirm('Changer de rôle / reconfigurer ?')) return; location.reload(); }
-
-window.addEventListener('load', () => {
-  const cfg = loadConfig();
-  if (cfg) {
-    document.getElementById('cfg-apiKey').value = cfg.apiKey || '';
-    document.getElementById('cfg-authDomain').value = cfg.authDomain || '';
-    document.getElementById('cfg-dbUrl').value = cfg.dbUrl || '';
-    document.getElementById('cfg-projectId').value = cfg.projectId || '';
-    if (cfg.role) selectRole(cfg.role);
-  }
+const PM={};
+MENU.forEach(c=>{
+  if(c.items)c.items.forEach(i=>PM[i.n]=i.p);
+  if(c.subs)c.subs.forEach(s=>s.items.forEach(i=>PM[i.n]=i.p));
 });
 
-// ═══════════════════════════════════════════
-// UI LAUNCH
-// ═══════════════════════════════════════════
-function launchUI() {
-  document.getElementById('config-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-  const badge = document.getElementById('role-badge');
-  badge.textContent = role === 'serveur' ? '🍽️ Serveur' : '🍸 Barman';
-  badge.className = 'badge-role badge-' + role;
-  if (role === 'serveur') { buildServerTabs(); renderMenu(); document.getElementById('fab-payment').style.display = 'block'; }
-  else buildBarmanTabs();
-  listenOrders();
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let db=null,messaging=null;
+let role='',serveurName='',serveurId=''; // serveurId = UUID stable généré une fois
+let cart={},allOrders={},histFilt='all',selPay_=null;
+let pickupKeys=[],bannerDismissed=false;
+let printEnabled=false,printMethod='browser',notifEnabled=false;
+
+// ══════════════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════════════
+const fmt=n=>n.toFixed(2).replace('.',',')+' €';
+const cartTotal=()=>Object.entries(cart).reduce((s,[n,d])=>s+(PM[n]||0)*d.qty,0);
+const orderTotal=o=>(o.items||[]).reduce((s,i)=>s+(i.p||PM[i.n]||0)*i.qty,0);
+
+// Generate a random UUID (used as stable serveur identity stored in localStorage)
+function genUUID(){
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{
+    const r=Math.random()*16|0,v=c==='x'?r:(r&0x3|0x8);return v.toString(16);
+  });
 }
 
-// ═══════════════════════════════════════════
+// Firebase-safe key: remove forbidden chars . # $ [ ] /
+function fbKey(s){ return s.replace(/[.#$\[\]/\s]/g,'_').toLowerCase().slice(0,80)||'user'; }
+
+// ══════════════════════════════════════════════════════════
+// SOUNDS
+// ══════════════════════════════════════════════════════════
+const ACtx=window.AudioContext||window.webkitAudioContext;
+let ac;
+function ensureAC(){if(!ac)ac=new ACtx();}
+function playSound(t){
+  ensureAC();const ctx=ac,now=ctx.currentTime;
+  if(t==='new_order'){
+    [[0,880],[.18,660],[.36,770]].forEach(([d,f])=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;o.type='sine';
+      g.gain.setValueAtTime(0,now+d);g.gain.linearRampToValueAtTime(.3,now+d+.04);g.gain.exponentialRampToValueAtTime(.001,now+d+.35);
+      o.start(now+d);o.stop(now+d+.4);
+    });
+  }else if(t==='ready'){
+    [0,.12,.24,.36,.55,.67,.79,.91].forEach((d,i)=>{
+      const f=[523,659,784,1047,523,659,784,1047][i];
+      const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=f;o.type='triangle';
+      g.gain.setValueAtTime(0,now+d);g.gain.linearRampToValueAtTime(.22,now+d+.04);g.gain.exponentialRampToValueAtTime(.001,now+d+.28);
+      o.start(now+d);o.stop(now+d+.35);
+    });
+  }else if(t==='payment'){
+    [0,.22].forEach(d=>{
+      const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=1200;o.type='square';
+      g.gain.setValueAtTime(0,now+d);g.gain.linearRampToValueAtTime(.13,now+d+.03);g.gain.exponentialRampToValueAtTime(.001,now+d+.18);
+      o.start(now+d);o.stop(now+d+.22);
+    });
+  }else if(t==='sent'){
+    const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=440;o.type='sine';
+    g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(.18,now+.05);g.gain.exponentialRampToValueAtTime(.001,now+.3);
+    o.start(now);o.stop(now+.35);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// CONFIG SCREEN
+// ══════════════════════════════════════════════════════════
+function selRole(r){
+  role=r;
+  document.getElementById('r-srv').classList.toggle('selected',r==='serveur');
+  document.getElementById('r-bar').classList.toggle('selected',r==='barman');
+  document.getElementById('profile-wrap').style.display=r==='serveur'?'block':'none';
+}
+
+function loadCfg(){const s=localStorage.getItem('bfcfg');return s?JSON.parse(s):null;}
+function saveCfg(c){localStorage.setItem('bfcfg',JSON.stringify(c));}
+
+function startApp(){
+  const api=v('c-api'),auth=v('c-auth'),db_=v('c-db'),pid=v('c-pid'),
+        vapid=v('c-vapid'),name=v('c-name').trim();
+  if(!api||!db_||!pid){alert('Remplissez les champs Firebase obligatoires.');return;}
+  if(!role){alert('Choisissez votre rôle.');return;}
+  if(role==='serveur'&&!name){alert('Entrez votre prénom ou pseudo.');return;}
+
+  // Generate or retrieve a stable UUID for this serveur device
+  let sid=localStorage.getItem('bf_serveur_id');
+  if(!sid){sid=genUUID();localStorage.setItem('bf_serveur_id',sid);}
+
+  const cfg={api,auth,db:db_,pid,vapid,role,name,sid};
+  saveCfg(cfg);
+  initFB(cfg);
+}
+function v(id){return document.getElementById(id).value.trim();}
+
+function initFB(cfg){
+  try{
+    if(firebase.apps.length===0)firebase.initializeApp({apiKey:cfg.api,authDomain:cfg.auth,databaseURL:cfg.db,projectId:cfg.pid});
+    db=firebase.database();
+    role=cfg.role; serveurName=cfg.name||''; serveurId=cfg.sid||'';
+    // Store VAPID key for push later
+    window._vapid=cfg.vapid||'';
+    // Init messaging only if FCM available
+    try{messaging=firebase.messaging();}catch(e){messaging=null;}
+    launchUI();
+  }catch(e){alert('Erreur Firebase : '+e.message+'\nVérifiez vos paramètres.');console.error(e);}
+}
+
+function logout(){if(!confirm('Changer de rôle / reconfigurer ?'))return;location.reload();}
+
+window.addEventListener('load',()=>{
+  const c=loadCfg();
+  if(c){
+    document.getElementById('c-api').value=c.api||'';
+    document.getElementById('c-auth').value=c.auth||'';
+    document.getElementById('c-db').value=c.db||'';
+    document.getElementById('c-pid').value=c.pid||'';
+    document.getElementById('c-vapid').value=c.vapid||'';
+    document.getElementById('c-name').value=c.name||'';
+    if(c.role)selRole(c.role);
+  }
+  // Restore print / notif prefs
+  const pp=JSON.parse(localStorage.getItem('bf_print')||'{}');
+  printEnabled=pp.enabled||false; printMethod=pp.method||'browser';
+  const np=JSON.parse(localStorage.getItem('bf_notif')||'{}');
+  notifEnabled=np.enabled||false;
+});
+
+// ══════════════════════════════════════════════════════════
+// LAUNCH UI
+// ══════════════════════════════════════════════════════════
+function launchUI(){
+  document.getElementById('cfg').style.display='none';
+  document.getElementById('app').style.display='block';
+  const badge=document.getElementById('role-badge');
+  if(role==='serveur'){
+    badge.textContent='🍽️ '+serveurName;
+    badge.className='badge badge-s';
+    buildServTabs(); renderMenu();
+    document.getElementById('fab-pay').style.display='block';
+    document.getElementById('profile-section').style.display='block';
+    document.getElementById('profile-name-display').textContent='🍽️ '+serveurName;
+    document.getElementById('profile-id-display').textContent=serveurId.slice(0,8)+'…';
+  }else{
+    badge.textContent='🍸 Barman';
+    badge.className='badge badge-b';
+    buildBarTabs();
+  }
+  initSettings();
+  listenOrders();
+  // Register this device for push if previously enabled
+  if(notifEnabled&&messaging)requestNotifPermission(false);
+}
+
+// ══════════════════════════════════════════════════════════
 // TABS
-// ═══════════════════════════════════════════
-function buildServerTabs() {
-  document.getElementById('tabs-container').innerHTML = `<div class="tab active" onclick="switchTab('order-panel',this)">📋 Commander</div><div class="tab" onclick="switchTab('history-panel',this)">📜 Historique</div>`;
+// ══════════════════════════════════════════════════════════
+function buildServTabs(){
+  document.getElementById('tabs').innerHTML=`
+    <div class="tab active" onclick="switchTab('order-panel',this)">📋 Commander</div>
+    <div class="tab" onclick="switchTab('hp',this)">📜 Historique</div>
+    <div class="tab" onclick="switchTab('settings-panel',this)">⚙️ Réglages</div>`;
   document.getElementById('order-panel').classList.add('active');
 }
-function buildBarmanTabs() {
-  document.getElementById('tabs-container').innerHTML = `<div class="tab active" onclick="switchTab('barman-panel',this)">🍸 En cours</div><div class="tab" onclick="switchTab('history-panel',this)">📜 Historique</div>`;
-  document.getElementById('barman-panel').classList.add('active');
+function buildBarTabs(){
+  document.getElementById('tabs').innerHTML=`
+    <div class="tab active" onclick="switchTab('bp',this)">🍸 En cours</div>
+    <div class="tab" onclick="switchTab('hp',this)">📜 Historique</div>
+    <div class="tab" onclick="switchTab('settings-panel',this)">⚙️ Réglages</div>`;
+  document.getElementById('bp').classList.add('active');
 }
-function switchTab(panelId, el) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById(panelId).classList.add('active'); el.classList.add('active');
-  if (panelId === 'history-panel') renderHistory();
+function switchTab(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');el.classList.add('active');
+  if(id==='hp')renderHistory();
 }
 
-// ═══════════════════════════════════════════
-// MENU RENDERING — with beer subcategories
-// ═══════════════════════════════════════════
-function renderMenu() {
-  const container = document.getElementById('drinks-container');
-  let html = '';
-  MENU.forEach(cat => {
-    html += `<div class="category-title">${cat.category}</div>`;
-    if (cat.subcategories) {
-      cat.subcategories.forEach(sub => {
-        html += `<div class="subcategory-title">${sub.label}</div>`;
-        html += `<div class="drinks-grid">`;
-        sub.items.forEach(item => {
-          const qty = cart[item.name] ? cart[item.name].qty : 0;
-          const safeName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-          html += `<div class="drink-card${qty > 0 ? ' in-cart' : ''}" onclick="addToCart('${safeName}','${item.emoji}',${item.price})">
-            <span class="drink-emoji">${item.emoji}</span>
-            <span class="drink-name">${item.name}</span>
-            <span class="drink-price">${fmt(item.price)}</span>
-            ${qty > 0 ? `<span class="drink-qty">${qty}</span>` : ''}
-          </div>`;
-        });
-        html += `</div>`;
+// ══════════════════════════════════════════════════════════
+// MENU RENDER
+// ══════════════════════════════════════════════════════════
+function renderMenu(){
+  let h='';
+  MENU.forEach(cat=>{
+    h+=`<div class="cat-title">${cat.cat}</div>`;
+    if(cat.subs){
+      cat.subs.forEach(s=>{
+        h+=`<div class="subcat-title">${s.lbl}</div><div class="dgrid">`;
+        s.items.forEach(i=>{h+=dCard(i);});
+        h+=`</div>`;
       });
-    } else {
-      html += `<div class="drinks-grid">`;
-      cat.items.forEach(item => {
-        const qty = cart[item.name] ? cart[item.name].qty : 0;
-        const safeName = item.name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        html += `<div class="drink-card${qty > 0 ? ' in-cart' : ''}" onclick="addToCart('${safeName}','${item.emoji}',${item.price})">
-          <span class="drink-emoji">${item.emoji}</span>
-          <span class="drink-name">${item.name}</span>
-          <span class="drink-price">${fmt(item.price)}</span>
-          ${qty > 0 ? `<span class="drink-qty">${qty}</span>` : ''}
-        </div>`;
-      });
-      html += `</div>`;
+    }else{
+      h+=`<div class="dgrid">`;
+      cat.items.forEach(i=>{h+=dCard(i);});
+      h+=`</div>`;
     }
   });
-  container.innerHTML = html;
+  document.getElementById('menu-container').innerHTML=h;
+}
+function dCard(item){
+  const qty=cart[item.n]?cart[item.n].qty:0;
+  const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  return `<div class="dcard${qty?' ic':''}" onclick="addCart('${sn}','${item.e}',${item.p})">
+    <span class="d-emoji">${item.e}</span>
+    <span class="d-name">${item.n}</span>
+    <span class="d-price">${fmt(item.p)}</span>
+    ${qty?`<span class="d-qty">${qty}</span>`:''}
+  </div>`;
 }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 // CART
-// ═══════════════════════════════════════════
-function addToCart(name, emoji, price) {
-  ensureAudio();
-  if (!cart[name]) cart[name] = { qty: 0, comment: '', emoji, price };
-  cart[name].qty++;
-  updateCartBar(); renderMenu();
+// ══════════════════════════════════════════════════════════
+function addCart(n,e,p){
+  ensureAC();
+  if(!cart[n])cart[n]={qty:0,comment:'',e,p};
+  cart[n].qty++;updateCartBar();renderMenu();
 }
-
-function updateCartBar() {
-  const total = Object.values(cart).reduce((s, v) => s + v.qty, 0);
-  const bar = document.getElementById('cart-bar');
-  document.getElementById('cart-count-txt').textContent = `${total} boisson${total > 1 ? 's' : ''}`;
-  document.getElementById('cart-total-bar-txt').textContent = total > 0 ? fmt(cartTotal()) : '';
-  if (total > 0) bar.classList.add('visible'); else bar.classList.remove('visible');
+function updateCartBar(){
+  const tot=Object.values(cart).reduce((s,v)=>s+v.qty,0);
+  const bar=document.getElementById('cbar');
+  document.getElementById('cart-cnt').textContent=tot;
+  document.getElementById('cart-tot').textContent=tot>0?fmt(cartTotal()):'';
+  if(tot>0)bar.classList.add('vis');else bar.classList.remove('vis');
 }
-
-function openCartModal() {
-  selectedPayment = null; updatePaymentButtons(); renderCartItems(); updateModalTotal();
-  document.getElementById('cart-overlay').classList.add('open');
-}
-function closeCartModal(e) {
-  if (!e || e.target === document.getElementById('cart-overlay')) document.getElementById('cart-overlay').classList.remove('open');
-}
-
-function renderCartItems() {
-  const list = document.getElementById('cart-items-list');
-  let html = '';
-  Object.entries(cart).forEach(([name, data]) => {
-    const safeName = name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-    const lineTotal = (data.price || PRICE_MAP[name] || 0) * data.qty;
-    html += `<div class="cart-item">
-      <div class="ci-info">
-        <div class="ci-name">${data.emoji} ${name}</div>
-        <div class="ci-price-line">${fmt(data.price || PRICE_MAP[name] || 0)} × ${data.qty} = ${fmt(lineTotal)}</div>
-        <input class="ci-comment-input" type="text" placeholder="Commentaire (ex: sans glaçons…)" value="${data.comment}" onchange="setComment('${safeName}', this.value)" />
+function openCart(){selPay_=null;updPayBtns();renderCartItems();updModalTot();document.getElementById('ov-cart').classList.add('open');}
+function closeCart(e){if(!e||e.target===document.getElementById('ov-cart'))document.getElementById('ov-cart').classList.remove('open');}
+function renderCartItems(){
+  let h='';
+  Object.entries(cart).forEach(([n,d])=>{
+    const sn=n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const lt=(d.p||PM[n]||0)*d.qty;
+    h+=`<div class="citem">
+      <div class="ci-inf">
+        <div class="ci-n">${d.e} ${n}</div>
+        <div class="ci-pl">${fmt(d.p||PM[n]||0)} × ${d.qty} = ${fmt(lt)}</div>
+        <input class="ci-comm" type="text" placeholder="Commentaire…" value="${d.comment}"
+          onchange="setComm('${sn}',this.value)">
       </div>
-      <div class="ci-actions">
-        <button class="ci-btn" onclick="changeQty('${safeName}',-1)">−</button>
-        <span class="ci-qty">${data.qty}</span>
-        <button class="ci-btn" onclick="changeQty('${safeName}',1)">+</button>
+      <div class="ci-act">
+        <button class="cibtn" onclick="chQty('${sn}',-1)">−</button>
+        <span class="ciq">${d.qty}</span>
+        <button class="cibtn" onclick="chQty('${sn}',1)">+</button>
       </div>
     </div>`;
   });
-  if (!html) html = '<p style="color:var(--text2);text-align:center;padding:1.5rem">Panier vide</p>';
-  list.innerHTML = html;
+  if(!h)h='<p style="color:var(--text2);text-align:center;padding:1.4rem">Panier vide</p>';
+  document.getElementById('cart-items').innerHTML=h;
+}
+function updModalTot(){document.getElementById('modal-tot').textContent=fmt(cartTotal());}
+function setComm(n,v){if(cart[n])cart[n].comment=v;}
+function chQty(n,d){
+  if(!cart[n])return;
+  cart[n].qty=Math.max(0,cart[n].qty+d);
+  if(!cart[n].qty)delete cart[n];
+  updateCartBar();renderCartItems();updModalTot();renderMenu();
 }
 
-function updateModalTotal() { document.getElementById('modal-total-amount').textContent = fmt(cartTotal()); }
-function setComment(name, val) { if (cart[name]) cart[name].comment = val; }
-
-function changeQty(name, delta) {
-  if (!cart[name]) return;
-  cart[name].qty = Math.max(0, cart[name].qty + delta);
-  if (cart[name].qty === 0) delete cart[name];
-  updateCartBar(); renderCartItems(); updateModalTotal(); renderMenu();
-}
-
-// ═══════════════════════════════════════════
-// PAYMENT
-// ═══════════════════════════════════════════
-function selectPayment(method) { selectedPayment = method; updatePaymentButtons(); }
-function updatePaymentButtons() {
-  ['cash','card','later'].forEach(m => {
-    const el = document.getElementById('pay-' + m);
-    if (el) { el.className = 'pay-btn'; if (selectedPayment === m) el.classList.add('selected-' + m); }
+// ══════════════════════════════════════════════════════════
+// PAYMENT SELECTION
+// ══════════════════════════════════════════════════════════
+function selPay(m){selPay_=m;updPayBtns();}
+function updPayBtns(){
+  ['cash','card','later'].forEach(m=>{
+    const el=document.getElementById('pb-'+m);
+    if(el){el.className='pbtn';if(selPay_===m)el.classList.add('sel-'+m);}
   });
 }
-
-function openPaymentModal() { ensureAudio(); document.getElementById('payment-overlay').classList.add('open'); }
-function closePaymentModal(e) {
-  if (!e || e.target === document.getElementById('payment-overlay')) document.getElementById('payment-overlay').classList.remove('open');
+function openPayMod(){ensureAC();document.getElementById('ov-pay').classList.add('open');}
+function closePayMod(e){if(!e||e.target===document.getElementById('ov-pay'))document.getElementById('ov-pay').classList.remove('open');}
+function sendPayAlert(m){
+  const tbl=document.getElementById('pay-table').value.trim();
+  if(!tbl){alert('Numéro de table requis.');return;}
+  // Store with serveurId so only this device's notifications are targeted
+  db.ref('orders').push({
+    table:tbl,type:'payment',payment:m,status:'pending',
+    serveurName,serveurId,
+    timestamp:Date.now(),date:new Date().toLocaleString('fr-FR'),
+    items:[],total:0
+  }).then(()=>{playSound('sent');closePayMod();document.getElementById('pay-table').value='';showToast('💳',`Demande envoyée — ${tbl}`);})
+  .catch(e=>alert('Erreur : '+e.message));
 }
-function sendPaymentAlert(method) {
-  const table = document.getElementById('payment-table-number').value.trim();
-  if (!table) { alert('Veuillez indiquer le numéro de table.'); return; }
-  db.ref('orders').push({ table, type: 'payment', payment: method, status: 'pending', timestamp: Date.now(), date: new Date().toLocaleString('fr-FR'), items: [], total: 0 }).then(() => {
-    playSound('sent'); closePaymentModal(); document.getElementById('payment-table-number').value = '';
-    showToast('💳', `Demande de paiement envoyée — ${table}`);
-  }).catch(err => alert('Erreur : ' + err.message));
-}
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 // SEND ORDER
-// ═══════════════════════════════════════════
-function sendOrder() {
-  const table = document.getElementById('table-number').value.trim();
-  if (!table) { alert('Veuillez indiquer le numéro de table.'); return; }
-  if (Object.keys(cart).length === 0) return;
-  const total = cartTotal();
-  const order = {
-    table, total: parseFloat(total.toFixed(2)),
-    payment: selectedPayment || 'later', status: 'pending',
-    timestamp: Date.now(), date: new Date().toLocaleString('fr-FR'),
-    items: Object.entries(cart).map(([name, d]) => ({ name, qty: d.qty, comment: d.comment, emoji: d.emoji, price: d.price || PRICE_MAP[name] || 0 }))
+// ══════════════════════════════════════════════════════════
+function sendOrder(){
+  const tbl=document.getElementById('table-in').value.trim();
+  if(!tbl){alert('Numéro de table requis.');return;}
+  if(!Object.keys(cart).length)return;
+  const total=cartTotal();
+  const order={
+    table:tbl,
+    serveurName,   // lisible pour le barman
+    serveurId,     // UUID stable pour cibler les notifications
+    total:parseFloat(total.toFixed(2)),
+    payment:selPay_||'later',
+    status:'pending',
+    timestamp:Date.now(),
+    date:new Date().toLocaleString('fr-FR'),
+    items:Object.entries(cart).map(([n,d])=>({n,qty:d.qty,comment:d.comment,e:d.e,p:d.p||PM[n]||0}))
   };
-  db.ref('orders').push(order).then(() => {
-    playSound('sent'); cart = {}; selectedPayment = null; updatePaymentButtons();
-    updateCartBar(); renderMenu(); closeCartModal(); document.getElementById('table-number').value = '';
-    showToast('✅', 'Commande envoyée !');
-  }).catch(err => alert('Erreur envoi : ' + err.message));
+  db.ref('orders').push(order)
+    .then(ref=>{
+      playSound('sent');
+      // Auto-print if barman has it enabled — handled in listenOrders on barman side
+      cart={};selPay_=null;updPayBtns();updateCartBar();renderMenu();
+      closeCart();document.getElementById('table-in').value='';
+      showToast('✅','Commande envoyée !');
+    })
+    .catch(e=>alert('Erreur envoi : '+e.message));
 }
 
-// ═══════════════════════════════════════════
-// LISTEN ORDERS
-// ═══════════════════════════════════════════
-function listenOrders() {
-  db.ref('orders').on('value', snapshot => {
-    const data = snapshot.val() || {};
-    const prevOrders = { ...allOrders };
-    allOrders = data;
+// ══════════════════════════════════════════════════════════
+// LISTEN ORDERS (real-time)
+// ══════════════════════════════════════════════════════════
+function listenOrders(){
+  db.ref('orders').on('value',snap=>{
+    const data=snap.val()||{};
+    const prev={...allOrders};
+    allOrders=data;
 
-    if (role === 'barman') {
-      renderBarmanOrders();
-      const newPending = Object.entries(data).filter(([k, v]) => v.status === 'pending' && !prevOrders[k]);
-      if (newPending.length > 0 && Object.keys(prevOrders).length > 0) {
-        const isPayment = newPending.some(([, v]) => v.type === 'payment');
-        playSound(isPayment ? 'payment' : 'new_order');
-        showToast(isPayment ? '💳' : '🔔', `${isPayment ? '💳 Paiement demandé' : '🔔 Nouvelle commande'} — ${newPending[0][1].table} !`);
+    if(role==='barman'){
+      renderBarman();
+      const newP=Object.entries(data).filter(([k,v])=>v.status==='pending'&&!prev[k]);
+      if(newP.length&&Object.keys(prev).length){
+        const isP=newP.some(([,v])=>v.type==='payment');
+        playSound(isP?'payment':'new_order');
+        showToast(isP?'💳':'🔔',`${isP?'💳 Paiement':'🔔 Commande'} — ${newP[0][1].table} !`);
+        // Auto-print on barman side
+        if(printEnabled&&!isP)newP.forEach(([,o])=>printOrder(o));
       }
     }
 
-    if (role === 'serveur') {
-      // Detect orders that just became "done" — add to pendingPickup
-      const justDone = Object.entries(data).filter(([k, v]) =>
-        v.status === 'done' && v.type !== 'payment' && v.type !== 'picked' &&
-        (!prevOrders[k] || prevOrders[k].status === 'pending')
+    if(role==='serveur'){
+      // Only watch orders tagged with THIS device's serveurId
+      const justDone=Object.entries(data).filter(([k,v])=>
+        v.status==='done'&&v.type!=='payment'&&v.type!=='picked'&&
+        v.serveurId===serveurId&&  // ← UUID comparison, never fails with forbidden chars
+        (!prev[k]||prev[k].status==='pending')
       );
-      justDone.forEach(([k]) => { if (!pendingPickupKeys.includes(k)) pendingPickupKeys.push(k); });
-
-      if (pendingPickupKeys.length > 0 && !bannerDismissed) {
-        playSound('order_ready');
-        showReadyBanner();
-      } else if (pendingPickupKeys.length === 0) {
-        hideReadyBanner();
-      }
+      justDone.forEach(([k])=>{if(!pickupKeys.includes(k))pickupKeys.push(k);});
+      if(pickupKeys.length&&!bannerDismissed){playSound('ready');showReadyBanner();}
+      else if(!pickupKeys.length)hideBanner();
     }
 
-    const pendingCount = Object.values(data).filter(o => o.status === 'pending').length;
-    const badge = document.getElementById('pending-count');
-    if (pendingCount > 0) { badge.style.display = 'flex'; badge.textContent = pendingCount; }
-    else badge.style.display = 'none';
+    // Pending badge
+    const pc=role==='barman'
+      ?Object.values(data).filter(o=>o.status==='pending').length
+      :pickupKeys.length;
+    const badge=document.getElementById('pcount');
+    if(pc){badge.style.display='flex';badge.textContent=pc;}else badge.style.display='none';
 
-    if (document.getElementById('history-panel').classList.contains('active')) renderHistory();
+    if(document.getElementById('hp').classList.contains('active'))renderHistory();
   });
 }
 
-// ═══════════════════════════════════════════
-// READY BANNER (serveur)
-// ═══════════════════════════════════════════
-function showReadyBanner() {
-  const banner = document.getElementById('ready-banner');
-  const list = document.getElementById('ready-orders-list');
-  let html = '';
-  pendingPickupKeys.forEach(k => {
-    const order = allOrders[k];
-    if (!order) return;
-    const total = orderTotal(order);
-    const itemsSummary = (order.items || []).map(i => `×${i.qty} ${i.name}`).join(', ');
-    html += `<div class="rb-order-item">
-      <div class="rb-order-table">📍 ${order.table}</div>
-      <div class="rb-order-items">${itemsSummary}</div>
-      <div class="rb-order-total">${fmt(total)}</div>
-    </div>`;
+// ══════════════════════════════════════════════════════════
+// READY BANNER
+// ══════════════════════════════════════════════════════════
+function showReadyBanner(){
+  let h='';
+  pickupKeys.forEach(k=>{
+    const o=allOrders[k];if(!o)return;
+    const tot=orderTotal(o);
+    const its=(o.items||[]).map(i=>`×${i.qty} ${i.n}`).join(', ');
+    h+=`<div class="rb-item"><div class="rb-tbl">📍 ${o.table}</div><div class="rb-its">${its}</div><div class="rb-tot">${fmt(tot)}</div></div>`;
   });
-  list.innerHTML = html || '<p style="color:var(--text2);font-size:.85rem">Aucun détail disponible.</p>';
-  banner.classList.add('show');
+  document.getElementById('rbl').innerHTML=h||'<p style="color:var(--text2);font-size:.82rem">…</p>';
+  document.getElementById('rb').classList.add('show');
 }
-
-function hideReadyBanner() {
-  document.getElementById('ready-banner').classList.remove('show');
-}
-
-function confirmPickup() {
-  // Mark all pending-pickup orders as 'picked' in Firebase (final status)
-  const updates = {};
-  pendingPickupKeys.forEach(k => {
-    updates[k + '/status'] = 'picked';
-    updates[k + '/pickedAt'] = new Date().toLocaleString('fr-FR');
+function hideBanner(){document.getElementById('rb').classList.remove('show');}
+function confirmPickup(){
+  const upd={};
+  pickupKeys.forEach(k=>{upd[k+'/status']='picked';upd[k+'/pickedAt']=new Date().toLocaleString('fr-FR');});
+  db.ref('orders').update(upd).then(()=>{
+    pickupKeys=[];bannerDismissed=false;hideBanner();showToast('🎉','Commande(s) récupérée(s) !');
   });
-  db.ref('orders').update(updates).then(() => {
-    pendingPickupKeys = [];
-    bannerDismissed = false;
-    hideReadyBanner();
-    showToast('🎉', 'Commande(s) récupérée(s) !');
-  }).catch(err => console.error(err));
+}
+function dismissBanner(){
+  bannerDismissed=true;hideBanner();
+  showToast('🍸',pickupKeys.length+' commande(s) en attente');
+  setTimeout(()=>{if(pickupKeys.length){bannerDismissed=false;playSound('ready');showReadyBanner();}},60000);
 }
 
-function dismissBanner() {
-  bannerDismissed = true;
-  hideReadyBanner();
-  showToast('🍸', `${pendingPickupKeys.length} commande(s) en attente de récupération`);
-  // Re-show after 60 seconds if still not picked
-  setTimeout(() => {
-    if (pendingPickupKeys.length > 0) { bannerDismissed = false; playSound('order_ready'); showReadyBanner(); }
-  }, 60000);
-}
-
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 // BARMAN VIEW
-// ═══════════════════════════════════════════
-const PAY_LABELS = {
-  cash: { icon: '💵', label: 'Espèces', cls: 'pmb-cash' },
-  card: { icon: '💳', label: 'Carte bancaire', cls: 'pmb-card' },
-  later: { icon: '⏳', label: 'À encaisser', cls: 'pmb-later' },
-};
+// ══════════════════════════════════════════════════════════
+const PL={cash:{i:'💵',l:'Espèces',c:'pmb-c'},card:{i:'💳',l:'Carte bancaire',c:'pmb-k'},later:{i:'⏳',l:'À encaisser',c:'pmb-l'}};
 
-function renderBarmanOrders() {
-  const list = document.getElementById('orders-list');
-  const pending = Object.entries(allOrders).filter(([, o]) => o.status === 'pending').sort((a, b) => a[1].timestamp - b[1].timestamp);
-  document.getElementById('orders-count').textContent = pending.length + (pending.length > 1 ? ' commandes en attente' : ' commande en attente');
-  if (pending.length === 0) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">✨</div>Aucune commande en attente</div>`; return; }
-
-  let html = '';
-  pending.forEach(([key, order]) => {
-    const elapsed = Math.floor((Date.now() - order.timestamp) / 60000);
-    const timeLabel = elapsed < 1 ? "À l'instant" : `il y a ${elapsed} min`;
-    const isPaymentAlert = order.type === 'payment';
-
-    if (isPaymentAlert) {
-      const pm = PAY_LABELS[order.payment] || PAY_LABELS.cash;
-      html += `<div class="order-card payment-card">
-        <div class="order-header"><div><div class="order-table">${order.table}</div><div class="order-time">${timeLabel} — ${order.date}</div></div><span class="order-status status-payment">Paiement</span></div>
-        <div style="margin-bottom:.75rem"><span class="payment-method-badge pmb-payment-request">💳 Le client souhaite payer</span></div>
-        <div class="payment-method-badge ${pm.cls}" style="margin-bottom:.75rem;font-size:.85rem;padding:.4rem 1rem">${pm.icon} ${pm.label}</div>
-        <button class="btn-paid" onclick="markReady('${key}')">✅ Paiement encaissé</button>
-        <button class="btn-delete" onclick="deleteOrder('${key}')">Supprimer</button>
-      </div>`;
-      return;
+function renderBarman(){
+  const list=document.getElementById('orders-list');
+  const pend=Object.entries(allOrders).filter(([,o])=>o.status==='pending').sort((a,b)=>a[1].timestamp-b[1].timestamp);
+  document.getElementById('orders-cnt').textContent=pend.length+(pend.length>1?' commandes':' commande')+' en attente';
+  if(!pend.length){list.innerHTML=`<div class="empty"><div class="empty-ico">✨</div>Aucune commande en attente</div>`;return;}
+  let h='';
+  pend.forEach(([k,o])=>{
+    const el=Math.floor((Date.now()-o.timestamp)/60000);
+    const tl=el<1?"À l'instant":`il y a ${el} min`;
+    const srv=o.serveurName?`<div class="o-srv">🍽️ ${o.serveurName}</div>`:'';
+    if(o.type==='payment'){
+      const pm=PL[o.payment]||PL.cash;
+      h+=`<div class="ocard pay-card">
+        <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div><span class="os os-pay">Paiement</span></div>
+        <span class="pmb pmb-req">💳 Le client souhaite payer</span><br>
+        <span class="pmb ${pm.c}" style="margin-top:.35rem;font-size:.82rem;padding:.36rem .9rem">${pm.i} ${pm.l}</span>
+        <button class="btn-paid" onclick="markDone('${k}')">✅ Paiement encaissé</button>
+        <button class="btn-del" onclick="delOrder('${k}')">Supprimer</button>
+      </div>`;return;
     }
-
-    const total = orderTotal(order);
-    const pm = order.payment ? (PAY_LABELS[order.payment] || PAY_LABELS.later) : null;
-    html += `<div class="order-card">
-      <div class="order-header"><div><div class="order-table">${order.table}</div><div class="order-time">${timeLabel} — ${order.date}</div></div><span class="order-status status-pending">En attente</span></div>
-      <div class="order-items">`;
-    (order.items || []).forEach(item => {
-      const lineTotal = (item.price || 0) * item.qty;
-      html += `<div class="oi"><span class="oi-qty">×${item.qty}</span><span class="oi-name">${item.emoji} ${item.name}</span><span class="oi-price">${fmt(lineTotal)}</span>${item.comment ? `<br><span class="oi-comment" style="padding-left:28px">— ${item.comment}</span>` : ''}</div>`;
+    const tot=orderTotal(o);const pm=o.payment?(PL[o.payment]||PL.later):null;
+    h+=`<div class="ocard">
+      <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div><span class="os os-p">En attente</span></div>
+      <div class="oitems">`;
+    (o.items||[]).forEach(i=>{
+      const lt=(i.p||0)*i.qty;
+      h+=`<div class="oi"><span class="oiq">×${i.qty}</span><span class="oin">${i.e} ${i.n}</span><span class="oip">${fmt(lt)}</span>${i.comment?`<br><span class="oic" style="padding-left:26px">— ${i.comment}</span>`:''}</div>`;
     });
-    html += `</div>
-      <div class="order-total-line"><span class="order-total-label">Total commande</span><span class="order-total-amount">${fmt(total)}</span></div>
-      ${pm ? `<div class="payment-method-badge ${pm.cls}" style="margin-bottom:.75rem">${pm.icon} ${pm.label}</div>` : ''}
-      <button class="btn-ready" onclick="markReady('${key}')">✅ Commande prête</button>
-      <button class="btn-delete" onclick="deleteOrder('${key}')">Supprimer</button>
+    h+=`</div><div class="otl"><span class="otl-l">Total</span><span class="otl-a">${fmt(tot)}</span></div>
+      ${pm?`<span class="pmb ${pm.c}" style="margin-bottom:.65rem">${pm.i} ${pm.l}</span>`:''}
+      <button class="btn-rdy" onclick="markDone('${k}')">✅ Commande prête</button>
+      <button class="btn-del" onclick="delOrder('${k}')">Supprimer</button>
     </div>`;
   });
-  list.innerHTML = html;
+  list.innerHTML=h;
+}
+function markDone(k){
+  db.ref('orders/'+k+'/status').set('done');
+  db.ref('orders/'+k+'/readyAt').set(new Date().toLocaleString('fr-FR'));
+  // Push notification to the specific serveur via Firebase
+  pushToServeur(k);
+}
+function delOrder(k){if(confirm('Supprimer ?'))db.ref('orders/'+k).remove();}
+
+// ══════════════════════════════════════════════════════════
+// PUSH — notify specific serveur via Firebase trigger node
+// ══════════════════════════════════════════════════════════
+function pushToServeur(orderKey){
+  const o=allOrders[orderKey];if(!o||!o.serveurId)return;
+  // Write to a /notifications/{serveurId}/{pushKey} node
+  // The serveur device listens on this path and triggers a local notification
+  db.ref('notifications/'+o.serveurId).push({
+    type:'order_ready',
+    orderKey,
+    table:o.table,
+    timestamp:Date.now()
+  });
 }
 
-function markReady(key) {
-  db.ref('orders/' + key + '/status').set('done');
-  db.ref('orders/' + key + '/readyAt').set(new Date().toLocaleString('fr-FR'));
+// ══════════════════════════════════════════════════════════
+// PUSH — serveur listens for their notifications
+// ══════════════════════════════════════════════════════════
+function listenForPushNotifs(){
+  if(!serveurId)return;
+  db.ref('notifications/'+serveurId).on('child_added',snap=>{
+    const notif=snap.val();
+    if(!notif)return;
+    // Remove after reading to avoid re-triggering
+    snap.ref.remove();
+    // Show browser notification if permission granted
+    if(Notification.permission==='granted'){
+      const n=new Notification('🍸 BarFlow — Commande prête !',{
+        body:`Votre commande pour ${notif.table||'une table'} est prête. Allez la récupérer !`,
+        icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
+        badge:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
+        tag:'barflow-ready',
+        renotify:true,
+        requireInteraction:true
+      });
+      n.onclick=()=>{window.focus();n.close();};
+    }
+  });
 }
 
-function deleteOrder(key) { if (confirm('Supprimer cette commande ?')) db.ref('orders/' + key).remove(); }
-
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 // HISTORY
-// ═══════════════════════════════════════════
-function filterHistory(f, el) {
-  historyFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  el.classList.add('active'); renderHistory();
+// ══════════════════════════════════════════════════════════
+function filtHist(f,el){
+  histFilt=f;
+  document.querySelectorAll('.hfbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');renderHistory();
 }
-
-function renderHistory() {
-  const list = document.getElementById('history-list');
-  let entries = Object.entries(allOrders).sort((a, b) => b[1].timestamp - a[1].timestamp);
-  if (historyFilter === 'pending') entries = entries.filter(([, o]) => o.status === 'pending' && o.type !== 'payment');
-  if (historyFilter === 'done') entries = entries.filter(([, o]) => (o.status === 'done' || o.status === 'picked') && o.type !== 'payment');
-  if (historyFilter === 'payment') entries = entries.filter(([, o]) => o.type === 'payment');
-
-  if (entries.length === 0) { list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div>Aucune commande</div>`; return; }
-
-  let html = '';
-  entries.forEach(([key, order]) => {
-    const isPayment = order.type === 'payment';
-    let statusLabel;
-    if (order.status === 'picked') statusLabel = `<span style="color:var(--green);font-size:.75rem">✅ Récupérée</span>`;
-    else if (order.status === 'done') statusLabel = `<span style="color:var(--blue);font-size:.75rem">🍸 Prête</span>`;
-    else statusLabel = `<span style="color:var(--gold2);font-size:.75rem">⏳ En attente</span>`;
-
-    const total = isPayment ? null : orderTotal(order);
-    const pm = order.payment ? (PAY_LABELS[order.payment] || null) : null;
-    const payBadgeClass = isPayment ? 'hi-pay-payment' : (order.payment === 'cash' ? 'hi-pay-cash' : order.payment === 'card' ? 'hi-pay-card' : 'hi-pay-later');
-    const payLabel = isPayment ? `💳 Paiement ${pm ? pm.label : ''}` : (pm ? `${pm.icon} ${pm.label}` : '');
-    const itemsSummary = isPayment ? '<em>Demande de paiement</em>' : (order.items || []).map(i => `×${i.qty} ${i.name}`).join(', ');
-
-    html += `<div class="history-item">
-      <div class="hi-header"><span class="hi-table">${order.table}</span><div style="display:flex;align-items:center;gap:.5rem">${statusLabel}<span class="hi-time">${order.date}</span></div></div>
-      <div class="hi-items">${itemsSummary}</div>
-      <div class="hi-footer">
-        <span class="hi-total">${total !== null ? fmt(total) : '—'}</span>
-        ${payLabel ? `<span class="hi-pay ${payBadgeClass}">${payLabel}</span>` : ''}
-      </div>
+function renderHistory(){
+  const list=document.getElementById('hist-list');
+  let entries=Object.entries(allOrders).sort((a,b)=>b[1].timestamp-a[1].timestamp);
+  // Serveur : only their own orders
+  if(role==='serveur')entries=entries.filter(([,o])=>!o.serveurId||o.serveurId===serveurId);
+  if(histFilt==='pending')entries=entries.filter(([,o])=>o.status==='pending'&&o.type!=='payment');
+  if(histFilt==='done')entries=entries.filter(([,o])=>(o.status==='done'||o.status==='picked')&&o.type!=='payment');
+  if(histFilt==='payment')entries=entries.filter(([,o])=>o.type==='payment');
+  if(!entries.length){list.innerHTML=`<div class="empty"><div class="empty-ico">📭</div>Aucune commande</div>`;return;}
+  let h='';
+  entries.forEach(([k,o])=>{
+    const isP=o.type==='payment';
+    let sl;
+    if(o.status==='picked')sl=`<span style="color:var(--green);font-size:.73rem">✅ Récupérée</span>`;
+    else if(o.status==='done')sl=`<span style="color:var(--blue);font-size:.73rem">🍸 Prête</span>`;
+    else sl=`<span style="color:var(--gold2);font-size:.73rem">⏳ En attente</span>`;
+    const tot=isP?null:orderTotal(o);
+    const pm=o.payment?(PL[o.payment]||null):null;
+    const tc=isP?'tag-p':(o.payment==='cash'?'tag-c':o.payment==='card'?'tag-k':'tag-l');
+    const tl=isP?`💳 ${pm?pm.l:''}`:pm?`${pm.i} ${pm.l}`:'';
+    const its=isP?'<em>Demande de paiement</em>':(o.items||[]).map(i=>`×${i.qty} ${i.n}`).join(', ');
+    const srv=(role==='barman'&&o.serveurName)?`<div class="hi-srv">🍽️ ${o.serveurName}</div>`:'';
+    h+=`<div class="hi">
+      <div class="hi-h"><span class="hi-t">${o.table}</span><div style="display:flex;align-items:center;gap:.45rem">${sl}<span class="hi-dt">${o.date}</span></div></div>
+      ${srv}<div class="hi-its">${its}</div>
+      <div class="hi-ft"><span class="hi-tot">${tot!==null?fmt(tot):'—'}</span>${tl?`<span class="hp-tag ${tc}">${tl}</span>`:''}</div>
     </div>`;
   });
-  list.innerHTML = html;
+  list.innerHTML=h;
 }
 
-// ═══════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// SETTINGS — Notifications
+// ══════════════════════════════════════════════════════════
+function initSettings(){
+  const nt=document.getElementById('notif-toggle');
+  const pt=document.getElementById('print-toggle');
+  nt.checked=notifEnabled;
+  pt.checked=printEnabled;
+  if(printEnabled){
+    document.getElementById('print-options').style.display='block';
+    selPrintMethod(printMethod);
+    const pp=JSON.parse(localStorage.getItem('bf_print')||'{}');
+    if(pp.ip)document.getElementById('printer-ip').value=pp.ip;
+    if(pp.port)document.getElementById('printer-port').value=pp.port;
+  }
+  if(notifEnabled){
+    document.getElementById('notif-test-btn').style.display='block';
+    document.getElementById('notif-info').style.display='block';
+    if(role==='serveur')listenForPushNotifs();
+  }
+}
+
+async function requestNotifPermission(showPrompt=true){
+  if(!('Notification' in window)){
+    showToast('❌','Notifications non supportées sur ce navigateur');return false;
+  }
+  let perm=Notification.permission;
+  if(perm==='default'&&showPrompt){perm=await Notification.requestPermission();}
+  if(perm==='granted'){
+    document.getElementById('notif-sub').textContent='✅ Notifications actives — même en veille.';
+    document.getElementById('notif-test-btn').style.display='block';
+    document.getElementById('notif-info').style.display='block';
+    if(role==='serveur')listenForPushNotifs();
+    return true;
+  }else if(perm==='denied'){
+    document.getElementById('notif-sub').textContent='❌ Permission refusée. Autorisez dans les réglages du navigateur.';
+    return false;
+  }
+  return false;
+}
+
+async function toggleNotif(on){
+  notifEnabled=on;
+  localStorage.setItem('bf_notif',JSON.stringify({enabled:on}));
+  if(on){
+    const ok=await requestNotifPermission(true);
+    if(!ok){document.getElementById('notif-toggle').checked=false;notifEnabled=false;}
+  }else{
+    document.getElementById('notif-test-btn').style.display='none';
+    document.getElementById('notif-info').style.display='none';
+    document.getElementById('notif-sub').textContent='Recevez une alerte même si le téléphone est en veille.';
+  }
+}
+
+function sendTestNotif(){
+  if(Notification.permission!=='granted'){alert('Autorisez les notifications d\'abord.');return;}
+  new Notification('🍸 BarFlow — Test',{
+    body:'Notification de test ! Tout fonctionne correctement.',
+    icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
+    requireInteraction:false
+  });
+  showToast('📲','Notification test envoyée !');
+}
+
+// ══════════════════════════════════════════════════════════
+// SETTINGS — Impression
+// ══════════════════════════════════════════════════════════
+function togglePrint(on){
+  printEnabled=on;
+  const opts=document.getElementById('print-options');
+  opts.style.display=on?'block':'none';
+  if(on&&!printMethod)printMethod='browser';
+  if(on)selPrintMethod(printMethod);
+  savePrintPrefs();
+}
+
+function selPrintMethod(m){
+  printMethod=m;
+  ['browser','network'].forEach(pm=>{
+    const el=document.getElementById('pm-'+pm);
+    if(el)el.style.border=pm===m?'2px solid var(--gold)':'2px solid var(--border)';
+  });
+  document.getElementById('print-browser-info').style.display=m==='browser'?'block':'none';
+  document.getElementById('print-network-info').style.display=m==='network'?'block':'none';
+  savePrintPrefs();
+}
+
+function savePrintPrefs(){
+  const ip=document.getElementById('printer-ip')?.value||'';
+  const port=document.getElementById('printer-port')?.value||'9100';
+  localStorage.setItem('bf_print',JSON.stringify({enabled:printEnabled,method:printMethod,ip,port}));
+}
+function savePrinterIp(){savePrintPrefs();}
+
+// ─── Print logic ───────────────────────────────────────────
+function printOrder(order){
+  if(printMethod==='browser')printBrowser(order);
+  else if(printMethod==='network')printNetwork(order);
+}
+
+function buildTicket(order){
+  const tot=orderTotal(order);
+  let lines='';
+  (order.items||[]).forEach(i=>{
+    lines+=`  x${i.qty} ${i.n}${i.comment?' ('+i.comment+')':''} ... ${fmt((i.p||0)*i.qty)}\n`;
+  });
+  return `
+════════════════════════
+      🍸 BarFlow
+════════════════════════
+Table  : ${order.table}
+Serveur: ${order.serveurName||'—'}
+Heure  : ${order.date}
+────────────────────────
+${lines}────────────────────────
+TOTAL  : ${fmt(tot)}
+Paiement : ${order.payment==='cash'?'Espèces':order.payment==='card'?'Carte':'À définir'}
+════════════════════════
+  `.trim();
+}
+
+function printBrowser(order){
+  const ticket=buildTicket(order);
+  const win=window.open('','_blank','width=320,height=500');
+  if(!win)return;
+  win.document.write(`<!DOCTYPE html><html><head><style>
+    body{font-family:monospace;font-size:13px;padding:12px;line-height:1.5;white-space:pre}
+    @media print{body{margin:0;padding:4px}}
+  </style></head><body>${ticket.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>{win.print();setTimeout(()=>win.close(),800);},300);
+}
+
+async function printNetwork(order){
+  const pp=JSON.parse(localStorage.getItem('bf_print')||'{}');
+  const ip=pp.ip||document.getElementById('printer-ip').value.trim();
+  const port=parseInt(pp.port||document.getElementById('printer-port').value||9100);
+  if(!ip){showToast('❌','Entrez l\'adresse IP de l\'imprimante.');return;}
+  const ticket=buildTicket(order);
+  // ESC/POS over HTTP (works with Epson TM, Star TSP compatible network printers)
+  // Most network receipt printers expose a simple HTTP/TCP endpoint
+  try{
+    const resp=await fetch(`http://${ip}/cgi-bin/epos/service.cgi`,{
+      method:'POST',headers:{'Content-Type':'text/xml;charset=utf-8'},
+      body:`<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+  <epos-print xmlns="http://www.epson-pos.com/schemas/2011/03/epos-print">
+    <text>${ticket.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text>
+    <feed unit="3"/><cut type="feed"/>
+  </epos-print>
+</s:Body>
+</s:Envelope>`,
+      signal:AbortSignal.timeout(4000)
+    });
+    if(resp.ok){showToast('🖨️','Bon imprimé !');document.getElementById('print-status').textContent='✅ Impression réussie';}
+    else throw new Error('HTTP '+resp.status);
+  }catch(e){
+    // Fallback: browser print if network fails
+    document.getElementById('print-status').textContent='⚠️ Réseau échoué — impression navigateur utilisée';
+    printBrowser(order);
+  }
+}
+
+function testPrint(){
+  const fakeOrder={table:'Test',serveurName:serveurName||'Test',date:new Date().toLocaleString('fr-FR'),
+    payment:'cash',items:[{n:'Mojito',qty:2,comment:'sans glaçons',e:'🍹',p:10},{n:'Espresso',qty:1,comment:'',e:'☕',p:2.5}]};
+  printBrowser(fakeOrder);
+}
+async function testPrintNetwork(){
+  const fakeOrder={table:'Test',serveurName:serveurName||'Test',date:new Date().toLocaleString('fr-FR'),
+    payment:'card',items:[{n:'Bière pression 33cl',qty:3,comment:'',e:'🍺',p:4}]};
+  await printNetwork(fakeOrder);
+}
+
+// ══════════════════════════════════════════════════════════
 // TOAST
-// ═══════════════════════════════════════════
-let toastTimeout;
-function showToast(icon, msg) {
-  document.getElementById('toast-icon').textContent = icon;
-  document.getElementById('toast-msg').textContent = msg;
-  const t = document.getElementById('toast');
-  t.classList.add('show'); clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), 3500);
+// ══════════════════════════════════════════════════════════
+let tT;
+function showToast(ico,msg){
+  document.getElementById('t-ico').textContent=ico;
+  document.getElementById('t-msg').textContent=msg;
+  const t=document.getElementById('toast');
+  t.classList.add('show');clearTimeout(tT);
+  tT=setTimeout(()=>t.classList.remove('show'),3500);
 }
 </script>
 </body>
