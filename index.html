@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Le Sirableu</title>
+<title>BarFlow</title>
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -224,6 +224,53 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
 .tag-l{color:var(--text2);background:rgba(154,149,144,.1)}
 .tag-p{color:var(--purple);background:rgba(167,139,250,.1)}
 
+/* ═ OPEN TABLES (tab later) ═ */
+#tp{padding-bottom:2rem}
+.tp-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.tp-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem}
+.tp-cnt{font-size:.78rem;color:var(--text2)}
+.tcard{background:var(--bg2);border:1px solid rgba(154,149,144,.25);border-radius:var(--r);padding:.95rem;margin-bottom:.72rem;animation:sIn .3s ease}
+.tcard-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.65rem;gap:.4rem}
+.tcard-head-l{flex:1}
+.tc-table{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--gold2)}
+.tc-srv{display:inline-flex;align-items:center;gap:.28rem;background:rgba(212,168,67,.1);color:var(--gold);border:1px solid rgba(212,168,67,.22);border-radius:20px;padding:.18rem .55rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.67rem;margin-top:.25rem;letter-spacing:.02em}
+.tc-date{font-size:.73rem;color:var(--text2);margin-top:.08rem}
+.tc-badge{font-size:.65rem;font-family:'Syne',sans-serif;font-weight:700;padding:.22rem .58rem;border-radius:20px;background:rgba(154,149,144,.12);color:var(--text2);border:1px solid rgba(154,149,144,.25);flex-shrink:0}
+.tc-items{margin-bottom:.65rem}
+.tc-run-total{display:flex;justify-content:space-between;align-items:center;padding:.42rem 0;border-top:1px solid var(--border2);margin-bottom:.65rem}
+.tc-run-lbl{font-size:.8rem;color:var(--text2)}
+.tc-run-amt{font-family:'Syne',sans-serif;font-weight:800;color:var(--gold2);font-size:1rem}
+.tc-actions{display:grid;grid-template-columns:1fr 1fr;gap:.42rem}
+.btn-tc-add{background:rgba(212,168,67,.12);color:var(--gold2);border:1px solid rgba(212,168,67,.3);border-radius:var(--rs);padding:.68rem .5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;text-align:center}
+.btn-tc-add:hover{background:rgba(212,168,67,.22)}
+.btn-tc-pay{background:rgba(62,207,142,.12);color:var(--green);border:1px solid rgba(62,207,142,.3);border-radius:var(--rs);padding:.68rem .5rem;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;text-align:center}
+.btn-tc-pay:hover{background:rgba(62,207,142,.22)}
+
+/* ═ ADD DRINKS TO OPEN TABLE modal ═ */
+#ov-add-drinks .modal{padding-bottom:1.5rem}
+.add-drinks-cat{font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.09em;margin:.9rem 0 .4rem}
+.add-drinks-subcat{font-family:'Syne',sans-serif;font-size:.63rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.07em;margin:.6rem 0 .32rem .1rem;display:flex;align-items:center;gap:.3rem}
+.add-drinks-subcat::before{content:'';display:block;width:12px;height:1px;background:var(--gold);opacity:.4}
+.ad-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.45rem}
+.ad-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:.7rem;cursor:pointer;transition:all .15s;position:relative}
+.ad-card:hover{border-color:var(--border2)}
+.ad-card.ad-sel{border-color:var(--gold);background:rgba(212,168,67,.07)}
+.ad-emoji{font-size:1.2rem;display:block;margin-bottom:.18rem}
+.ad-name{font-size:.82rem;font-weight:500;line-height:1.3}
+.ad-price{font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;color:var(--gold);margin-top:.18rem;display:block}
+.ad-qty{position:absolute;top:.38rem;right:.38rem;background:var(--gold);color:#0d0d0d;border-radius:50%;width:19px;height:19px;font-size:.68rem;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center}
+.add-cart-bar{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--rs);padding:.72rem .9rem;margin:.9rem 0 .5rem;display:flex;justify-content:space-between;align-items:center}
+.add-cart-info{font-family:'Syne',sans-serif;font-size:.85rem;color:var(--text2)}
+.add-cart-amt{font-family:'Syne',sans-serif;font-weight:700;color:var(--gold2)}
+
+/* ═ PAY TABLE modal ═ */
+#pay-table-total{font-family:'Syne',sans-serif;font-weight:800;font-size:1.5rem;color:var(--gold2);margin:.4rem 0 .8rem}
+
+/* ═ HISTORY — clear button ═ */
+.hist-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;gap:.5rem}
+.btn-clear-hist{background:rgba(224,92,92,.1);color:var(--red);border:1px solid rgba(224,92,92,.2);border-radius:20px;padding:.3rem .8rem;font-size:.75rem;font-family:'Syne',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-clear-hist:hover{background:rgba(224,92,92,.2)}
+
 /* ═ TOAST ═ */
 #toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:1px solid var(--gold);border-radius:var(--r);padding:.72rem 1.2rem;font-family:'Syne',sans-serif;font-weight:600;font-size:.88rem;z-index:9999;transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:.55rem;white-space:nowrap;box-shadow:0 4px 28px rgba(0,0,0,.5)}
 #toast.show{transform:translateX(-50%) translateY(0)}
@@ -236,7 +283,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
 
 <!-- ═══ CONFIG ═══ -->
 <div id="cfg">
-  <h1>Le Sirableu</h1>
+  <h1>BarFlow</h1>
   <p>Application de commandes bar.<br>Configurez votre connexion Firebase ci-dessous.</p>
 
   <div class="card">
@@ -280,7 +327,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
 <!-- ═══ APP ═══ -->
 <div id="app">
   <header>
-    <span class="brand">🍸 Le Sirableu</span>
+    <span class="brand">🍸 BarFlow</span>
     <div class="hright">
       <div id="pcount">0</div>
       <span id="role-badge" class="badge"></span>
@@ -302,12 +349,23 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
     <div id="orders-list"></div>
   </div>
 
+  <div id="tp" class="panel">
+    <div class="tp-header">
+      <div class="tp-title">🧾 Tables ouvertes</div>
+      <div class="tp-cnt" id="tp-cnt"></div>
+    </div>
+    <div id="tp-list"></div>
+  </div>
+
   <div id="hp" class="panel">
-    <div class="hfilts">
-      <button class="hfbtn active" onclick="filtHist('all',this)">Toutes</button>
-      <button class="hfbtn" onclick="filtHist('pending',this)">En attente</button>
-      <button class="hfbtn" onclick="filtHist('done',this)">Terminées</button>
-      <button class="hfbtn" onclick="filtHist('payment',this)">Paiements</button>
+    <div class="hist-toolbar">
+      <div class="hfilts" style="margin-bottom:0">
+        <button class="hfbtn active" onclick="filtHist('all',this)">Toutes</button>
+        <button class="hfbtn" onclick="filtHist('pending',this)">En attente</button>
+        <button class="hfbtn" onclick="filtHist('done',this)">Terminées</button>
+        <button class="hfbtn" onclick="filtHist('payment',this)">Paiements</button>
+      </div>
+      <button class="btn-clear-hist" id="btn-clear-hist" onclick="clearHistory()" style="display:none">🗑 Nettoyer</button>
     </div>
     <div id="hist-list"></div>
   </div>
@@ -429,6 +487,40 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
       <button class="pbcard" onclick="sendPayAlert('card')">💳 Carte</button>
     </div>
     <button class="btn-no" onclick="closePayMod()">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ ADD DRINKS TO OPEN TABLE ═══ -->
+<div class="ov" id="ov-add-drinks" onclick="closeAddDrinks(event)">
+  <div class="modal">
+    <div class="drag"></div>
+    <h3 id="add-drinks-title">Ajouter des boissons</h3>
+    <p style="color:var(--text2);font-size:.83rem;margin-bottom:.9rem" id="add-drinks-sub"></p>
+    <div id="add-drinks-menu" style="max-height:45vh;overflow-y:auto"></div>
+    <div class="add-cart-bar">
+      <span class="add-cart-info"><span id="add-cnt">0</span> boisson(s) ajoutée(s)</span>
+      <span class="add-cart-amt" id="add-tot">0,00 €</span>
+    </div>
+    <button class="btn-ok" onclick="confirmAddDrinks()">➕ Ajouter à la table</button>
+    <button class="btn-no" onclick="closeAddDrinks()">Annuler</button>
+  </div>
+</div>
+
+<!-- ═══ PAY OPEN TABLE ═══ -->
+<div class="ov" id="ov-pay-table" onclick="closePayTable(event)">
+  <div class="modal">
+    <div class="drag"></div>
+    <h3 id="pay-table-title">Encaisser la table</h3>
+    <p style="color:var(--text2);font-size:.83rem;margin-bottom:.3rem" id="pay-table-items-summary"></p>
+    <div id="pay-table-total"></div>
+    <span class="pay-lbl">💳 Mode de paiement encaissé</span>
+    <div class="pgrid" style="margin-bottom:1rem">
+      <div class="pbtn" id="ptb-cash" onclick="selPayTable('cash')"><span class="pi">💵</span><span class="pn pn-c">Espèces</span></div>
+      <div class="pbtn" id="ptb-card" onclick="selPayTable('card')"><span class="pi">💳</span><span class="pn pn-k">Carte</span></div>
+      <div class="pbtn" id="ptb-later" onclick="selPayTable('later')" style="opacity:.4;pointer-events:none"><span class="pi">⏳</span><span class="pn pn-l">Plus tard</span></div>
+    </div>
+    <button class="btn-ok" style="background:var(--green);color:#0d0d0d" onclick="confirmPayTable()">✅ Confirmer le paiement</button>
+    <button class="btn-no" onclick="closePayTable()">Annuler</button>
   </div>
 </div>
 
@@ -636,6 +728,9 @@ function launchUI(){
     badge.textContent='🍸 Barman';
     badge.className='badge badge-b';
     buildBarTabs();
+    // Barman can clear history
+    const cb=document.getElementById('btn-clear-hist');
+    if(cb)cb.style.display='block';
   }
   initSettings();
   listenOrders();
@@ -656,6 +751,7 @@ function buildServTabs(){
 function buildBarTabs(){
   document.getElementById('tabs').innerHTML=`
     <div class="tab active" onclick="switchTab('bp',this)">🍸 En cours</div>
+    <div class="tab" onclick="switchTab('tp',this)">🧾 Tables</div>
     <div class="tab" onclick="switchTab('hp',this)">📜 Historique</div>
     <div class="tab" onclick="switchTab('settings-panel',this)">⚙️ Réglages</div>`;
   document.getElementById('bp').classList.add('active');
@@ -665,6 +761,7 @@ function switchTab(id,el){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(id).classList.add('active');el.classList.add('active');
   if(id==='hp')renderHistory();
+  if(id==='tp')renderOpenTables();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -813,7 +910,7 @@ function listenOrders(){
 
     if(role==='barman'){
       renderBarman();
-      const newP=Object.entries(data).filter(([k,v])=>v.status==='pending'&&!prev[k]);
+      const newP=Object.entries(data).filter(([k,v])=>v.status==='pending'&&v.type!=='addon'&&!prev[k]);
       if(newP.length&&Object.keys(prev).length){
         const isP=newP.some(([,v])=>v.type==='payment');
         playSound(isP?'payment':'new_order');
@@ -826,7 +923,8 @@ function listenOrders(){
     if(role==='serveur'){
       // Only watch orders tagged with THIS device's serveurId
       const justDone=Object.entries(data).filter(([k,v])=>
-        v.status==='done'&&v.type!=='payment'&&v.type!=='picked'&&
+        v.status==='done'&&
+        v.type!=='payment'&&v.type!=='picked'&&v.type!=='addon'&&
         v.serveurId===serveurId&&  // ← UUID comparison, never fails with forbidden chars
         (!prev[k]||prev[k].status==='pending')
       );
@@ -843,6 +941,7 @@ function listenOrders(){
     if(pc){badge.style.display='flex';badge.textContent=pc;}else badge.style.display='none';
 
     if(document.getElementById('hp').classList.contains('active'))renderHistory();
+    if(document.getElementById('tp')&&document.getElementById('tp').classList.contains('active'))renderOpenTables();
   });
 }
 
@@ -881,7 +980,10 @@ const PL={cash:{i:'💵',l:'Espèces',c:'pmb-c'},card:{i:'💳',l:'Carte bancair
 
 function renderBarman(){
   const list=document.getElementById('orders-list');
-  const pend=Object.entries(allOrders).filter(([,o])=>o.status==='pending').sort((a,b)=>a[1].timestamp-b[1].timestamp);
+  // Exclude addon orders (already served) and closed/paid/picked orders
+  const pend=Object.entries(allOrders)
+    .filter(([,o])=>o.status==='pending'&&o.type!=='addon')
+    .sort((a,b)=>a[1].timestamp-b[1].timestamp);
   document.getElementById('orders-cnt').textContent=pend.length+(pend.length>1?' commandes':' commande')+' en attente';
   if(!pend.length){list.innerHTML=`<div class="empty"><div class="empty-ico">✨</div>Aucune commande en attente</div>`;return;}
   let h='';
@@ -916,12 +1018,40 @@ function renderBarman(){
   list.innerHTML=h;
 }
 function markDone(k){
-  db.ref('orders/'+k+'/status').set('done');
-  db.ref('orders/'+k+'/readyAt').set(new Date().toLocaleString('fr-FR'));
-  // Push notification to the specific serveur via Firebase
-  pushToServeur(k);
+  const o=allOrders[k];
+  if(!o)return;
+  if(o.type==='payment'){
+    // Payment confirmation: mark as paid + closed, do NOT push ready-notification
+    db.ref('orders/'+k).update({
+      status:'paid',
+      paidAt:new Date().toLocaleString('fr-FR')
+    });
+  }else{
+    // Normal order: mark done and notify serveur
+    db.ref('orders/'+k).update({
+      status:'done',
+      readyAt:new Date().toLocaleString('fr-FR')
+    });
+    pushToServeur(k);
+  }
 }
 function delOrder(k){if(confirm('Supprimer ?'))db.ref('orders/'+k).remove();}
+
+// ══════════════════════════════════════════════════════════
+// CLEAR HISTORY (barman only)
+// ══════════════════════════════════════════════════════════
+function clearHistory(){
+  // Identify which orders are "done" — picked, paid, or done+older than 1h
+  const done=Object.entries(allOrders).filter(([,o])=>
+    o.status==='picked'||o.status==='paid'||
+    (o.status==='done'&&Date.now()-o.timestamp>3600000)
+  );
+  if(!done.length){showToast('ℹ️','Aucune commande terminée à effacer.');return;}
+  if(!confirm(`Supprimer ${done.length} commande(s) terminée(s) de l'historique ?`))return;
+  const upd={};
+  done.forEach(([k])=>{upd[k]=null;});
+  db.ref('orders').update(upd).then(()=>showToast('🗑️','Historique nettoyé !'));
+}
 
 // ══════════════════════════════════════════════════════════
 // PUSH — notify specific serveur via Firebase trigger node
@@ -950,7 +1080,7 @@ function listenForPushNotifs(){
     snap.ref.remove();
     // Show browser notification if permission granted
     if(Notification.permission==='granted'){
-      const n=new Notification('🍸 Sirableu — Commande prête !',{
+      const n=new Notification('🍸 BarFlow — Commande prête !',{
         body:`Votre commande pour ${notif.table||'une table'} est prête. Allez la récupérer !`,
         icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
         badge:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
@@ -976,30 +1106,231 @@ function renderHistory(){
   let entries=Object.entries(allOrders).sort((a,b)=>b[1].timestamp-a[1].timestamp);
   // Serveur : only their own orders
   if(role==='serveur')entries=entries.filter(([,o])=>!o.serveurId||o.serveurId===serveurId);
+  // Filters
   if(histFilt==='pending')entries=entries.filter(([,o])=>o.status==='pending'&&o.type!=='payment');
-  if(histFilt==='done')entries=entries.filter(([,o])=>(o.status==='done'||o.status==='picked')&&o.type!=='payment');
-  if(histFilt==='payment')entries=entries.filter(([,o])=>o.type==='payment');
+  if(histFilt==='done')entries=entries.filter(([,o])=>
+    (o.status==='done'||o.status==='picked'||o.status==='paid'||o.status==='closed')&&o.type!=='payment'
+  );
+  if(histFilt==='payment')entries=entries.filter(([,o])=>o.type==='payment'||o.status==='paid');
   if(!entries.length){list.innerHTML=`<div class="empty"><div class="empty-ico">📭</div>Aucune commande</div>`;return;}
   let h='';
   entries.forEach(([k,o])=>{
-    const isP=o.type==='payment';
+    const isPayReq=o.type==='payment';
     let sl;
-    if(o.status==='picked')sl=`<span style="color:var(--green);font-size:.73rem">✅ Récupérée</span>`;
-    else if(o.status==='done')sl=`<span style="color:var(--blue);font-size:.73rem">🍸 Prête</span>`;
-    else sl=`<span style="color:var(--gold2);font-size:.73rem">⏳ En attente</span>`;
-    const tot=isP?null:orderTotal(o);
+    if(o.status==='picked')    sl=`<span style="color:var(--green);font-size:.73rem">✅ Récupérée</span>`;
+    else if(o.status==='paid') sl=`<span style="color:var(--green);font-size:.73rem">✅ Payée</span>`;
+    else if(o.status==='closed')sl=`<span style="color:var(--green);font-size:.73rem">✅ Clôturée</span>`;
+    else if(o.status==='done') sl=`<span style="color:var(--blue);font-size:.73rem">🍸 Prête</span>`;
+    else                        sl=`<span style="color:var(--gold2);font-size:.73rem">⏳ En attente</span>`;
+    const tot=isPayReq?null:orderTotal(o);
     const pm=o.payment?(PL[o.payment]||null):null;
-    const tc=isP?'tag-p':(o.payment==='cash'?'tag-c':o.payment==='card'?'tag-k':'tag-l');
-    const tl=isP?`💳 ${pm?pm.l:''}`:pm?`${pm.i} ${pm.l}`:'';
-    const its=isP?'<em>Demande de paiement</em>':(o.items||[]).map(i=>`×${i.qty} ${i.n}`).join(', ');
+    const tc=isPayReq?'tag-p':(o.payment==='cash'?'tag-c':o.payment==='card'?'tag-k':'tag-l');
+    const tl=isPayReq?`💳 Paiement ${pm?pm.l:''}`:pm?`${pm.i} ${pm.l}`:'';
+    const its=isPayReq?'<em>Demande de paiement</em>':(o.items||[]).map(i=>`×${i.qty} ${i.n}`).join(', ');
     const srv=(role==='barman'&&o.serveurName)?`<div class="hi-srv">🍽️ ${o.serveurName}</div>`:'';
+    // Cumulative run-total for open tables that were paid
+    const runTot=(o.runTotal&&o.status==='closed')?`<div style="font-size:.72rem;color:var(--text2);margin-top:.18rem">Cumulé : ${fmt(o.runTotal)}</div>`:'';
     h+=`<div class="hi">
       <div class="hi-h"><span class="hi-t">${o.table}</span><div style="display:flex;align-items:center;gap:.45rem">${sl}<span class="hi-dt">${o.date}</span></div></div>
       ${srv}<div class="hi-its">${its}</div>
+      ${runTot}
       <div class="hi-ft"><span class="hi-tot">${tot!==null?fmt(tot):'—'}</span>${tl?`<span class="hp-tag ${tc}">${tl}</span>`:''}</div>
     </div>`;
   });
   list.innerHTML=h;
+}
+
+// ══════════════════════════════════════════════════════════
+// OPEN TABLES — commandes "later" actives (non clôturées)
+// ══════════════════════════════════════════════════════════
+// An "open table" is a set of orders for the same table with payment=later
+// that haven't been closed yet. We group them by table name.
+
+function getOpenTables(){
+  // Gather all orders with payment=later and status NOT closed/paid/picked
+  const open={};
+  Object.entries(allOrders).forEach(([k,o])=>{
+    if(o.payment!=='later')return;
+    if(['closed','paid','picked'].includes(o.status))return;
+    if(o.type==='payment')return;
+    const tbl=o.table;
+    if(!open[tbl])open[tbl]={keys:[],items:[],total:0,firstDate:o.date,firstTs:o.timestamp,serveurName:o.serveurName||''};
+    open[tbl].keys.push(k);
+    (o.items||[]).forEach(i=>open[tbl].items.push(i));
+    open[tbl].total+=orderTotal(o);
+    if(o.timestamp<open[tbl].firstTs){open[tbl].firstTs=o.timestamp;open[tbl].firstDate=o.date;open[tbl].serveurName=o.serveurName||'';}
+  });
+  return open;
+}
+
+function renderOpenTables(){
+  const list=document.getElementById('tp-list');
+  const tables=getOpenTables();
+  const keys=Object.keys(tables);
+  const cnt=document.getElementById('tp-cnt');
+  cnt.textContent=keys.length+(keys.length>1?' tables ouvertes':' table ouverte');
+  if(!keys.length){
+    list.innerHTML=`<div class="empty"><div class="empty-ico">🎉</div>Aucune table ouverte</div>`;
+    return;
+  }
+  let h='';
+  keys.sort().forEach(tbl=>{
+    const t=tables[tbl];
+    const srv=t.serveurName?`<div class="tc-srv">🍽️ ${t.serveurName}</div>`:'';
+    // Group items by name for display
+    const grouped={};
+    t.items.forEach(i=>{
+      if(!grouped[i.n])grouped[i.n]={qty:0,p:i.p||PM[i.n]||0,e:i.e};
+      grouped[i.n].qty+=i.qty;
+    });
+    let itemsHtml='';
+    Object.entries(grouped).forEach(([n,d])=>{
+      const lt=d.p*d.qty;
+      itemsHtml+=`<div class="oi"><span class="oiq">×${d.qty}</span><span class="oin">${d.e} ${n}</span><span class="oip">${fmt(lt)}</span></div>`;
+    });
+    const safeT=tbl.replace(/'/g,"\\'");
+    h+=`<div class="tcard">
+      <div class="tcard-head">
+        <div class="tcard-head-l">
+          <div class="tc-table">${tbl}</div>
+          <div class="tc-date">Depuis le ${t.firstDate}</div>
+          ${srv}
+        </div>
+        <span class="tc-badge">Ardoise ouverte</span>
+      </div>
+      <div class="tc-items oitems">${itemsHtml}</div>
+      <div class="tc-run-total">
+        <span class="tc-run-lbl">Total ardoise</span>
+        <span class="tc-run-amt">${fmt(t.total)}</span>
+      </div>
+      <div class="tc-actions">
+        <button class="btn-tc-add" onclick="openAddDrinks('${safeT}')">➕ Ajouter</button>
+        <button class="btn-tc-pay" onclick="openPayTable('${safeT}')">💳 Encaisser</button>
+      </div>
+    </div>`;
+  });
+  list.innerHTML=h;
+}
+
+// ── Add drinks to open table ─────────────────────────────
+let addTarget=''; // table name being added to
+let addCart_={}; // temp cart for additions
+
+function openAddDrinks(tbl){
+  addTarget=tbl;addCart_={};
+  document.getElementById('add-drinks-title').textContent='Ajouter à '+tbl;
+  document.getElementById('add-drinks-sub').textContent='Sélectionnez les boissons à ajouter à l\'ardoise.';
+  renderAddDrinksMenu();
+  document.getElementById('ov-add-drinks').classList.add('open');
+}
+function closeAddDrinks(e){
+  if(!e||e.target===document.getElementById('ov-add-drinks'))
+    document.getElementById('ov-add-drinks').classList.remove('open');
+}
+function renderAddDrinksMenu(){
+  const menu=document.getElementById('add-drinks-menu');
+  let h='';
+  MENU.forEach(cat=>{
+    h+=`<div class="add-drinks-cat">${cat.cat}</div>`;
+    const renderGroup=items=>{
+      h+=`<div class="ad-grid">`;
+      items.forEach(item=>{
+        const qty=addCart_[item.n]?addCart_[item.n].qty:0;
+        const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        h+=`<div class="ad-card${qty?' ad-sel':''}" onclick="addToAdCart('${sn}','${item.e}',${item.p})">
+          <span class="ad-emoji">${item.e}</span>
+          <span class="ad-name">${item.n}</span>
+          <span class="ad-price">${fmt(item.p)}</span>
+          ${qty?`<span class="ad-qty">${qty}</span>`:''}
+        </div>`;
+      });
+      h+=`</div>`;
+    };
+    if(cat.subs)cat.subs.forEach(s=>{h+=`<div class="add-drinks-subcat">${s.lbl}</div>`;renderGroup(s.items);});
+    else renderGroup(cat.items);
+  });
+  menu.innerHTML=h;
+}
+function addToAdCart(n,e,p){
+  if(!addCart_[n])addCart_[n]={qty:0,e,p};
+  addCart_[n].qty++;
+  updAddCartBar();renderAddDrinksMenu();
+}
+function updAddCartBar(){
+  const cnt=Object.values(addCart_).reduce((s,v)=>s+v.qty,0);
+  const tot=Object.entries(addCart_).reduce((s,[n,d])=>s+(d.p||PM[n]||0)*d.qty,0);
+  document.getElementById('add-cnt').textContent=cnt;
+  document.getElementById('add-tot').textContent=fmt(tot);
+}
+function confirmAddDrinks(){
+  if(!Object.keys(addCart_).length){alert('Aucune boisson sélectionnée.');return;}
+  const items=Object.entries(addCart_).map(([n,d])=>({n,qty:d.qty,comment:'',e:d.e,p:d.p||PM[n]||0}));
+  const total=Object.entries(addCart_).reduce((s,[n,d])=>s+(d.p||PM[n]||0)*d.qty,0);
+  // Create a new sub-order linked to the same open table
+  db.ref('orders').push({
+    table:addTarget,
+    serveurName,serveurId,
+    payment:'later',  // keep it on the open table
+    status:'done',    // it was served (no need to prepare)
+    type:'addon',     // addon order — barman sees it as already served
+    items,
+    total:parseFloat(total.toFixed(2)),
+    timestamp:Date.now(),
+    date:new Date().toLocaleString('fr-FR')
+  }).then(()=>{
+    showToast('➕','Boissons ajoutées à '+addTarget+' !');
+    closeAddDrinks();
+    renderOpenTables();
+  }).catch(e=>alert('Erreur : '+e.message));
+}
+
+// ── Pay open table ────────────────────────────────────────
+let payTableTarget='';
+let selPayTable_='cash';
+
+function openPayTable(tbl){
+  payTableTarget=tbl;selPayTable_='cash';updPayTableBtns();
+  const tables=getOpenTables();
+  const t=tables[tbl];
+  document.getElementById('pay-table-title').textContent='Encaisser '+tbl;
+  const itemNames=(()=>{
+    const g={};
+    (t?t.items:[]).forEach(i=>{if(!g[i.n])g[i.n]=0;g[i.n]+=i.qty;});
+    return Object.entries(g).map(([n,q])=>`×${q} ${n}`).join(', ');
+  })();
+  document.getElementById('pay-table-items-summary').textContent=itemNames;
+  document.getElementById('pay-table-total').textContent=t?fmt(t.total):'—';
+  document.getElementById('ov-pay-table').classList.add('open');
+}
+function closePayTable(e){
+  if(!e||e.target===document.getElementById('ov-pay-table'))
+    document.getElementById('ov-pay-table').classList.remove('open');
+}
+function selPayTable(m){selPayTable_=m;updPayTableBtns();}
+function updPayTableBtns(){
+  ['cash','card'].forEach(m=>{
+    const el=document.getElementById('ptb-'+m);
+    if(el){el.className='pbtn';if(selPayTable_===m)el.classList.add('sel-'+m);}
+  });
+}
+function confirmPayTable(){
+  if(!selPayTable_){alert('Choisissez un mode de paiement.');return;}
+  const tables=getOpenTables();
+  const t=tables[payTableTarget];
+  if(!t){closePayTable();return;}
+  // Close all open orders for this table: set status=closed + final payment method
+  const upd={};
+  t.keys.forEach(k=>{
+    upd[k+'/status']='closed';
+    upd[k+'/payment']=selPayTable_;  // overwrite 'later' with real payment
+    upd[k+'/closedAt']=new Date().toLocaleString('fr-FR');
+    upd[k+'/runTotal']=t.total;
+  });
+  db.ref('orders').update(upd).then(()=>{
+    showToast('✅',`${payTableTarget} encaissée — ${selPayTable_==='cash'?'Espèces':'Carte'} !`);
+    closePayTable();
+    renderOpenTables();
+  }).catch(e=>alert('Erreur : '+e.message));
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1058,7 +1389,7 @@ async function toggleNotif(on){
 
 function sendTestNotif(){
   if(Notification.permission!=='granted'){alert('Autorisez les notifications d\'abord.');return;}
-  new Notification('🍸 Sirableu — Test',{
+  new Notification('🍸 BarFlow — Test',{
     body:'Notification de test ! Tout fonctionne correctement.',
     icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
     requireInteraction:false
@@ -1110,7 +1441,7 @@ function buildTicket(order){
   });
   return `
 ════════════════════════
-      🍸 Le Sirableu
+      🍸 BarFlow
 ════════════════════════
 Table  : ${order.table}
 Serveur: ${order.serveurName||'—'}
