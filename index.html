@@ -922,12 +922,12 @@ function listenOrders(){
     }
 
     if(role==='serveur'){
-      // Only watch orders tagged with THIS device's serveurId
-      // Exclude 'later' payment orders from the ready banner — they stay on the open table
+      // Only watch orders tagged with THIS device's serveurId.
+      // All payment modes (cash, card, later) trigger the ready banner.
+      // "later" orders stay visible in the Tables tab after pickup — that's independent.
       const justDone=Object.entries(data).filter(([k,v])=>
         v.status==='done'&&
-        v.type!=='payment'&&v.type!=='picked'&&v.type!=='addon'&&
-        v.payment!=='later'&&           // ← open-tab orders don't trigger a pickup banner
+        v.type!=='payment'&&v.type!=='addon'&&
         v.serveurId===serveurId&&
         (!prev[k]||prev[k].status==='pending')
       );
