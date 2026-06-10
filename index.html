@@ -744,6 +744,7 @@ function launchUI(){
 function buildServTabs(){
   document.getElementById('tabs').innerHTML=`
     <div class="tab active" onclick="switchTab('order-panel',this)">📋 Commander</div>
+    <div class="tab" onclick="switchTab('tp',this)">🧾 Tables</div>
     <div class="tab" onclick="switchTab('hp',this)">📜 Historique</div>
     <div class="tab" onclick="switchTab('settings-panel',this)">⚙️ Réglages</div>`;
   document.getElementById('order-panel').classList.add('active');
@@ -910,7 +911,7 @@ function listenOrders(){
 
     if(role==='barman'){
       renderBarman();
-      const newP=Object.entries(data).filter(([k,v])=>v.status==='pending'&&v.type!=='addon'&&!prev[k]);
+      const newP=Object.entries(data).filter(([k,v])=>v.status==='pending'&&!prev[k]);
       if(newP.length&&Object.keys(prev).length){
         const isP=newP.some(([,v])=>v.type==='payment');
         playSound(isP?'payment':'new_order');
@@ -922,10 +923,12 @@ function listenOrders(){
 
     if(role==='serveur'){
       // Only watch orders tagged with THIS device's serveurId
+      // Exclude 'later' payment orders from the ready banner — they stay on the open table
       const justDone=Object.entries(data).filter(([k,v])=>
         v.status==='done'&&
         v.type!=='payment'&&v.type!=='picked'&&v.type!=='addon'&&
-        v.serveurId===serveurId&&  // ← UUID comparison, never fails with forbidden chars
+        v.payment!=='later'&&           // ← open-tab orders don't trigger a pickup banner
+        v.serveurId===serveurId&&
         (!prev[k]||prev[k].status==='pending')
       );
       justDone.forEach(([k])=>{if(!pickupKeys.includes(k))pickupKeys.push(k);});
@@ -941,7 +944,8 @@ function listenOrders(){
     if(pc){badge.style.display='flex';badge.textContent=pc;}else badge.style.display='none';
 
     if(document.getElementById('hp').classList.contains('active'))renderHistory();
-    if(document.getElementById('tp')&&document.getElementById('tp').classList.contains('active'))renderOpenTables();
+    const tpEl=document.getElementById('tp');
+    if(tpEl&&tpEl.classList.contains('active'))renderOpenTables();
   });
 }
 
@@ -980,9 +984,9 @@ const PL={cash:{i:'💵',l:'Espèces',c:'pmb-c'},card:{i:'💳',l:'Carte bancair
 
 function renderBarman(){
   const list=document.getElementById('orders-list');
-  // Exclude addon orders (already served) and closed/paid/picked orders
+  // Show all pending orders including addons (addons need preparation too)
   const pend=Object.entries(allOrders)
-    .filter(([,o])=>o.status==='pending'&&o.type!=='addon')
+    .filter(([,o])=>o.status==='pending')
     .sort((a,b)=>a[1].timestamp-b[1].timestamp);
   document.getElementById('orders-cnt').textContent=pend.length+(pend.length>1?' commandes':' commande')+' en attente';
   if(!pend.length){list.innerHTML=`<div class="empty"><div class="empty-ico">✨</div>Aucune commande en attente</div>`;return;}
@@ -1002,8 +1006,10 @@ function renderBarman(){
       </div>`;return;
     }
     const tot=orderTotal(o);const pm=o.payment?(PL[o.payment]||PL.later):null;
-    h+=`<div class="ocard">
-      <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div><span class="os os-p">En attente</span></div>
+    const isAddon=o.type==='addon';
+    h+=`<div class="ocard${isAddon?' style="border-color:rgba(212,168,67,.35);background:rgba(212,168,67,.04)"':''}">
+      <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div>
+      <span class="os ${isAddon?'os-pay"style="background:rgba(212,168,67,.15);color:var(--gold2);border-color:rgba(212,168,67,.3)':' os-p'}">${isAddon?'Reprise':'En attente'}</span></div>
       <div class="oitems">`;
     (o.items||[]).forEach(i=>{
       const lt=(i.p||0)*i.qty;
@@ -1147,18 +1153,32 @@ function renderHistory(){
 // that haven't been closed yet. We group them by table name.
 
 function getOpenTables(){
-  // Gather all orders with payment=later and status NOT closed/paid/picked
+  // A table is "open" if it has at least one order with payment='later'
+  // that is NOT yet closed. We include ALL delivery statuses (pending, done, picked, addon)
+  // because "later" means the customer hasn't paid yet, regardless of whether drinks were served.
+  // Serveurs only see their own tables; barman sees all.
   const open={};
   Object.entries(allOrders).forEach(([k,o])=>{
-    if(o.payment!=='later')return;
-    if(['closed','paid','picked'].includes(o.status))return;
-    if(o.type==='payment')return;
+    if(o.payment!=='later')return;           // only "later" payment orders
+    if(o.status==='closed')return;           // already paid & closed
+    if(o.status==='paid')return;             // already paid
+    if(o.type==='payment')return;            // skip payment-request entries
+    // Serveur sees only their own tables (by UUID)
+    if(role==='serveur'&&o.serveurId&&o.serveurId!==serveurId)return;
     const tbl=o.table;
-    if(!open[tbl])open[tbl]={keys:[],items:[],total:0,firstDate:o.date,firstTs:o.timestamp,serveurName:o.serveurName||''};
+    if(!open[tbl])open[tbl]={
+      keys:[],items:[],total:0,
+      firstDate:o.date,firstTs:o.timestamp,
+      serveurName:o.serveurName||''
+    };
     open[tbl].keys.push(k);
-    (o.items||[]).forEach(i=>open[tbl].items.push(i));
+    (o.items||[]).forEach(i=>open[tbl].items.push({...i}));
     open[tbl].total+=orderTotal(o);
-    if(o.timestamp<open[tbl].firstTs){open[tbl].firstTs=o.timestamp;open[tbl].firstDate=o.date;open[tbl].serveurName=o.serveurName||'';}
+    if(o.timestamp<open[tbl].firstTs){
+      open[tbl].firstTs=o.timestamp;
+      open[tbl].firstDate=o.date;
+      open[tbl].serveurName=o.serveurName||'';
+    }
   });
   return open;
 }
@@ -1266,21 +1286,22 @@ function confirmAddDrinks(){
   if(!Object.keys(addCart_).length){alert('Aucune boisson sélectionnée.');return;}
   const items=Object.entries(addCart_).map(([n,d])=>({n,qty:d.qty,comment:'',e:d.e,p:d.p||PM[n]||0}));
   const total=Object.entries(addCart_).reduce((s,[n,d])=>s+(d.p||PM[n]||0)*d.qty,0);
-  // Create a new sub-order linked to the same open table
+  // Create a new order for the same table — sent to barman for preparation
+  // It keeps payment='later' so it stays on the open table
   db.ref('orders').push({
     table:addTarget,
     serveurName,serveurId,
-    payment:'later',  // keep it on the open table
-    status:'done',    // it was served (no need to prepare)
-    type:'addon',     // addon order — barman sees it as already served
+    payment:'later',    // stays on the open table ardoise
+    status:'pending',   // barman needs to prepare it
+    type:'addon',       // flagged as an addition (barman won't auto-print unless enabled)
     items,
     total:parseFloat(total.toFixed(2)),
     timestamp:Date.now(),
     date:new Date().toLocaleString('fr-FR')
   }).then(()=>{
-    showToast('➕','Boissons ajoutées à '+addTarget+' !');
+    showToast('➕','Boissons ajoutées à '+addTarget+' — envoyées au barman !');
     closeAddDrinks();
-    renderOpenTables();
+    addCart_={};
   }).catch(e=>alert('Erreur : '+e.message));
 }
 
