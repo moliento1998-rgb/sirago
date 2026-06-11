@@ -271,6 +271,18 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
 .btn-clear-hist{background:rgba(224,92,92,.1);color:var(--red);border:1px solid rgba(224,92,92,.2);border-radius:20px;padding:.3rem .8rem;font-size:.75rem;font-family:'Syne',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
 .btn-clear-hist:hover{background:rgba(224,92,92,.2)}
 
+/* ═ BEER SIZE PICKER ═ */
+#ov-size .modal{padding-bottom:1.8rem}
+.size-beer-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:var(--gold2);text-align:center;margin-bottom:.25rem}
+.size-beer-emoji{font-size:2.4rem;display:block;text-align:center;margin-bottom:.6rem}
+.size-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin:1rem 0}
+.size-btn{background:var(--bg3);border:2px solid var(--border);border-radius:var(--r);padding:1rem .5rem;cursor:pointer;text-align:center;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:.35rem}
+.size-btn:hover{border-color:var(--gold);transform:translateY(-2px)}
+.size-btn:active{transform:translateY(0)}
+.size-cl{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:var(--text)}
+.size-price{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--gold)}
+.size-hint{text-align:center;font-size:.78rem;color:var(--text2);margin-bottom:.5rem}
+
 /* ═ TOAST ═ */
 #toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--bg2);border:1px solid var(--gold);border-radius:var(--r);padding:.72rem 1.2rem;font-family:'Syne',sans-serif;font-weight:600;font-size:.88rem;z-index:9999;transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;align-items:center;gap:.55rem;white-space:nowrap;box-shadow:0 4px 28px rgba(0,0,0,.5)}
 #toast.show{transform:translateX(-50%) translateY(0)}
@@ -444,6 +456,18 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
   </div>
 </div>
 
+<!-- ═══ BEER SIZE PICKER ═══ -->
+<div class="ov" id="ov-size" onclick="closeSizePicker(event)">
+  <div class="modal" style="padding-bottom:2rem">
+    <div class="drag"></div>
+    <span class="size-beer-emoji" id="size-emoji">🍺</span>
+    <div class="size-beer-name" id="size-name">Pression</div>
+    <p class="size-hint">Choisissez la contenance</p>
+    <div class="size-grid" id="size-grid"></div>
+    <button class="btn-no" onclick="closeSizePicker()">Annuler</button>
+  </div>
+</div>
+
 <!-- ═══ CART BAR ═══ -->
 <div id="cbar">
   <div class="ci-lbl">
@@ -554,15 +578,14 @@ const MENU=[
   {cat:"🥂 Champagne & Vins",items:[
     {n:"Champagne Brut",e:"🥂",p:12},{n:"Champagne Rosé",e:"🍾",p:13},
     {n:"Vin rouge",e:"🍷",p:6},{n:"Vin blanc",e:"🥃",p:6},{n:"Vin rosé",e:"🍹",p:6}]},
-  {cat:"🍺 Bières",subs:[
-    {lbl:"Pressions — 25 cl",items:[
-      {n:"Pression 25cl",e:"🍺",p:3},{n:"Blanche pression 25cl",e:"🍺",p:3.5},{n:"IPA pression 25cl",e:"🍺",p:3.5}]},
-    {lbl:"Pressions — 33 cl",items:[
-      {n:"Pression 33cl",e:"🍺",p:4},{n:"Blanche pression 33cl",e:"🍺",p:4.5},{n:"IPA pression 33cl",e:"🍺",p:4.5}]},
-    {lbl:"Pressions — 50 cl",items:[
-      {n:"Pression 50cl",e:"🍺",p:5.5},{n:"Blanche pression 50cl",e:"🍺",p:6},{n:"IPA pression 50cl",e:"🍺",p:6}]},
-    {lbl:"Bouteilles",items:[
-      {n:"Bière blonde bouteille",e:"🍻",p:5},{n:"Bière brune bouteille",e:"🍻",p:5},{n:"Bière sans alcool",e:"🥤",p:4}]}]},
+  {cat:"🍺 Bières",items:[
+    // Pressions — sizes are selected via a popup (sizes array)
+    {n:"Pression",   e:"🍺",sizes:[{lbl:"25 cl",p:3},{lbl:"33 cl",p:4},{lbl:"50 cl",p:5.5}]},
+    {n:"Blanche",    e:"🍺",sizes:[{lbl:"25 cl",p:3.5},{lbl:"33 cl",p:4.5},{lbl:"50 cl",p:6}]},
+    {n:"IPA",        e:"🍺",sizes:[{lbl:"25 cl",p:3.5},{lbl:"33 cl",p:4.5},{lbl:"50 cl",p:6}]},
+    {n:"Bière blonde bouteille",e:"🍻",p:5},
+    {n:"Bière brune bouteille", e:"🍻",p:5},
+    {n:"Bière sans alcool",     e:"🥤",p:4}]},
   {cat:"🍸 Cocktails",items:[
     {n:"Mojito",e:"🍹",p:10},{n:"Spritz",e:"🥂",p:9},{n:"Margarita",e:"🍸",p:10},
     {n:"Gin Tonic",e:"🥃",p:10},{n:"Cosmopolitan",e:"🍸",p:10},{n:"Whisky Sour",e:"🥃",p:11},
@@ -578,7 +601,15 @@ const MENU=[
 ];
 const PM={};
 MENU.forEach(c=>{
-  if(c.items)c.items.forEach(i=>PM[i.n]=i.p);
+  const flat=c.items||[];
+  flat.forEach(i=>{
+    if(i.sizes){
+      // Register each size variant as "Name (XXcl)" → price
+      i.sizes.forEach(s=>{ PM[i.n+' ('+s.lbl+')'] = s.p; });
+    } else {
+      PM[i.n]=i.p;
+    }
+  });
   if(c.subs)c.subs.forEach(s=>s.items.forEach(i=>PM[i.n]=i.p));
 });
 
@@ -787,6 +818,24 @@ function renderMenu(){
   document.getElementById('menu-container').innerHTML=h;
 }
 function dCard(item){
+  // Items with sizes (beers on tap) → open size picker on tap
+  if(item.sizes){
+    // Count total qty across all size variants of this beer
+    const totalQty=item.sizes.reduce((s,sz)=>{
+      const key=item.n+' ('+sz.lbl+')';
+      return s+(cart[key]?cart[key].qty:0);
+    },0);
+    const priceFrom=item.sizes[0].p;
+    const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const se=item.e.replace(/'/g,"\\'");
+    return `<div class="dcard${totalQty?' ic':''}" onclick="openSizePicker('${sn}','${se}')">
+      <span class="d-emoji">${item.e}</span>
+      <span class="d-name">${item.n}</span>
+      <span class="d-price">dès ${fmt(priceFrom)}</span>
+      ${totalQty?`<span class="d-qty">${totalQty}</span>`:''}
+    </div>`;
+  }
+  // Regular item → direct add
   const qty=cart[item.n]?cart[item.n].qty:0;
   const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   return `<div class="dcard${qty?' ic':''}" onclick="addCart('${sn}','${item.e}',${item.p})">
@@ -795,6 +844,53 @@ function dCard(item){
     <span class="d-price">${fmt(item.p)}</span>
     ${qty?`<span class="d-qty">${qty}</span>`:''}
   </div>`;
+}
+
+// ── Beer size picker ─────────────────────────────────────────────────────────
+let _sizeItem=null; // current beer item being sized
+
+function openSizePicker(name,emoji){
+  // Find the item in MENU
+  let found=null;
+  MENU.forEach(cat=>{if(cat.items)cat.items.forEach(i=>{if(i.n===name)found=i;});});
+  if(!found)return;
+  _sizeItem=found;
+  document.getElementById('size-name').textContent=found.n;
+  document.getElementById('size-emoji').textContent=found.e;
+  // Build size buttons
+  let h='';
+  found.sizes.forEach(sz=>{
+    const key=found.n+' ('+sz.lbl+')';
+    const qty=cart[key]?cart[key].qty:0;
+    const ssz=sz.lbl.replace(/'/g,"\\'");
+    h+=`<div class="size-btn" onclick="pickSize('${ssz}')">
+      <span class="size-cl">${sz.lbl}</span>
+      <span class="size-price">${fmt(sz.p)}</span>
+      ${qty?`<span style="background:var(--gold);color:#0d0d0d;border-radius:50%;width:20px;height:20px;font-size:.7rem;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center">${qty}</span>`:''}
+    </div>`;
+  });
+  document.getElementById('size-grid').innerHTML=h;
+  document.getElementById('ov-size').classList.add('open');
+}
+
+function closeSizePicker(e){
+  if(!e||e.target===document.getElementById('ov-size'))
+    document.getElementById('ov-size').classList.remove('open');
+}
+
+function pickSize(sizeLabel){
+  if(!_sizeItem)return;
+  ensureAC();
+  // Find size price
+  const sz=_sizeItem.sizes.find(s=>s.lbl===sizeLabel);
+  if(!sz)return;
+  const key=_sizeItem.n+' ('+sizeLabel+')';
+  if(!cart[key])cart[key]={qty:0,comment:'',e:_sizeItem.e,p:sz.p};
+  cart[key].qty++;
+  updateCartBar();
+  // Refresh size picker to show updated qty
+  openSizePicker(_sizeItem.n,_sizeItem.e);
+  renderMenu();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -927,8 +1023,8 @@ function listenOrders(){
       // "later" orders stay visible in the Tables tab after pickup — that's independent.
       const justDone=Object.entries(data).filter(([k,v])=>
         v.status==='done'&&
-        v.type!=='payment'&&v.type!=='addon'&&
-        v.serveurId===serveurId&&
+        v.type!=='payment'&&          // skip payment-request entries
+        v.serveurId===serveurId&&     // only this device's orders
         (!prev[k]||prev[k].status==='pending')
       );
       justDone.forEach(([k])=>{if(!pickupKeys.includes(k))pickupKeys.push(k);});
@@ -1255,14 +1351,29 @@ function renderAddDrinksMenu(){
     const renderGroup=items=>{
       h+=`<div class="ad-grid">`;
       items.forEach(item=>{
-        const qty=addCart_[item.n]?addCart_[item.n].qty:0;
-        const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-        h+=`<div class="ad-card${qty?' ad-sel':''}" onclick="addToAdCart('${sn}','${item.e}',${item.p})">
-          <span class="ad-emoji">${item.e}</span>
-          <span class="ad-name">${item.n}</span>
-          <span class="ad-price">${fmt(item.p)}</span>
-          ${qty?`<span class="ad-qty">${qty}</span>`:''}
-        </div>`;
+        if(item.sizes){
+          // Beer with sizes: show each size variant as its own card
+          item.sizes.forEach(sz=>{
+            const key=item.n+' ('+sz.lbl+')';
+            const qty=addCart_[key]?addCart_[key].qty:0;
+            const sk=key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+            h+=`<div class="ad-card${qty?' ad-sel':''}" onclick="addToAdCart('${sk}','${item.e}',${sz.p})">
+              <span class="ad-emoji">${item.e}</span>
+              <span class="ad-name">${item.n}<br><span style="font-size:.72rem;color:var(--text2)">${sz.lbl}</span></span>
+              <span class="ad-price">${fmt(sz.p)}</span>
+              ${qty?`<span class="ad-qty">${qty}</span>`:''}
+            </div>`;
+          });
+        } else {
+          const qty=addCart_[item.n]?addCart_[item.n].qty:0;
+          const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+          h+=`<div class="ad-card${qty?' ad-sel':''}" onclick="addToAdCart('${sn}','${item.e}',${item.p})">
+            <span class="ad-emoji">${item.e}</span>
+            <span class="ad-name">${item.n}</span>
+            <span class="ad-price">${fmt(item.p)}</span>
+            ${qty?`<span class="ad-qty">${qty}</span>`:''}
+          </div>`;
+        }
       });
       h+=`</div>`;
     };
