@@ -847,23 +847,29 @@ function dCard(item){
 }
 
 // ── Beer size picker ─────────────────────────────────────────────────────────
-let _sizeItem=null; // current beer item being sized
+// _sizeCtx = 'main'  → writes to cart (order panel)
+//           = 'addon' → writes to addCart_ (add-drinks-to-open-table panel)
+let _sizeItem=null;
+let _sizeCtx='main';
 
-function openSizePicker(name,emoji){
-  // Find the item in MENU
+function openSizePicker(name,emoji,ctx){
+  ctx=ctx||'main';
+  _sizeCtx=ctx;
   let found=null;
   MENU.forEach(cat=>{if(cat.items)cat.items.forEach(i=>{if(i.n===name)found=i;});});
   if(!found)return;
   _sizeItem=found;
   document.getElementById('size-name').textContent=found.n;
   document.getElementById('size-emoji').textContent=found.e;
-  // Build size buttons
+  // Show qty from the active cart depending on context
+  const activeCart=ctx==='addon'?addCart_:cart;
   let h='';
   found.sizes.forEach(sz=>{
     const key=found.n+' ('+sz.lbl+')';
-    const qty=cart[key]?cart[key].qty:0;
-    const ssz=sz.lbl.replace(/'/g,"\\'");
-    h+=`<div class="size-btn" onclick="pickSize('${ssz}')">
+    const qty=activeCart[key]?activeCart[key].qty:0;
+    const ssz=sz.lbl.replace(/'/g,"\'");
+    // Pass context into pickSize so it knows which cart to write to
+    h+=`<div class="size-btn" onclick="pickSize('${ssz}','${ctx}')">
       <span class="size-cl">${sz.lbl}</span>
       <span class="size-price">${fmt(sz.p)}</span>
       ${qty?`<span style="background:var(--gold);color:#0d0d0d;border-radius:50%;width:20px;height:20px;font-size:.7rem;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center">${qty}</span>`:''}
@@ -878,19 +884,25 @@ function closeSizePicker(e){
     document.getElementById('ov-size').classList.remove('open');
 }
 
-function pickSize(sizeLabel){
+function pickSize(sizeLabel,ctx){
   if(!_sizeItem)return;
   ensureAC();
-  // Find size price
+  const actualCtx=ctx||_sizeCtx||'main';
   const sz=_sizeItem.sizes.find(s=>s.lbl===sizeLabel);
   if(!sz)return;
   const key=_sizeItem.n+' ('+sizeLabel+')';
-  if(!cart[key])cart[key]={qty:0,comment:'',e:_sizeItem.e,p:sz.p};
-  cart[key].qty++;
-  updateCartBar();
-  // Refresh size picker to show updated qty
-  openSizePicker(_sizeItem.n,_sizeItem.e);
-  renderMenu();
+  if(actualCtx==='addon'){
+    if(!addCart_[key])addCart_[key]={qty:0,e:_sizeItem.e,p:sz.p};
+    addCart_[key].qty++;
+    updAddCartBar();
+    openSizePicker(_sizeItem.n,_sizeItem.e,'addon'); // refresh qty in picker
+  } else {
+    if(!cart[key])cart[key]={qty:0,comment:'',e:_sizeItem.e,p:sz.p};
+    cart[key].qty++;
+    updateCartBar();
+    renderMenu();
+    openSizePicker(_sizeItem.n,_sizeItem.e,'main'); // refresh qty in picker
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1352,18 +1364,19 @@ function renderAddDrinksMenu(){
       h+=`<div class="ad-grid">`;
       items.forEach(item=>{
         if(item.sizes){
-          // Beer with sizes: show each size variant as its own card
-          item.sizes.forEach(sz=>{
+          // Single card per beer — tapping opens the size picker in addon context
+          const totalQty=item.sizes.reduce((s,sz)=>{
             const key=item.n+' ('+sz.lbl+')';
-            const qty=addCart_[key]?addCart_[key].qty:0;
-            const sk=key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-            h+=`<div class="ad-card${qty?' ad-sel':''}" onclick="addToAdCart('${sk}','${item.e}',${sz.p})">
-              <span class="ad-emoji">${item.e}</span>
-              <span class="ad-name">${item.n}<br><span style="font-size:.72rem;color:var(--text2)">${sz.lbl}</span></span>
-              <span class="ad-price">${fmt(sz.p)}</span>
-              ${qty?`<span class="ad-qty">${qty}</span>`:''}
-            </div>`;
-          });
+            return s+(addCart_[key]?addCart_[key].qty:0);
+          },0);
+          const priceFrom=item.sizes[0].p;
+          const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+          h+=`<div class="ad-card${totalQty?' ad-sel':''}" onclick="openSizePicker('${sn}','${item.e}','addon')">
+            <span class="ad-emoji">${item.e}</span>
+            <span class="ad-name">${item.n}</span>
+            <span class="ad-price">dès ${fmt(priceFrom)}</span>
+            ${totalQty?`<span class="ad-qty">${totalQty}</span>`:''}
+          </div>`;
         } else {
           const qty=addCart_[item.n]?addCart_[item.n].qty:0;
           const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
@@ -1382,6 +1395,7 @@ function renderAddDrinksMenu(){
   });
   menu.innerHTML=h;
 }
+
 function addToAdCart(n,e,p){
   if(!addCart_[n])addCart_[n]={qty:0,e,p};
   addCart_[n].qty++;
