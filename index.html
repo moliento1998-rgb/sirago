@@ -272,6 +272,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
 .btn-clear-hist:hover{background:rgba(224,92,92,.2)}
 
 /* ═ BEER SIZE PICKER ═ */
+#ov-size{z-index:9500}
 #ov-size .modal{padding-bottom:1.8rem}
 .size-beer-name{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;color:var(--gold2);text-align:center;margin-bottom:.25rem}
 .size-beer-emoji{font-size:2.4rem;display:block;text-align:center;margin-bottom:.6rem}
@@ -847,504 +848,79 @@ function dCard(item){
 }
 
 // ── Beer size picker ─────────────────────────────────────────────────────────
-let _sizeItem=null; // current beer item being sized
+// _sizeCtx = 'main'  → writes to cart (order panel)
+//           = 'addon' → writes to addCart_ (add-drinks-to-open-table panel)
+let _sizeItem=null;
+let _sizeCtx='main';
 
-function openSizePicker(name,emoji){
-  // Find the item in MENU
+function openSizePicker(name,emoji,ctx){
+  ctx=ctx||'main';
+  _sizeCtx=ctx;
   let found=null;
   MENU.forEach(cat=>{if(cat.items)cat.items.forEach(i=>{if(i.n===name)found=i;});});
   if(!found)return;
   _sizeItem=found;
   document.getElementById('size-name').textContent=found.n;
   document.getElementById('size-emoji').textContent=found.e;
-  // Build size buttons
+  const activeCart=ctx==='addon'?addCart_:cart;
   let h='';
   found.sizes.forEach(sz=>{
     const key=found.n+' ('+sz.lbl+')';
-    const qty=cart[key]?cart[key].qty:0;
-    const ssz=sz.lbl.replace(/'/g,"\\'");
-    h+=`<div class="size-btn" onclick="pickSize('${ssz}')">
+    const qty=activeCart[key]?activeCart[key].qty:0;
+    const ssz=sz.lbl.replace(/'/g,"\'");
+    h+=`<div class="size-btn" onclick="pickSize('${ssz}','${ctx}')">
       <span class="size-cl">${sz.lbl}</span>
       <span class="size-price">${fmt(sz.p)}</span>
       ${qty?`<span style="background:var(--gold);color:#0d0d0d;border-radius:50%;width:20px;height:20px;font-size:.7rem;font-weight:800;font-family:'Syne',sans-serif;display:flex;align-items:center;justify-content:center">${qty}</span>`:''}
     </div>`;
   });
   document.getElementById('size-grid').innerHTML=h;
+  // When called from the add-drinks panel, hide that overlay so the size picker
+  // is fully accessible (both share z-index space and the backdrop blocks clicks)
+  if(ctx==='addon'){
+    const addOv=document.getElementById('ov-add-drinks');
+    if(addOv)addOv.style.visibility='hidden';
+  }
   document.getElementById('ov-size').classList.add('open');
 }
 
 function closeSizePicker(e){
-  if(!e||e.target===document.getElementById('ov-size'))
+  if(!e||e.target===document.getElementById('ov-size')){
     document.getElementById('ov-size').classList.remove('open');
+    // Restore add-drinks overlay if we hid it
+    if(_sizeCtx==='addon'){
+      const addOv=document.getElementById('ov-add-drinks');
+      if(addOv){addOv.style.visibility='';renderAddDrinksMenu();}
+    }
+  }
 }
 
-function pickSize(sizeLabel){
+function pickSize(sizeLabel,ctx){
   if(!_sizeItem)return;
   ensureAC();
-  // Find size price
+  const actualCtx=ctx||_sizeCtx||'main';
   const sz=_sizeItem.sizes.find(s=>s.lbl===sizeLabel);
   if(!sz)return;
   const key=_sizeItem.n+' ('+sizeLabel+')';
-  if(!cart[key])cart[key]={qty:0,comment:'',e:_sizeItem.e,p:sz.p};
-  cart[key].qty++;
-  updateCartBar();
-  // Refresh size picker to show updated qty
-  openSizePicker(_sizeItem.n,_sizeItem.e);
-  renderMenu();
-}
-
-// ══════════════════════════════════════════════════════════
-// CART
-// ══════════════════════════════════════════════════════════
-function addCart(n,e,p){
-  ensureAC();
-  if(!cart[n])cart[n]={qty:0,comment:'',e,p};
-  cart[n].qty++;updateCartBar();renderMenu();
-}
-function updateCartBar(){
-  const tot=Object.values(cart).reduce((s,v)=>s+v.qty,0);
-  const bar=document.getElementById('cbar');
-  document.getElementById('cart-cnt').textContent=tot;
-  document.getElementById('cart-tot').textContent=tot>0?fmt(cartTotal()):'';
-  if(tot>0)bar.classList.add('vis');else bar.classList.remove('vis');
-}
-function openCart(){selPay_=null;updPayBtns();renderCartItems();updModalTot();document.getElementById('ov-cart').classList.add('open');}
-function closeCart(e){if(!e||e.target===document.getElementById('ov-cart'))document.getElementById('ov-cart').classList.remove('open');}
-function renderCartItems(){
-  let h='';
-  Object.entries(cart).forEach(([n,d])=>{
-    const sn=n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    const lt=(d.p||PM[n]||0)*d.qty;
-    h+=`<div class="citem">
-      <div class="ci-inf">
-        <div class="ci-n">${d.e} ${n}</div>
-        <div class="ci-pl">${fmt(d.p||PM[n]||0)} × ${d.qty} = ${fmt(lt)}</div>
-        <input class="ci-comm" type="text" placeholder="Commentaire…" value="${d.comment}"
-          onchange="setComm('${sn}',this.value)">
-      </div>
-      <div class="ci-act">
-        <button class="cibtn" onclick="chQty('${sn}',-1)">−</button>
-        <span class="ciq">${d.qty}</span>
-        <button class="cibtn" onclick="chQty('${sn}',1)">+</button>
-      </div>
-    </div>`;
-  });
-  if(!h)h='<p style="color:var(--text2);text-align:center;padding:1.4rem">Panier vide</p>';
-  document.getElementById('cart-items').innerHTML=h;
-}
-function updModalTot(){document.getElementById('modal-tot').textContent=fmt(cartTotal());}
-function setComm(n,v){if(cart[n])cart[n].comment=v;}
-function chQty(n,d){
-  if(!cart[n])return;
-  cart[n].qty=Math.max(0,cart[n].qty+d);
-  if(!cart[n].qty)delete cart[n];
-  updateCartBar();renderCartItems();updModalTot();renderMenu();
-}
-
-// ══════════════════════════════════════════════════════════
-// PAYMENT SELECTION
-// ══════════════════════════════════════════════════════════
-function selPay(m){selPay_=m;updPayBtns();}
-function updPayBtns(){
-  ['cash','card','later'].forEach(m=>{
-    const el=document.getElementById('pb-'+m);
-    if(el){el.className='pbtn';if(selPay_===m)el.classList.add('sel-'+m);}
-  });
-}
-function openPayMod(){ensureAC();document.getElementById('ov-pay').classList.add('open');}
-function closePayMod(e){if(!e||e.target===document.getElementById('ov-pay'))document.getElementById('ov-pay').classList.remove('open');}
-function sendPayAlert(m){
-  const tbl=document.getElementById('pay-table').value.trim();
-  if(!tbl){alert('Numéro de table requis.');return;}
-  // Store with serveurId so only this device's notifications are targeted
-  db.ref('orders').push({
-    table:tbl,type:'payment',payment:m,status:'pending',
-    serveurName,serveurId,
-    timestamp:Date.now(),date:new Date().toLocaleString('fr-FR'),
-    items:[],total:0
-  }).then(()=>{playSound('sent');closePayMod();document.getElementById('pay-table').value='';showToast('💳',`Demande envoyée — ${tbl}`);})
-  .catch(e=>alert('Erreur : '+e.message));
-}
-
-// ══════════════════════════════════════════════════════════
-// SEND ORDER
-// ══════════════════════════════════════════════════════════
-function sendOrder(){
-  const tbl=document.getElementById('table-in').value.trim();
-  if(!tbl){alert('Numéro de table requis.');return;}
-  if(!Object.keys(cart).length)return;
-  const total=cartTotal();
-  const order={
-    table:tbl,
-    serveurName,   // lisible pour le barman
-    serveurId,     // UUID stable pour cibler les notifications
-    total:parseFloat(total.toFixed(2)),
-    payment:selPay_||'later',
-    status:'pending',
-    timestamp:Date.now(),
-    date:new Date().toLocaleString('fr-FR'),
-    items:Object.entries(cart).map(([n,d])=>({n,qty:d.qty,comment:d.comment,e:d.e,p:d.p||PM[n]||0}))
-  };
-  db.ref('orders').push(order)
-    .then(ref=>{
-      playSound('sent');
-      // Auto-print if barman has it enabled — handled in listenOrders on barman side
-      cart={};selPay_=null;updPayBtns();updateCartBar();renderMenu();
-      closeCart();document.getElementById('table-in').value='';
-      showToast('✅','Commande envoyée !');
-    })
-    .catch(e=>alert('Erreur envoi : '+e.message));
-}
-
-// ══════════════════════════════════════════════════════════
-// LISTEN ORDERS (real-time)
-// ══════════════════════════════════════════════════════════
-function listenOrders(){
-  db.ref('orders').on('value',snap=>{
-    const data=snap.val()||{};
-    const prev={...allOrders};
-    allOrders=data;
-
-    if(role==='barman'){
-      renderBarman();
-      const newP=Object.entries(data).filter(([k,v])=>v.status==='pending'&&!prev[k]);
-      if(newP.length&&Object.keys(prev).length){
-        const isP=newP.some(([,v])=>v.type==='payment');
-        playSound(isP?'payment':'new_order');
-        showToast(isP?'💳':'🔔',`${isP?'💳 Paiement':'🔔 Commande'} — ${newP[0][1].table} !`);
-        // Auto-print on barman side
-        if(printEnabled&&!isP)newP.forEach(([,o])=>printOrder(o));
-      }
-    }
-
-    if(role==='serveur'){
-      // Only watch orders tagged with THIS device's serveurId.
-      // All payment modes (cash, card, later) trigger the ready banner.
-      // "later" orders stay visible in the Tables tab after pickup — that's independent.
-      const justDone=Object.entries(data).filter(([k,v])=>
-        v.status==='done'&&
-        v.type!=='payment'&&          // skip payment-request entries
-        v.serveurId===serveurId&&     // only this device's orders
-        (!prev[k]||prev[k].status==='pending')
-      );
-      justDone.forEach(([k])=>{if(!pickupKeys.includes(k))pickupKeys.push(k);});
-      if(pickupKeys.length&&!bannerDismissed){playSound('ready');showReadyBanner();}
-      else if(!pickupKeys.length)hideBanner();
-    }
-
-    // Pending badge
-    const pc=role==='barman'
-      ?Object.values(data).filter(o=>o.status==='pending').length
-      :pickupKeys.length;
-    const badge=document.getElementById('pcount');
-    if(pc){badge.style.display='flex';badge.textContent=pc;}else badge.style.display='none';
-
-    if(document.getElementById('hp').classList.contains('active'))renderHistory();
-    const tpEl=document.getElementById('tp');
-    if(tpEl&&tpEl.classList.contains('active'))renderOpenTables();
-  });
-}
-
-// ══════════════════════════════════════════════════════════
-// READY BANNER
-// ══════════════════════════════════════════════════════════
-function showReadyBanner(){
-  let h='';
-  pickupKeys.forEach(k=>{
-    const o=allOrders[k];if(!o)return;
-    const tot=orderTotal(o);
-    const its=(o.items||[]).map(i=>`×${i.qty} ${i.n}`).join(', ');
-    h+=`<div class="rb-item"><div class="rb-tbl">📍 ${o.table}</div><div class="rb-its">${its}</div><div class="rb-tot">${fmt(tot)}</div></div>`;
-  });
-  document.getElementById('rbl').innerHTML=h||'<p style="color:var(--text2);font-size:.82rem">…</p>';
-  document.getElementById('rb').classList.add('show');
-}
-function hideBanner(){document.getElementById('rb').classList.remove('show');}
-function confirmPickup(){
-  const upd={};
-  pickupKeys.forEach(k=>{upd[k+'/status']='picked';upd[k+'/pickedAt']=new Date().toLocaleString('fr-FR');});
-  db.ref('orders').update(upd).then(()=>{
-    pickupKeys=[];bannerDismissed=false;hideBanner();showToast('🎉','Commande(s) récupérée(s) !');
-  });
-}
-function dismissBanner(){
-  bannerDismissed=true;hideBanner();
-  showToast('🍸',pickupKeys.length+' commande(s) en attente');
-  setTimeout(()=>{if(pickupKeys.length){bannerDismissed=false;playSound('ready');showReadyBanner();}},60000);
-}
-
-// ══════════════════════════════════════════════════════════
-// BARMAN VIEW
-// ══════════════════════════════════════════════════════════
-const PL={cash:{i:'💵',l:'Espèces',c:'pmb-c'},card:{i:'💳',l:'Carte bancaire',c:'pmb-k'},later:{i:'⏳',l:'À encaisser',c:'pmb-l'}};
-
-function renderBarman(){
-  const list=document.getElementById('orders-list');
-  // Show all pending orders including addons (addons need preparation too)
-  const pend=Object.entries(allOrders)
-    .filter(([,o])=>o.status==='pending')
-    .sort((a,b)=>a[1].timestamp-b[1].timestamp);
-  document.getElementById('orders-cnt').textContent=pend.length+(pend.length>1?' commandes':' commande')+' en attente';
-  if(!pend.length){list.innerHTML=`<div class="empty"><div class="empty-ico">✨</div>Aucune commande en attente</div>`;return;}
-  let h='';
-  pend.forEach(([k,o])=>{
-    const el=Math.floor((Date.now()-o.timestamp)/60000);
-    const tl=el<1?"À l'instant":`il y a ${el} min`;
-    const srv=o.serveurName?`<div class="o-srv">🍽️ ${o.serveurName}</div>`:'';
-    if(o.type==='payment'){
-      const pm=PL[o.payment]||PL.cash;
-      h+=`<div class="ocard pay-card">
-        <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div><span class="os os-pay">Paiement</span></div>
-        <span class="pmb pmb-req">💳 Le client souhaite payer</span><br>
-        <span class="pmb ${pm.c}" style="margin-top:.35rem;font-size:.82rem;padding:.36rem .9rem">${pm.i} ${pm.l}</span>
-        <button class="btn-paid" onclick="markDone('${k}')">✅ Paiement encaissé</button>
-        <button class="btn-del" onclick="delOrder('${k}')">Supprimer</button>
-      </div>`;return;
-    }
-    const tot=orderTotal(o);const pm=o.payment?(PL[o.payment]||PL.later):null;
-    const isAddon=o.type==='addon';
-    h+=`<div class="ocard${isAddon?' style="border-color:rgba(212,168,67,.35);background:rgba(212,168,67,.04)"':''}">
-      <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div>
-      <span class="os ${isAddon?'os-pay"style="background:rgba(212,168,67,.15);color:var(--gold2);border-color:rgba(212,168,67,.3)':' os-p'}">${isAddon?'Reprise':'En attente'}</span></div>
-      <div class="oitems">`;
-    (o.items||[]).forEach(i=>{
-      const lt=(i.p||0)*i.qty;
-      h+=`<div class="oi"><span class="oiq">×${i.qty}</span><span class="oin">${i.e} ${i.n}</span><span class="oip">${fmt(lt)}</span>${i.comment?`<br><span class="oic" style="padding-left:26px">— ${i.comment}</span>`:''}</div>`;
-    });
-    h+=`</div><div class="otl"><span class="otl-l">Total</span><span class="otl-a">${fmt(tot)}</span></div>
-      ${pm?`<span class="pmb ${pm.c}" style="margin-bottom:.65rem">${pm.i} ${pm.l}</span>`:''}
-      <button class="btn-rdy" onclick="markDone('${k}')">✅ Commande prête</button>
-      <button class="btn-del" onclick="delOrder('${k}')">Supprimer</button>
-    </div>`;
-  });
-  list.innerHTML=h;
-}
-function markDone(k){
-  const o=allOrders[k];
-  if(!o)return;
-  if(o.type==='payment'){
-    // Payment confirmation: mark as paid + closed, do NOT push ready-notification
-    db.ref('orders/'+k).update({
-      status:'paid',
-      paidAt:new Date().toLocaleString('fr-FR')
-    });
-  }else{
-    // Normal order: mark done and notify serveur
-    db.ref('orders/'+k).update({
-      status:'done',
-      readyAt:new Date().toLocaleString('fr-FR')
-    });
-    pushToServeur(k);
+  if(actualCtx==='addon'){
+    if(!addCart_[key])addCart_[key]={qty:0,e:_sizeItem.e,p:sz.p};
+    addCart_[key].qty++;
+    updAddCartBar();
+    // Refresh qty in size picker (stay open so user can add more)
+    openSizePicker(_sizeItem.n,_sizeItem.e,'addon');
+  } else {
+    if(!cart[key])cart[key]={qty:0,comment:'',e:_sizeItem.e,p:sz.p};
+    cart[key].qty++;
+    updateCartBar();
+    renderMenu();
+    openSizePicker(_sizeItem.n,_sizeItem.e,'main');
   }
 }
-function delOrder(k){if(confirm('Supprimer ?'))db.ref('orders/'+k).remove();}
 
-// ══════════════════════════════════════════════════════════
-// CLEAR HISTORY (barman only)
-// ══════════════════════════════════════════════════════════
-function clearHistory(){
-  // Identify which orders are "done" — picked, paid, or done+older than 1h
-  const done=Object.entries(allOrders).filter(([,o])=>
-    o.status==='picked'||o.status==='paid'||
-    (o.status==='done'&&Date.now()-o.timestamp>3600000)
-  );
-  if(!done.length){showToast('ℹ️','Aucune commande terminée à effacer.');return;}
-  if(!confirm(`Supprimer ${done.length} commande(s) terminée(s) de l'historique ?`))return;
-  const upd={};
-  done.forEach(([k])=>{upd[k]=null;});
-  db.ref('orders').update(upd).then(()=>showToast('🗑️','Historique nettoyé !'));
-}
 
-// ══════════════════════════════════════════════════════════
-// PUSH — notify specific serveur via Firebase trigger node
-// ══════════════════════════════════════════════════════════
-function pushToServeur(orderKey){
-  const o=allOrders[orderKey];if(!o||!o.serveurId)return;
-  // Write to a /notifications/{serveurId}/{pushKey} node
-  // The serveur device listens on this path and triggers a local notification
-  db.ref('notifications/'+o.serveurId).push({
-    type:'order_ready',
-    orderKey,
-    table:o.table,
-    timestamp:Date.now()
-  });
-}
-
-// ══════════════════════════════════════════════════════════
-// PUSH — serveur listens for their notifications
-// ══════════════════════════════════════════════════════════
-function listenForPushNotifs(){
-  if(!serveurId)return;
-  db.ref('notifications/'+serveurId).on('child_added',snap=>{
-    const notif=snap.val();
-    if(!notif)return;
-    // Remove after reading to avoid re-triggering
-    snap.ref.remove();
-    // Show browser notification if permission granted
-    if(Notification.permission==='granted'){
-      const n=new Notification('🍸 BarFlow — Commande prête !',{
-        body:`Votre commande pour ${notif.table||'une table'} est prête. Allez la récupérer !`,
-        icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
-        badge:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
-        tag:'barflow-ready',
-        renotify:true,
-        requireInteraction:true
-      });
-      n.onclick=()=>{window.focus();n.close();};
-    }
-  });
-}
-
-// ══════════════════════════════════════════════════════════
-// HISTORY
-// ══════════════════════════════════════════════════════════
-function filtHist(f,el){
-  histFilt=f;
-  document.querySelectorAll('.hfbtn').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');renderHistory();
-}
-function renderHistory(){
-  const list=document.getElementById('hist-list');
-  let entries=Object.entries(allOrders).sort((a,b)=>b[1].timestamp-a[1].timestamp);
-  // Serveur : only their own orders
-  if(role==='serveur')entries=entries.filter(([,o])=>!o.serveurId||o.serveurId===serveurId);
-  // Filters
-  if(histFilt==='pending')entries=entries.filter(([,o])=>o.status==='pending'&&o.type!=='payment');
-  if(histFilt==='done')entries=entries.filter(([,o])=>
-    (o.status==='done'||o.status==='picked'||o.status==='paid'||o.status==='closed')&&o.type!=='payment'
-  );
-  if(histFilt==='payment')entries=entries.filter(([,o])=>o.type==='payment'||o.status==='paid');
-  if(!entries.length){list.innerHTML=`<div class="empty"><div class="empty-ico">📭</div>Aucune commande</div>`;return;}
-  let h='';
-  entries.forEach(([k,o])=>{
-    const isPayReq=o.type==='payment';
-    let sl;
-    if(o.status==='picked')    sl=`<span style="color:var(--green);font-size:.73rem">✅ Récupérée</span>`;
-    else if(o.status==='paid') sl=`<span style="color:var(--green);font-size:.73rem">✅ Payée</span>`;
-    else if(o.status==='closed')sl=`<span style="color:var(--green);font-size:.73rem">✅ Clôturée</span>`;
-    else if(o.status==='done') sl=`<span style="color:var(--blue);font-size:.73rem">🍸 Prête</span>`;
-    else                        sl=`<span style="color:var(--gold2);font-size:.73rem">⏳ En attente</span>`;
-    const tot=isPayReq?null:orderTotal(o);
-    const pm=o.payment?(PL[o.payment]||null):null;
-    const tc=isPayReq?'tag-p':(o.payment==='cash'?'tag-c':o.payment==='card'?'tag-k':'tag-l');
-    const tl=isPayReq?`💳 Paiement ${pm?pm.l:''}`:pm?`${pm.i} ${pm.l}`:'';
-    const its=isPayReq?'<em>Demande de paiement</em>':(o.items||[]).map(i=>`×${i.qty} ${i.n}`).join(', ');
-    const srv=(role==='barman'&&o.serveurName)?`<div class="hi-srv">🍽️ ${o.serveurName}</div>`:'';
-    // Cumulative run-total for open tables that were paid
-    const runTot=(o.runTotal&&o.status==='closed')?`<div style="font-size:.72rem;color:var(--text2);margin-top:.18rem">Cumulé : ${fmt(o.runTotal)}</div>`:'';
-    h+=`<div class="hi">
-      <div class="hi-h"><span class="hi-t">${o.table}</span><div style="display:flex;align-items:center;gap:.45rem">${sl}<span class="hi-dt">${o.date}</span></div></div>
-      ${srv}<div class="hi-its">${its}</div>
-      ${runTot}
-      <div class="hi-ft"><span class="hi-tot">${tot!==null?fmt(tot):'—'}</span>${tl?`<span class="hp-tag ${tc}">${tl}</span>`:''}</div>
-    </div>`;
-  });
-  list.innerHTML=h;
-}
-
-// ══════════════════════════════════════════════════════════
-// OPEN TABLES — commandes "later" actives (non clôturées)
-// ══════════════════════════════════════════════════════════
-// An "open table" is a set of orders for the same table with payment=later
-// that haven't been closed yet. We group them by table name.
-
-function getOpenTables(){
-  // A table is "open" if it has at least one order with payment='later'
-  // that is NOT yet closed. We include ALL delivery statuses (pending, done, picked, addon)
-  // because "later" means the customer hasn't paid yet, regardless of whether drinks were served.
-  // Serveurs only see their own tables; barman sees all.
-  const open={};
-  Object.entries(allOrders).forEach(([k,o])=>{
-    if(o.payment!=='later')return;           // only "later" payment orders
-    if(o.status==='closed')return;           // already paid & closed
-    if(o.status==='paid')return;             // already paid
-    if(o.type==='payment')return;            // skip payment-request entries
-    // Serveur sees only their own tables (by UUID)
-    if(role==='serveur'&&o.serveurId&&o.serveurId!==serveurId)return;
-    const tbl=o.table;
-    if(!open[tbl])open[tbl]={
-      keys:[],items:[],total:0,
-      firstDate:o.date,firstTs:o.timestamp,
-      serveurName:o.serveurName||''
-    };
-    open[tbl].keys.push(k);
-    (o.items||[]).forEach(i=>open[tbl].items.push({...i}));
-    open[tbl].total+=orderTotal(o);
-    if(o.timestamp<open[tbl].firstTs){
-      open[tbl].firstTs=o.timestamp;
-      open[tbl].firstDate=o.date;
-      open[tbl].serveurName=o.serveurName||'';
-    }
-  });
-  return open;
-}
-
-function renderOpenTables(){
-  const list=document.getElementById('tp-list');
-  const tables=getOpenTables();
-  const keys=Object.keys(tables);
-  const cnt=document.getElementById('tp-cnt');
-  cnt.textContent=keys.length+(keys.length>1?' tables ouvertes':' table ouverte');
-  if(!keys.length){
-    list.innerHTML=`<div class="empty"><div class="empty-ico">🎉</div>Aucune table ouverte</div>`;
-    return;
-  }
-  let h='';
-  keys.sort().forEach(tbl=>{
-    const t=tables[tbl];
-    const srv=t.serveurName?`<div class="tc-srv">🍽️ ${t.serveurName}</div>`:'';
-    // Group items by name for display
-    const grouped={};
-    t.items.forEach(i=>{
-      if(!grouped[i.n])grouped[i.n]={qty:0,p:i.p||PM[i.n]||0,e:i.e};
-      grouped[i.n].qty+=i.qty;
-    });
-    let itemsHtml='';
-    Object.entries(grouped).forEach(([n,d])=>{
-      const lt=d.p*d.qty;
-      itemsHtml+=`<div class="oi"><span class="oiq">×${d.qty}</span><span class="oin">${d.e} ${n}</span><span class="oip">${fmt(lt)}</span></div>`;
-    });
-    const safeT=tbl.replace(/'/g,"\\'");
-    h+=`<div class="tcard">
-      <div class="tcard-head">
-        <div class="tcard-head-l">
-          <div class="tc-table">${tbl}</div>
-          <div class="tc-date">Depuis le ${t.firstDate}</div>
-          ${srv}
-        </div>
-        <span class="tc-badge">Ardoise ouverte</span>
-      </div>
-      <div class="tc-items oitems">${itemsHtml}</div>
-      <div class="tc-run-total">
-        <span class="tc-run-lbl">Total ardoise</span>
-        <span class="tc-run-amt">${fmt(t.total)}</span>
-      </div>
-      <div class="tc-actions">
-        <button class="btn-tc-add" onclick="openAddDrinks('${safeT}')">➕ Ajouter</button>
-        <button class="btn-tc-pay" onclick="openPayTable('${safeT}')">💳 Encaisser</button>
-      </div>
-    </div>`;
-  });
-  list.innerHTML=h;
-}
-
-// ── Add drinks to open table ─────────────────────────────
-let addTarget=''; // table name being added to
-let addCart_={}; // temp cart for additions
-
-function openAddDrinks(tbl){
-  addTarget=tbl;addCart_={};
-  document.getElementById('add-drinks-title').textContent='Ajouter à '+tbl;
-  document.getElementById('add-drinks-sub').textContent='Sélectionnez les boissons à ajouter à l\'ardoise.';
-  renderAddDrinksMenu();
-  document.getElementById('ov-add-drinks').classList.add('open');
-}
-function closeAddDrinks(e){
-  if(!e||e.target===document.getElementById('ov-add-drinks'))
-    document.getElementById('ov-add-drinks').classList.remove('open');
-}
 function renderAddDrinksMenu(){
   const menu=document.getElementById('add-drinks-menu');
+  if(!menu)return;
   let h='';
   MENU.forEach(cat=>{
     h+=`<div class="add-drinks-cat">${cat.cat}</div>`;
@@ -1352,18 +928,19 @@ function renderAddDrinksMenu(){
       h+=`<div class="ad-grid">`;
       items.forEach(item=>{
         if(item.sizes){
-          // Beer with sizes: show each size variant as its own card
-          item.sizes.forEach(sz=>{
+          // Single card per beer — tap opens the size picker in addon context
+          const totalQty=item.sizes.reduce((s,sz)=>{
             const key=item.n+' ('+sz.lbl+')';
-            const qty=addCart_[key]?addCart_[key].qty:0;
-            const sk=key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-            h+=`<div class="ad-card${qty?' ad-sel':''}" onclick="addToAdCart('${sk}','${item.e}',${sz.p})">
-              <span class="ad-emoji">${item.e}</span>
-              <span class="ad-name">${item.n}<br><span style="font-size:.72rem;color:var(--text2)">${sz.lbl}</span></span>
-              <span class="ad-price">${fmt(sz.p)}</span>
-              ${qty?`<span class="ad-qty">${qty}</span>`:''}
-            </div>`;
-          });
+            return s+(addCart_[key]?addCart_[key].qty:0);
+          },0);
+          const priceFrom=item.sizes[0].p;
+          const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+          h+=`<div class="ad-card${totalQty?' ad-sel':''}" onclick="openSizePicker('${sn}','${item.e}','addon')">
+            <span class="ad-emoji">${item.e}</span>
+            <span class="ad-name">${item.n}</span>
+            <span class="ad-price">dès ${fmt(priceFrom)}</span>
+            ${totalQty?`<span class="ad-qty">${totalQty}</span>`:''}
+          </div>`;
         } else {
           const qty=addCart_[item.n]?addCart_[item.n].qty:0;
           const sn=item.n.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
@@ -1377,11 +954,15 @@ function renderAddDrinksMenu(){
       });
       h+=`</div>`;
     };
-    if(cat.subs)cat.subs.forEach(s=>{h+=`<div class="add-drinks-subcat">${s.lbl}</div>`;renderGroup(s.items);});
+    if(cat.subs)cat.subs.forEach(s=>{
+      h+=`<div class="add-drinks-subcat">${s.lbl}</div>`;
+      renderGroup(s.items);
+    });
     else renderGroup(cat.items);
   });
   menu.innerHTML=h;
 }
+
 function addToAdCart(n,e,p){
   if(!addCart_[n])addCart_[n]={qty:0,e,p};
   addCart_[n].qty++;
