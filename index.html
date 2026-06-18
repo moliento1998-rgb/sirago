@@ -653,6 +653,13 @@ function initFB(cfg){
 function logout(){ if(!confirm('Changer de rôle / reconfigurer ?')) return; location.reload(); }
 
 window.addEventListener('load',()=>{
+  // Register Service Worker for background notifications
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./firebase-messaging-sw.js')
+      .then(reg=>{ console.log('SW registered:', reg.scope); })
+      .catch(err=>{ console.warn('SW registration failed (notifications limited to foreground):', err); });
+  }
+
   // Migrate from old key 'barflow_config' to new key 'bfcfg'
   const oldCfg = localStorage.getItem('barflow_config');
   if(oldCfg && !localStorage.getItem('bfcfg')){
@@ -701,7 +708,12 @@ function launchUI(){
     buildBarTabs();
     const cb=document.getElementById('btn-clear-hist'); if(cb) cb.style.display='block';
   }
-  initSettings(); listenOrders();
+  initSettings();
+  // Re-attach push listener on every startup (not just when toggling in settings)
+  if(role==='serveur' && Notification.permission==='granted'){
+    listenForPushNotifs();
+  }
+  listenOrders();
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -1001,18 +1013,63 @@ function pushToServeur(orderKey){
   const o=allOrders[orderKey]; if(!o||!o.serveurId) return;
   db.ref('notifications/'+o.serveurId).push({ type:'order_ready', orderKey, table:o.table, timestamp:Date.now() });
 }
+let _pushListenerAttached = false;
 function listenForPushNotifs(){
   if(!serveurId) return;
+  if(_pushListenerAttached) return;
+  _pushListenerAttached = true;
+
+  // Record the attach time so we ignore old notifications that predate this session
+  const attachedAt = Date.now();
+
   db.ref('notifications/'+serveurId).on('child_added', snap=>{
-    const notif=snap.val(); if(!notif) return;
-    snap.ref.remove();
-    if(Notification.permission==='granted'){
-      const n=new Notification('🍸 BarFlow — Commande prête !',{
-        body:'Votre commande pour '+(notif.table||'une table')+' est prête !',
-        icon:'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>',
-        tag:'barflow-ready', renotify:true, requireInteraction:true
-      });
-      n.onclick=()=>{ window.focus(); n.close(); };
+    const notif = snap.val();
+    if(!notif) return;
+
+    // Skip notifications older than when we attached (avoids replaying old ones on reconnect)
+    if(notif.timestamp && notif.timestamp < attachedAt - 5000) {
+      snap.ref.remove(); // clean up old ones silently
+      return;
+    }
+
+    snap.ref.remove(); // delete after reading
+
+    if(Notification.permission !== 'granted') return;
+
+    const title = '🍸 BarFlow — Commande prête !';
+    const body  = 'Votre commande pour ' + (notif.table||'une table') + ' est prête. Venez la récupérer !';
+    const icon  = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>';
+
+    // Try Service Worker first (works when screen is locked / app in background)
+    const showViaAPI = () => {
+      try {
+        const n = new Notification(title, {
+          body, icon,
+          tag: 'barflow-ready-' + Date.now(),
+          renotify: true,
+          requireInteraction: true
+        });
+        n.onclick = () => { window.focus(); n.close(); };
+      } catch(e){ console.warn('Notification API failed:', e); }
+    };
+
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if(reg){
+          // showNotification via SW works even when app is backgrounded
+          reg.showNotification(title, {
+            body, icon,
+            tag: 'barflow-ready-' + Date.now(),
+            renotify: true,
+            requireInteraction: true,
+            badge: icon
+          }).catch(()=>{ showViaAPI(); });
+        } else {
+          showViaAPI();
+        }
+      }).catch(()=>{ showViaAPI(); });
+    } else {
+      showViaAPI();
     }
   });
 }
@@ -1280,9 +1337,27 @@ function clearHistory(){
 // SETTINGS — Notifications
 // ══════════════════════════════════════════════════════════════════════════════
 function initSettings(){
-  document.getElementById('notif-toggle').checked=JSON.parse(localStorage.getItem('bf_notif')||'{}').enabled||false;
+  const notifSaved = JSON.parse(localStorage.getItem('bf_notif')||'{}');
+  const notifOn = notifSaved.enabled || false;
+  document.getElementById('notif-toggle').checked = notifOn;
+
+  // If notifications were previously enabled AND permission is already granted,
+  // reattach the Firebase push listener immediately (no user action needed)
+  if(notifOn && role==='serveur' && typeof Notification!=='undefined' && Notification.permission==='granted'){
+    document.getElementById('notif-sub').textContent='✅ Notifications actives.';
+    document.getElementById('notif-test-btn').style.display='block';
+    document.getElementById('notif-info').style.display='block';
+    listenForPushNotifs();  // ← key: reattach on every page load
+  }
+
   document.getElementById('print-toggle').checked=printEnabled;
-  if(printEnabled){ document.getElementById('print-options').style.display='block'; selPrintMethod(printMethod); const pp=JSON.parse(localStorage.getItem('bf_print')||'{}'); if(pp.ip) document.getElementById('printer-ip').value=pp.ip; if(pp.port) document.getElementById('printer-port').value=pp.port; }
+  if(printEnabled){
+    document.getElementById('print-options').style.display='block';
+    selPrintMethod(printMethod);
+    const pp=JSON.parse(localStorage.getItem('bf_print')||'{}');
+    if(pp.ip) document.getElementById('printer-ip').value=pp.ip;
+    if(pp.port) document.getElementById('printer-port').value=pp.port;
+  }
 }
 async function requestNotifPermission(showPrompt=true){
   if(!('Notification' in window)){ showToast('❌','Notifications non supportées'); return false; }
@@ -1370,6 +1445,18 @@ function showToast(ico,msg){
   t.classList.add('show'); clearTimeout(tT);
   tT=setTimeout(()=>t.classList.remove('show'),3500);
 }
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SERVICE WORKER — enregistrement au démarrage pour les notifications en veille
+// ══════════════════════════════════════════════════════════════════════════════
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./firebase-messaging-sw.js')
+      .then(reg=>{ console.log('[BarFlow] SW enregistré :', reg.scope); })
+      .catch(err=>{ console.warn('[BarFlow] SW échec :', err); });
+  });
+}
+
 </script>
 </body>
 </html>
