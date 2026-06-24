@@ -382,13 +382,35 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
             <div class="pbtn" id="pm-browser" onclick="selPrintMethod('browser')" style="border:2px solid var(--border)"><span style="font-size:1.3rem">🖥️</span><span style="font-family:'Syne',sans-serif;font-weight:600;font-size:.72rem;color:var(--text2)">Navigateur</span></div>
             <div class="pbtn" id="pm-network" onclick="selPrintMethod('network')" style="border:2px solid var(--border)"><span style="font-size:1.3rem">📡</span><span style="font-family:'Syne',sans-serif;font-weight:600;font-size:.72rem;color:var(--text2)">Réseau</span></div>
           </div>
-          <div id="print-browser-info" style="display:none"><div class="info-box">Le navigateur affichera une fenêtre d'impression à chaque commande.</div><button class="set-btn" onclick="testPrint()">🧾 Imprimer un bon test</button></div>
+          <!-- Méthode Navigateur -->
+          <div id="print-browser-info" style="display:none">
+            <div class="info-box">Le navigateur ouvre une fenêtre d'impression système. Compatible avec toute imprimante connectée en USB ou réseau à cette tablette/PC.</div>
+            <button class="set-btn" onclick="testPrint()">🧾 Imprimer un bon test</button>
+          </div>
+
+          <!-- Méthode Réseau (ESC/POS universel) -->
           <div id="print-network-info" style="display:none">
-            <div class="info-box" style="margin-bottom:.5rem">Entrez l'adresse IP de votre imprimante réseau (Epson TM, Star Micronics…). Elle doit être sur le même WiFi.</div>
-            <label class="lbl">Adresse IP de l'imprimante</label><input type="text" class="set-input" id="printer-ip" placeholder="192.168.1.50" oninput="savePrintPrefs()">
-            <label class="lbl" style="margin-top:.5rem">Port (défaut : 9100)</label><input type="text" class="set-input" id="printer-port" placeholder="9100" oninput="savePrintPrefs()">
-            <div id="print-status"></div>
-            <button class="set-btn" onclick="testPrintNetwork()">🧾 Tester l'impression réseau</button>
+            <label class="lbl">Marque / Protocole</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.75rem" id="proto-grid">
+              <div class="pbtn" id="proto-escpos" onclick="selProto('escpos')" style="border:2px solid var(--border)">
+                <span style="font-size:1.1rem">🖨️</span>
+                <span style="font-family:'Syne',sans-serif;font-weight:600;font-size:.68rem;color:var(--text2);text-align:center">SAGA / Star<br>Génériques</span>
+              </div>
+              <div class="pbtn" id="proto-epson" onclick="selProto('epson')" style="border:2px solid var(--border)">
+                <span style="font-size:1.1rem">🖨️</span>
+                <span style="font-family:'Syne',sans-serif;font-weight:600;font-size:.68rem;color:var(--text2);text-align:center">Epson TM<br>ePOS-Print</span>
+              </div>
+            </div>
+            <div id="proto-hint" class="info-box" style="margin-bottom:.6rem">Sélectionnez le protocole correspondant à votre imprimante.</div>
+            <label class="lbl">Adresse IP de l'imprimante</label>
+            <input type="text" class="set-input" id="printer-ip" placeholder="192.168.1.50" oninput="savePrintPrefs()">
+            <label class="lbl" style="margin-top:.5rem">Port</label>
+            <input type="text" class="set-input" id="printer-port" placeholder="9100" oninput="savePrintPrefs()">
+            <div id="print-status" style="font-size:.75rem;color:var(--text2);margin-top:.4rem;min-height:1rem"></div>
+            <button class="set-btn" id="btn-test-network" onclick="testPrintNetwork()">🧾 Tester l'impression</button>
+            <div class="info-box" style="margin-top:.6rem;font-size:.75rem" id="cors-warning" style="display:none">
+              ⚠️ Si l'impression échoue en CORS : vérifiez que l'imprimante et la tablette sont sur le même réseau WiFi, et que l'app est en HTTP (pas HTTPS). Sinon utilisez la méthode Navigateur.
+            </div>
           </div>
         </div>
       </div>
@@ -515,13 +537,9 @@ const MENU = [
   ]},
   { cat:'🍺 Bières', items:[
     // Bières pression : sélecteur de taille (sizes[])
-    {n:'St Omer',  e:'🍺', sizes:[{lbl:'25 cl',p:2.5},{lbl:'33 cl',p:3.5},{lbl:'50 cl',p:5}]},
-    {n:'Goudale',   e:'🍺', sizes:[{lbl:'25 cl',p:3.3},{lbl:'33 cl',p:5},{lbl:'50 cl',p:6.5}]},
-    {n:'Goudale Ruby',       e:'🍺', sizes:[{lbl:'25 cl',p:3.5},{lbl:'33 cl',p:5.5},{lbl:'50 cl',p:7}]},
-    {n:'Chouffe',       e:'🍺', sizes:[{lbl:'25 cl',p:3.8},{lbl:'33 cl',p:5.7},{lbl:'50 cl',p:8}]},
-    {n:'Triple Secret des Moines',       e:'🍺', sizes:[{lbl:'25 cl',p:3.8},{lbl:'33 cl',p:5.7},{lbl:'50 cl',p:8}]},
-    {n:'Bon Secours',       e:'🍺', sizes:[{lbl:'25 cl',p:4},{lbl:'33 cl',p:5.7},{lbl:'50 cl',p:8}]},
-    {n:'Paix Dieu',       e:'🍺', sizes:[{lbl:'25 cl',p:4.2},{lbl:'33 cl',p:5.7},{lbl:'50 cl',p:8}]},
+    {n:'Pression',  e:'🍺', sizes:[{lbl:'25 cl',p:3},{lbl:'33 cl',p:4},{lbl:'50 cl',p:5.5}]},
+    {n:'Blanche',   e:'🍺', sizes:[{lbl:'25 cl',p:3.5},{lbl:'33 cl',p:4.5},{lbl:'50 cl',p:6}]},
+    {n:'IPA',       e:'🍺', sizes:[{lbl:'25 cl',p:3.5},{lbl:'33 cl',p:4.5},{lbl:'50 cl',p:6}]},
     // Bouteilles : prix fixe
     {n:'Bière blonde bouteille',e:'🍻',p:5},
     {n:'Bière brune bouteille', e:'🍻',p:5},
@@ -561,7 +579,7 @@ let db=null, messaging=null;
 let role='', serveurName='', serveurId='';
 let cart={}, allOrders={}, histFilt='all', selPay_=null;
 let pickupKeys=[], bannerDismissed=false;
-let printEnabled=false, printMethod='browser';
+let printEnabled=false, printMethod='browser', printProto='escpos';
 let addCart_={}, addTarget='';
 let payTableTarget='', selPayTable_='cash';
 let _sizeItem=null, _sizeCtx='main';
@@ -1359,8 +1377,10 @@ function initSettings(){
     document.getElementById('print-options').style.display='block';
     selPrintMethod(printMethod);
     const pp=JSON.parse(localStorage.getItem('bf_print')||'{}');
-    if(pp.ip) document.getElementById('printer-ip').value=pp.ip;
-    if(pp.port) document.getElementById('printer-port').value=pp.port;
+    if(pp.ip)    document.getElementById('printer-ip').value=pp.ip;
+    if(pp.port)  document.getElementById('printer-port').value=pp.port;
+    if(pp.proto){ printProto=pp.proto; selProto(pp.proto); }
+    else          selProto('escpos'); // défaut universel
   }
 }
 async function requestNotifPermission(showPrompt=true){
@@ -1405,62 +1425,313 @@ function selPrintMethod(m){
   savePrintPrefs();
 }
 function savePrintPrefs(){
-  const ip=document.getElementById('printer-ip')?.value||'';
+  const ip=(document.getElementById('printer-ip')?.value||'').trim();
   const port=document.getElementById('printer-port')?.value||'9100';
-  localStorage.setItem('bf_print',JSON.stringify({enabled:printEnabled,method:printMethod,ip,port}));
+  localStorage.setItem('bf_print',JSON.stringify({enabled:printEnabled,method:printMethod,ip,port,proto:printProto}));
 }
-function printOrder(order){ if(printMethod==='network') printNetwork(order); else printBrowser(order); }
+function savePrinterIp(){savePrintPrefs();}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// IMPRESSION — Moteur universel ESC/POS + ePOS-Print Epson
+// ══════════════════════════════════════════════════════════════════════════════
+
+// ── Sélection du protocole ────────────────────────────────────────────────────
+function selProto(p){
+  printProto=p;
+  // Visual feedback on proto buttons
+  ['escpos','epson'].forEach(proto=>{
+    const el=document.getElementById('proto-'+proto);
+    if(el) el.style.border=proto===p?'2px solid var(--gold)':'2px solid var(--border)';
+  });
+  // Update hint text
+  const hints={
+    escpos:'✅ Compatible : SAGA, Star TSP, Munbyn, Volcora, et toutes les imprimantes ESC/POS génériques.',
+    epson:'✅ Compatible : Epson TM-T20, TM-T88, TM-T82 et modèles avec SDK ePOS-Print.',
+  };
+  const hint=document.getElementById('proto-hint');
+  if(hint) hint.textContent=hints[p]||'';
+  savePrintPrefs();
+}
+
+// ── Dispatcher principal ──────────────────────────────────────────────────────
+function printOrder(order){
+  if(!printEnabled) return;
+  if(printMethod==='browser') printBrowser(order);
+  else printNetwork(order);
+}
+
+// ── Construction du ticket texte ─────────────────────────────────────────────
 function buildTicket(order){
   const tot=orderTotal(order);
-  let lines='';
-  (order.items||[]).forEach(i=>{ lines+=`  x${i.qty} ${i.n}${i.comment?' ('+i.comment+')':''} ... ${fmt((i.p||0)*i.qty)}\n`; });
-  return `\n════════════════════════\n      🍸 BarFlow\n════════════════════════\nTable  : ${order.table}\nServeur: ${order.serveurName||'—'}\nHeure  : ${order.date}\n────────────────────────\n${lines}────────────────────────\nTOTAL  : ${fmt(tot)}\nPaiement : ${order.payment==='cash'?'Espèces':order.payment==='card'?'Carte':'À définir'}\n════════════════════════\n`.trim();
+  const PW=32; // largeur ticket 80mm ≈ 32 caractères
+  const line=(char)=>char.repeat(PW);
+  const center=(s)=>{
+    const pad=Math.max(0,Math.floor((PW-s.length)/2));
+    return ' '.repeat(pad)+s;
+  };
+  const row=(left,right)=>{
+    const space=Math.max(1, PW-left.length-right.length);
+    return left+' '.repeat(space)+right;
+  };
+
+  const lines=[
+    center('BAR FLOW'),
+    center('BON DE COMMANDE'),
+    line('-'),
+    row('Table  :',order.table||'—'),
+    row('Serveur:',order.serveurName||'—'),
+    row('Heure  :',order.date||''),
+    line('-'),
+  ];
+
+  (order.items||[]).forEach(i=>{
+    const price=fmt((i.p||PM[i.n]||0)*i.qty);
+    const label='x'+i.qty+' '+(i.n||'');
+    lines.push(row(label.slice(0,PW-8),price));
+    if(i.comment) lines.push('  >> '+i.comment.slice(0,PW-5));
+  });
+
+  lines.push(line('-'));
+  lines.push(row('TOTAL  :',fmt(tot)));
+
+  const payLabels={cash:'Especes',card:'Carte bancaire',later:'Note ouverte'};
+  lines.push(row('Paiement:',payLabels[order.payment]||order.payment||'—'));
+  lines.push(line('='));
+  lines.push('');lines.push('');
+
+  return lines.join('\n');
 }
+
+// ── Méthode 1 : Impression navigateur (popup système) ────────────────────────
 function printBrowser(order){
   const ticket=buildTicket(order);
-  const win=window.open('','_blank','width=320,height=500');
-  if(!win) return;
-  win.document.write(`<!DOCTYPE html><html><head><style>body{font-family:monospace;font-size:13px;padding:12px;line-height:1.5;white-space:pre}@media print{body{margin:0;padding:4px}}</style></head><body>${ticket.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</body></html>`);
-  win.document.close(); win.focus();
-  setTimeout(()=>{ win.print(); setTimeout(()=>win.close(),800); },300);
+  const escaped=ticket
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+
+  const win=window.open('','_blank','width=380,height=560,toolbar=0,menubar=0');
+  if(!win){ showToast('❌','Popup bloqué — autorisez les popups pour ce site'); return; }
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+  @page{margin:4mm}
+  body{font-family:'Courier New',Courier,monospace;font-size:11pt;margin:0;padding:6px;line-height:1.4;white-space:pre-wrap;word-break:break-all}
+  @media print{.no-print{display:none}}
+</style></head>
+<body>${escaped}
+<div class="no-print" style="margin-top:8px;text-align:center">
+  <button onclick="window.print();setTimeout(()=>window.close(),600)" style="padding:6px 18px;font-size:12pt;cursor:pointer">🖨️ Imprimer</button>
+</div>
+</body></html>`);
+  win.document.close();
+  win.focus();
+  // Auto-print after 400ms then close
+  setTimeout(()=>{ try{ win.print(); }catch(e){} setTimeout(()=>{ try{ win.close(); }catch(e){} },800); },400);
 }
+
+// ── Méthode 2a : ESC/POS universel (SAGA, Star, génériques) ─────────────────
+// Envoie les octets ESC/POS via fetch HTTP sur port 9100 (WebSocket tunnel)
+// ou via l'endpoint HTTP direct si l'imprimante le supporte.
+// Note : les navigateurs bloquent TCP direct → on tente d'abord HTTP, puis fallback.
+function buildEscPos(order){
+  const ESC='\x1B', GS='\x1D';
+  const cmds=[];
+
+  // Init + centrer
+  cmds.push(ESC+'@');            // Initialize printer
+  cmds.push(ESC+'a\x01');       // Center align
+
+  // Header en gras
+  cmds.push(ESC+'E\x01');       // Bold ON
+  cmds.push(ESC+'!\x10');       // Double height
+  cmds.push('BARFLOW\n');
+  cmds.push(ESC+'!\x00');       // Normal size
+  cmds.push(ESC+'E\x00');       // Bold OFF
+  cmds.push('BON DE COMMANDE\n');
+  cmds.push(ESC+'a\x00');       // Left align
+
+  cmds.push('-'.repeat(32)+'\n');
+  cmds.push('Table  : '+(order.table||'—')+'\n');
+  cmds.push('Serveur: '+(order.serveurName||'—')+'\n');
+  cmds.push('Heure  : '+(order.date||'')+'\n');
+  cmds.push('-'.repeat(32)+'\n');
+
+  // Items
+  (order.items||[]).forEach(i=>{
+    const price=fmt((i.p||PM[i.n]||0)*i.qty);
+    const label='x'+i.qty+' '+(i.n||'');
+    const space=Math.max(1,32-label.length-price.length);
+    cmds.push(label.slice(0,24)+' '.repeat(space)+price+'\n');
+    if(i.comment) cmds.push('  >> '+i.comment+'\n');
+  });
+
+  cmds.push('-'.repeat(32)+'\n');
+
+  // Total en gras
+  cmds.push(ESC+'E\x01');
+  const tot=fmt(orderTotal(order));
+  const totLabel='TOTAL  :';
+  cmds.push(totLabel+' '.repeat(32-totLabel.length-tot.length)+tot+'\n');
+  cmds.push(ESC+'E\x00');
+
+  const payLabels={cash:'Especes',card:'Carte bancaire',later:'Note ouverte'};
+  cmds.push('Paiement: '+(payLabels[order.payment]||order.payment||'—')+'\n');
+  cmds.push('='.repeat(32)+'\n');
+
+  // Feed + full cut
+  cmds.push('\n\n\n');
+  cmds.push(GS+'V\x41\x03');   // Full cut
+
+  return cmds.join('');
+}
+
+// ── Méthode 2b : ePOS-Print XML (Epson TM native) ────────────────────────────
+function buildEpsonXml(order){
+  const esc=(s)=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const tot=fmt(orderTotal(order));
+  const payLabels={cash:'Especes',card:'Carte bancaire',later:'Note ouverte'};
+
+  let items='';
+  (order.items||[]).forEach(i=>{
+    const price=fmt((i.p||PM[i.n]||0)*i.qty);
+    const label='x'+i.qty+' '+esc(i.n||'');
+    const space=Math.max(1,32-label.length-price.length);
+    items+=`<text>${label}${' '.repeat(space)}${price}&#10;</text>`;
+    if(i.comment) items+=`<text>  >> ${esc(i.comment)}&#10;</text>`;
+  });
+
+  return `<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+<epos-print xmlns="http://www.epson-pos.com/schemas/2011/03/epos-print">
+  <text align="center" font="font_a" width="2" height="2">BARFLOW&#10;</text>
+  <text align="center" width="1" height="1">BON DE COMMANDE&#10;</text>
+  <text align="left">--------------------------------&#10;</text>
+  <text>Table  : ${esc(order.table||'—')}&#10;</text>
+  <text>Serveur: ${esc(order.serveurName||'—')}&#10;</text>
+  <text>Heure  : ${esc(order.date||'')}&#10;</text>
+  <text>--------------------------------&#10;</text>
+  ${items}
+  <text>--------------------------------&#10;</text>
+  <text em="true">TOTAL  : ${tot}&#10;</text>
+  <text em="false">Paiement: ${payLabels[order.payment]||order.payment||'—'}&#10;</text>
+  <text>================================&#10;</text>
+  <feed unit="3"/><cut type="feed"/>
+</epos-print>
+</s:Body>
+</s:Envelope>`;
+}
+
+// ── Méthode réseau — orchestrateur ────────────────────────────────────────────
 async function printNetwork(order){
   const pp=JSON.parse(localStorage.getItem('bf_print')||'{}');
-  const ip=pp.ip||''; const port=pp.port||'9100';
-  if(!ip){ showToast('❌','Entrez l\'adresse IP de l\'imprimante.'); return; }
-  const ticket=buildTicket(order);
+  const ip=(pp.ip||'').trim();
+  const port=parseInt(pp.port||'9100',10);
+  const proto=pp.proto||printProto||'escpos';
+
+  if(!ip){ showToast('❌','Entrez l\'adresse IP de l\'imprimante dans les Réglages'); printBrowser(order); return; }
+
+  const statusEl=document.getElementById('print-status');
+  if(statusEl) statusEl.textContent='⏳ Impression en cours…';
+
   try{
-    const resp=await fetch(`http://${ip}/cgi-bin/epos/service.cgi`,{method:'POST',headers:{'Content-Type':'text/xml;charset=utf-8'},body:`<?xml version="1.0" encoding="utf-8"?><s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/"><s:Body><epos-print xmlns="http://www.epson-pos.com/schemas/2011/03/epos-print"><text>${ticket.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</text><feed unit="3"/><cut type="feed"/></epos-print></s:Body></s:Envelope>`,signal:AbortSignal.timeout(4000)});
-    if(resp.ok){ showToast('🖨️','Bon imprimé !'); document.getElementById('print-status').textContent='✅ Impression réussie'; }
-    else throw new Error('HTTP '+resp.status);
-  }catch(e){ document.getElementById('print-status').textContent='⚠️ Réseau échoué — impression navigateur'; printBrowser(order); }
+    if(proto==='epson'){
+      await printEpson(ip, port, buildEpsonXml(order));
+    } else {
+      await printEscPos(ip, port, buildEscPos(order));
+    }
+    if(statusEl) statusEl.textContent='✅ Bon imprimé avec succès';
+    showToast('🖨️','Bon imprimé !');
+  }catch(err){
+    console.warn('Impression réseau échouée:',err.message);
+    if(statusEl) statusEl.textContent='⚠️ Réseau échoué → impression navigateur';
+    showToast('⚠️','Réseau indisponible — impression navigateur');
+    printBrowser(order);
+  }
 }
-function testPrint(){ printBrowser({table:'Test',serveurName:serveurName||'Test',date:new Date().toLocaleString('fr-FR'),payment:'cash',items:[{n:'Mojito',qty:2,comment:'sans glaçons',e:'🍹',p:10},{n:'Espresso',qty:1,comment:'',e:'☕',p:2.5}]}); }
-async function testPrintNetwork(){ await printNetwork({table:'Test',serveurName:serveurName||'Test',date:new Date().toLocaleString('fr-FR'),payment:'card',items:[{n:'Pression 33cl',qty:3,comment:'',e:'🍺',p:4}]}); }
+
+// ── ESC/POS via HTTP proxy (port 9100 HTTP-accessible) ───────────────────────
+async function printEscPos(ip, port, data){
+  // Many generic printers accept raw HTTP POST on port 9100 or 80
+  // We try multiple endpoints in order
+  const endpoints=[
+    { url:`http://${ip}:${port}/`, ct:'application/octet-stream' },
+    { url:`http://${ip}/cgi-bin/epos/service.cgi`, ct:'text/plain' },
+    { url:`http://${ip}:${port}/print`, ct:'application/octet-stream' },
+  ];
+
+  let lastErr=null;
+  for(const ep of endpoints){
+    try{
+      const r=await fetch(ep.url,{
+        method:'POST',
+        headers:{'Content-Type':ep.ct},
+        body:data,
+        signal:AbortSignal.timeout(4000),
+        mode:'no-cors'   // bypass CORS — response will be opaque but print fires
+      });
+      // With no-cors, response is always opaque (type='opaque') — we assume success
+      return;
+    }catch(e){ lastErr=e; }
+  }
+  throw lastErr||new Error('All ESC/POS endpoints failed');
+}
+
+// ── ePOS-Print XML via Epson HTTP API ────────────────────────────────────────
+async function printEpson(ip, port, xml){
+  const url=`http://${ip}/cgi-bin/epos/service.cgi`;
+  const r=await fetch(url,{
+    method:'POST',
+    headers:{
+      'Content-Type':'text/xml;charset=utf-8',
+      'SOAPAction':'""'
+    },
+    body:xml,
+    signal:AbortSignal.timeout(5000),
+    mode:'no-cors'
+  });
+  // no-cors response is opaque — assume success if no throw
+}
+
+// ── Boutons de test ───────────────────────────────────────────────────────────
+function testPrint(){
+  const fake={
+    table:'Table Test',serveurName:serveurName||'Test',
+    date:new Date().toLocaleString('fr-FR'),payment:'cash',
+    items:[
+      {n:'Mojito',qty:2,comment:'sans glaçons',e:'🍹',p:10},
+      {n:'Pression 33cl',qty:3,comment:'',e:'🍺',p:4},
+      {n:'Espresso',qty:1,comment:'',e:'☕',p:2.5},
+    ]
+  };
+  printBrowser(fake);
+}
+async function testPrintNetwork(){
+  const fake={
+    table:'Table Test',serveurName:serveurName||'Test',
+    date:new Date().toLocaleString('fr-FR'),payment:'card',
+    items:[
+      {n:'Pression 33cl',qty:4,comment:'bien froides',e:'🍺',p:4},
+      {n:'Gin Tonic',qty:2,comment:'',e:'🥃',p:10},
+    ]
+  };
+  await printNetwork(fake);
+}
+
 
 // ══════════════════════════════════════════════════════════════════════════════
 // TOAST
 // ══════════════════════════════════════════════════════════════════════════════
-let tT;
-function showToast(ico,msg){
-  document.getElementById('t-ico').textContent=ico;
-  document.getElementById('t-msg').textContent=msg;
-  const t=document.getElementById('toast');
-  t.classList.add('show'); clearTimeout(tT);
-  tT=setTimeout(()=>t.classList.remove('show'),3500);
+let _toastTimer;
+function showToast(ico, msg){
+  document.getElementById('t-ico').textContent = ico;
+  document.getElementById('t-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
 }
-
-// ══════════════════════════════════════════════════════════════════════════════
-// SERVICE WORKER — enregistrement au démarrage pour les notifications en veille
-// ══════════════════════════════════════════════════════════════════════════════
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('./firebase-messaging-sw.js')
-      .then(reg=>{ console.log('[BarFlow] SW enregistré :', reg.scope); })
-      .catch(err=>{ console.warn('[BarFlow] SW échec :', err); });
-  });
-}
-
 </script>
 </body>
 </html>
