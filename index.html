@@ -950,7 +950,7 @@ function updPayBtns(){
 function openPayMod(){ ensureAC(); document.getElementById('ov-pay').classList.add('open'); }
 function closePayMod(e){ if(!e||e.target===document.getElementById('ov-pay')) document.getElementById('ov-pay').classList.remove('open'); }
 function sendPayAlert(m){
-  const tbl=document.getElementById('pay-table-in').value.trim();
+  const tbl=normTable(document.getElementById('pay-table-in').value);
   if(!tbl){ alert('Numéro de table requis.'); return; }
   db.ref('orders').push({
     table:tbl, type:'payment', payment:m, status:'pending',
@@ -964,8 +964,12 @@ function sendPayAlert(m){
 // ══════════════════════════════════════════════════════════════════════════════
 // SEND ORDER
 // ══════════════════════════════════════════════════════════════════════════════
+// Normalise le nom de table : stockage en minuscules, affichage en majuscules
+function normTable(s){ return s.trim().toLowerCase(); }
+function dispTable(s){ return s.toUpperCase(); }
+
 function sendOrder(){
-  const tbl=document.getElementById('table-in').value.trim();
+  const tbl=normTable(document.getElementById('table-in').value);
   if(!tbl){ alert('Numéro de table requis.'); return; }
   if(!Object.keys(cart).length) return;
   const total=cartTotal();
@@ -999,7 +1003,7 @@ function listenOrders(){
       if(newP.length&&Object.keys(prev).length){
         const isP=newP.some(([,v])=>v.type==='payment');
         playSound(isP?'payment':'new_order');
-        showToast(isP?'💳':'🔔',(isP?'💳 Paiement':'🔔 Commande')+' — '+newP[0][1].table+' !');
+        showToast(isP?'💳':'🔔',(isP?'💳 Paiement':'🔔 Commande')+' — '+dispTable(newP[0][1].table)+' !');
         if(printEnabled&&!isP) newP.forEach(([,o])=>printOrder(o));
       }
     }
@@ -1038,7 +1042,7 @@ function showReadyBanner(){
   pickupKeys.forEach(k=>{
     const o=allOrders[k]; if(!o) return;
     const its=(o.items||[]).map(i=>`×${i.qty} ${i.n}`).join(', ');
-    h+=`<div class="rb-item"><div class="rb-tbl">📍 ${o.table}</div><div class="rb-its">${its}</div><div class="rb-tot">${fmt(orderTotal(o))}</div></div>`;
+    h+=`<div class="rb-item"><div class="rb-tbl">📍 ${dispTable(o.table)}</div><div class="rb-its">${its}</div><div class="rb-tot">${fmt(orderTotal(o))}</div></div>`;
   });
   document.getElementById('rbl').innerHTML=h||'<p style="color:var(--text2);font-size:.82rem">…</p>';
   document.getElementById('rb').classList.add('show');
@@ -1086,7 +1090,7 @@ function listenForPushNotifs(){
     if(Notification.permission !== 'granted') return;
 
     const title = '🍸 BarFlow — Commande prête !';
-    const body  = 'Votre commande pour ' + (notif.table||'une table') + ' est prête. Venez la récupérer !';
+    const body  = 'Votre commande pour ' + dispTable(notif.table||'une table') + ' est prête. Venez la récupérer !';
     const icon  = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>';
 
     // Try Service Worker first (works when screen is locked / app in background)
@@ -1142,7 +1146,7 @@ function renderBarman(){
     if(o.type==='payment'){
       const pm=PL[o.payment]||PL.cash;
       h+=`<div class="ocard pay-card">
-        <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div><span class="os os-pay">Paiement</span></div>
+        <div class="oh"><div class="oh-l"><div class="o-table">${dispTable(o.table)}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div><span class="os os-pay">Paiement</span></div>
         <span class="pmb pmb-req">💳 Le client souhaite payer</span><br>
         <span class="pmb ${pm.c}" style="margin-top:.35rem;font-size:.82rem;padding:.36rem .9rem">${pm.i} ${pm.l}</span>
         <button class="btn-paid" onclick="markDone('${k}')">✅ Paiement encaissé</button>
@@ -1151,7 +1155,7 @@ function renderBarman(){
     }
     const tot=orderTotal(o); const pm=o.payment?(PL[o.payment]||PL.later):null;
     h+=`<div class="ocard" style="${isAddon?'border-color:rgba(212,168,67,.35);background:rgba(212,168,67,.04)':''}">
-      <div class="oh"><div class="oh-l"><div class="o-table">${o.table}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div>
+      <div class="oh"><div class="oh-l"><div class="o-table">${dispTable(o.table)}</div><div class="o-time">${tl} — ${o.date}</div>${srv}</div>
       <span class="os ${isAddon?'os-addon':'os-p'}">${isAddon?'Reprise':'En attente'}</span></div>
       <div class="oitems">`;
     (o.items||[]).forEach(i=>{
@@ -1216,7 +1220,7 @@ function renderOpenTables(){
     });
     const sT=tbl.replace(/'/g,"\\'");
     h+=`<div class="tcard">
-      <div class="tcard-head"><div class="tcard-head-l"><div class="tc-table">${tbl}</div><div class="tc-date">Depuis le ${t.firstDate}</div>${srv}</div><span class="tc-badge">Ardoise</span></div>
+      <div class="tcard-head"><div class="tcard-head-l"><div class="tc-table">${dispTable(tbl)}</div><div class="tc-date">Depuis le ${t.firstDate}</div>${srv}</div><span class="tc-badge">Ardoise</span></div>
       <div class="oitems">${itemsH}</div>
       <div class="tc-run-total"><span class="tc-run-lbl">Total ardoise</span><span class="tc-run-amt">${fmt(t.total)}</span></div>
       <div class="tc-actions">
@@ -1230,14 +1234,18 @@ function renderOpenTables(){
 
 // ── Add drinks to open table ──────────────────────────────────────────────────
 function openAddDrinks(tbl){
-  addTarget=tbl; addCart_={};
+  addTarget=normTable(tbl); addCart_={};
   document.getElementById('add-drinks-title').textContent='Ajouter à '+tbl;
   document.getElementById('add-drinks-sub').textContent='Sélectionnez les boissons à ajouter à l\'ardoise.';
   renderAddDrinksMenu(); updAddCartBar();
   document.getElementById('ov-add-drinks').classList.add('open');
 }
 function closeAddDrinks(e){
-  if(!e||e.target===document.getElementById('ov-add-drinks')) document.getElementById('ov-add-drinks').classList.remove('open');
+  if(!e||e.target===document.getElementById('ov-add-drinks')){
+    document.getElementById('ov-add-drinks').classList.remove('open');
+    addCart_={};
+    updAddCartBar();
+  }
 }
 function renderAddDrinksMenu(){
   let h='';
@@ -1365,7 +1373,7 @@ function renderHistory(){
     const srv=(role==='barman'&&o.serveurName)?`<div class="hi-srv">🍽️ ${o.serveurName}</div>`:'';
     const runTot=(o.runTotal&&o.status==='closed')?`<div style="font-size:.72rem;color:var(--text2);margin-top:.18rem">Cumulé : ${fmt(o.runTotal)}</div>`:'';
     h+=`<div class="hi">
-      <div class="hi-h"><span class="hi-t">${o.table}</span><div style="display:flex;align-items:center;gap:.45rem">${sl}<span class="hi-dt">${o.date}</span></div></div>
+      <div class="hi-h"><span class="hi-t">${dispTable(o.table)}</span><div style="display:flex;align-items:center;gap:.45rem">${sl}<span class="hi-dt">${o.date}</span></div></div>
       ${srv}<div class="hi-its">${its}</div>${runTot}
       <div class="hi-ft"><span class="hi-tot">${tot!==null?fmt(tot):'—'}</span>${tl?`<span class="hp-tag ${tc}">${tl}</span>`:''}</div>
     </div>`;
