@@ -758,9 +758,12 @@ function launchUI(){
     const cb=document.getElementById('btn-clear-hist'); if(cb) cb.style.display='block';
   }
   initSettings();
-  // Re-attach push listener on every startup (not just when toggling in settings)
+  // Re-attach push listeners on every startup
   if(role==='serveur' && Notification.permission==='granted'){
     listenForPushNotifs();
+  }
+  if(role==='barman' && Notification.permission==='granted'){
+    listenForBarmanNotifs();
   }
   listenOrders();
 }
@@ -957,7 +960,10 @@ function sendPayAlert(m){
     serveurName, serveurId,
     timestamp:Date.now(), date:new Date().toLocaleString('fr-FR'),
     items:[], total:0
-  }).then(()=>{ playSound('sent'); closePayMod(); document.getElementById('pay-table-in').value=''; showToast('💳','Demande envoyée — '+tbl); })
+  }).then(()=>{
+    pushToBarman({type:'payment',table:tbl,serveurName,items:[]});
+    playSound('sent'); closePayMod(); document.getElementById('pay-table-in').value=''; showToast('💳','Demande envoyée — '+tbl);
+  })
   .catch(e=>alert('Erreur : '+e.message));
 }
 
@@ -982,6 +988,7 @@ function sendOrder(){
     items:Object.entries(cart).map(([n,d])=>({n,qty:d.qty,comment:d.comment,e:d.e,p:d.p||PM[n]||0}))
   };
   db.ref('orders').push(order).then(()=>{
+    pushToBarman(order); // notification push barman si tablette en veille
     playSound('sent'); cart={}; selPay_=null; updPayBtns();
     updateCartBar(); renderMenu(); closeCart(); document.getElementById('table-in').value='';
     showToast('✅','Commande envoyée !');
@@ -1067,6 +1074,82 @@ function pushToServeur(orderKey){
   db.ref('notifications/'+o.serveurId).push({ type:'order_ready', orderKey, table:o.table, timestamp:Date.now() });
 }
 let _pushListenerAttached = false;
+let _barmanPushAttached   = false;  // Guard pour le listener push barman
+
+// Notifie le barman via Firebase quand une nouvelle commande arrive
+// N'est appelée que côté serveur, au moment du push Firebase
+function pushToBarman(order){
+  db.ref('notifications/barman').push({
+    type        : order.type==='payment' ? 'payment' : 'new_order',
+    table       : order.table,
+    serveurName : order.serveurName||'',
+    itemCount   : (order.items||[]).reduce((s,i)=>s+i.qty, 0),
+    timestamp   : Date.now()
+  });
+}
+
+// Listener Firebase côté barman — déclenche une notification push système
+// quand l'app est en veille. Ne s'attache qu'une seule fois par session.
+function listenForBarmanNotifs(){
+  if(_barmanPushAttached) return;
+  _barmanPushAttached = true;
+
+  const attachedAt = Date.now();
+
+  db.ref('notifications/barman').on('child_added', snap=>{
+    const notif = snap.val();
+    if(!notif) return;
+
+    // Ignorer les notifications antérieures à cette session
+    if(notif.timestamp && notif.timestamp < attachedAt - 5000){
+      snap.ref.remove();
+      return;
+    }
+    snap.ref.remove(); // supprimer après lecture
+
+    // Ne déclencher la push que si l'app est en arrière-plan / veille
+    // (quand elle est au premier plan, le son + toast suffisent)
+    if(document.visibilityState === 'visible') return;
+
+    if(Notification.permission !== 'granted') return;
+
+    const isPayment = notif.type === 'payment';
+    const title = isPayment
+      ? '💳 SiraGo — Paiement demandé'
+      : '🔔 SiraGo — Nouvelle commande';
+    const body = isPayment
+      ? 'Paiement à encaisser — ' + dispTable(notif.table||'')
+      : (notif.itemCount||'') + ' boisson(s) — ' + dispTable(notif.table||'')
+        + (notif.serveurName ? ' · ' + notif.serveurName : '');
+    const icon = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍸</text></svg>';
+
+    const showViaAPI = () => {
+      try{
+        const n = new Notification(title, {
+          body, icon,
+          tag        : 'barman-order-' + Date.now(),
+          renotify   : true,
+          requireInteraction: true
+        });
+        n.onclick = () => { window.focus(); n.close(); };
+      } catch(e){ console.warn('Barman notif failed:', e); }
+    };
+
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if(reg){
+          reg.showNotification(title, {
+            body, icon,
+            tag             : 'barman-order-' + Date.now(),
+            renotify        : true,
+            requireInteraction: true,
+            badge           : icon
+          }).catch(()=>{ showViaAPI(); });
+        } else { showViaAPI(); }
+      }).catch(()=>{ showViaAPI(); });
+    } else { showViaAPI(); }
+  });
+}
 function listenForPushNotifs(){
   if(!serveurId) return;
   if(_pushListenerAttached) return;
@@ -1400,11 +1483,12 @@ function initSettings(){
 
   // If notifications were previously enabled AND permission is already granted,
   // reattach the Firebase push listener immediately (no user action needed)
-  if(notifOn && role==='serveur' && typeof Notification!=='undefined' && Notification.permission==='granted'){
+  if(notifOn && typeof Notification!=='undefined' && Notification.permission==='granted'){
     document.getElementById('notif-sub').textContent='✅ Notifications actives.';
     document.getElementById('notif-test-btn').style.display='block';
     document.getElementById('notif-info').style.display='block';
-    listenForPushNotifs();  // ← key: reattach on every page load
+    if(role==='serveur') listenForPushNotifs();   // serveur : commandes prêtes
+    if(role==='barman')  listenForBarmanNotifs();  // barman  : nouvelles commandes
   }
 
   document.getElementById('print-toggle').checked=printEnabled;
@@ -1426,7 +1510,8 @@ async function requestNotifPermission(showPrompt=true){
     document.getElementById('notif-sub').textContent='✅ Notifications actives.';
     document.getElementById('notif-test-btn').style.display='block';
     document.getElementById('notif-info').style.display='block';
-    if(role==='serveur') listenForPushNotifs();
+    if(role==='serveur') listenForPushNotifs();   // serveur : commandes prêtes
+    if(role==='barman')  listenForBarmanNotifs();  // barman  : nouvelles commandes
     return true;
   }
   if(perm==='denied') document.getElementById('notif-sub').textContent='❌ Permission refusée dans les réglages du navigateur.';
