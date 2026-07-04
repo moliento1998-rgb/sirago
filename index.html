@@ -314,7 +314,7 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
 <!-- APP -->
 <div id="app">
   <header>
-    <span class="brand">🍸 SiraGo !</span>
+    <span class="brand">🍸 SiraGo</span>
     <div class="hright">
       <div id="pcount">0</div>
       <span id="role-badge" class="badge"></span>
@@ -358,6 +358,23 @@ header{position:sticky;top:0;z-index:100;background:rgba(13,13,13,.93);backdrop-
   </div>
 
   <div id="settings-panel" class="panel">
+    <div class="set-section">
+      <div class="set-title">🔊 Volume des alertes sonores</div>
+      <div class="set-card">
+        <div class="set-row" style="gap:.8rem;align-items:center">
+          <span style="font-size:1.3rem;flex-shrink:0">🔈</span>
+          <input type="range" id="vol-slider" min="0.05" max="1" step="0.05"
+            style="flex:1;accent-color:var(--gold);cursor:pointer"
+            oninput="onVolumeChange(this.value)">
+          <span style="font-size:1.3rem;flex-shrink:0">🔊</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:.6rem">
+          <span id="vol-pct" style="font-family:'Syne',sans-serif;font-size:.85rem;color:var(--gold2);font-weight:700">85%</span>
+          <button onclick="playSound('new_order')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:.35rem .9rem;font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif">▶ Tester le son</button>
+        </div>
+      </div>
+    </div>
+
     <div class="set-section">
       <div class="set-title">🔔 Notifications push</div>
       <div class="set-card">
@@ -574,8 +591,8 @@ const MENU = [
     {n:'Gin',e:'🥃',p:4.5},{n:'Gin Tonic',e:'🥃',p:5.5},{n:'Get 27',e:'🥃',p:5},
     {n:'Get 31',e:'🥃',p:5},{n:'Captain Morgan',e:'🥃',p:6},{n:'Jager Bomb',e:'🥃',p:5},
     {n:'Ballantines',e:'🥃',p:5},{n:'Jack Daniel',e:'🥃',p:7},{n:'Jack Coca',e:'🥃',p:7.5},
-    {n:'Limoncello',e:'🥃',p:5},{n:'Cognac',e:'🥃',p:5},{n:'Armaniac',e:'🥃',p:5},
-    {n:'Martini Blanc',e:'🥃',p:5},{n:'Martini Rouge',e:'🥃',p:5}
+    {n:'Cognac',e:'🥃',p:5},{n:'Baileys',e:'🥃',p:5},{n:'Martini Blanc',e:'🍸',p:3},
+    {n:'Martini Rouge',e:'🍸',p:3}
   ]},
   { cat:'🍸 Cocktails', items:[
     {n:'Mojito',e:'🍹',p:7},{n:'Spritz',e:'🍹',p:6.5},{n:'Le Rosé',e:'🍹',p:6},
@@ -584,7 +601,7 @@ const MENU = [
   { cat:'☕ Chaud', items:[
     {n:'Espresso',e:'☕',p:1.5},{n:'Café au Lait',e:'☕',p:1.6},{n:'Allongé',e:'☕',p:1.6},
     {n:'Allongé au Lait',e:'☕',p:1.6},{n:'Grand Café',e:'☕',p:3},{n:'Grand Cagé Lait',e:'☕',p:3},
-    {n:'Cappuccino',e:'☕',p:3},{n:'Irish Coffee',e:'☕',p:8}
+    {n:'Cappuccino',e:'☕',p:3}
   ]}
 ];
 
@@ -625,40 +642,82 @@ function genUUID(){
 // SOUNDS
 // ══════════════════════════════════════════════════════════════════════════════
 const ACtx = window.AudioContext||window.webkitAudioContext;
-let ac;
-function ensureAC(){ if(!ac) ac=new ACtx(); }
-function playSound(t){
-  ensureAC(); const ctx=ac, now=ctx.currentTime;
-  if(t==='new_order'){
-    [[0,880],[.18,660],[.36,770]].forEach(([d,f])=>{
-      const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
-      o.frequency.value=f; o.type='sine';
-      g.gain.setValueAtTime(0,now+d); g.gain.linearRampToValueAtTime(.3,now+d+.04); g.gain.exponentialRampToValueAtTime(.001,now+d+.35);
-      o.start(now+d); o.stop(now+d+.4);
-    });
-  } else if(t==='ready'){
-    [0,.12,.24,.36,.55,.67,.79,.91].forEach((d,i)=>{
-      const f=[523,659,784,1047,523,659,784,1047][i];
-      const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
-      o.frequency.value=f; o.type='triangle';
-      g.gain.setValueAtTime(0,now+d); g.gain.linearRampToValueAtTime(.22,now+d+.04); g.gain.exponentialRampToValueAtTime(.001,now+d+.28);
-      o.start(now+d); o.stop(now+d+.35);
-    });
-  } else if(t==='payment'){
-    [0,.22].forEach(d=>{
-      const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
-      o.frequency.value=1200; o.type='square';
-      g.gain.setValueAtTime(0,now+d); g.gain.linearRampToValueAtTime(.13,now+d+.03); g.gain.exponentialRampToValueAtTime(.001,now+d+.18);
-      o.start(now+d); o.stop(now+d+.22);
-    });
-  } else if(t==='sent'){
-    const o=ctx.createOscillator(),g=ctx.createGain(); o.connect(g); g.connect(ctx.destination);
-    o.frequency.value=440; o.type='sine';
-    g.gain.setValueAtTime(0,now); g.gain.linearRampToValueAtTime(.18,now+.05); g.gain.exponentialRampToValueAtTime(.001,now+.3);
-    o.start(now); o.stop(now+.35);
+let ac;        // AudioContext instance
+let acMaster;  // Master GainNode — volume global
+let acComp;    // DynamicsCompressor — évite la saturation
+let soundVolume = parseFloat(localStorage.getItem('bf_volume')||'0.85');
+
+function ensureAC(){
+  if(!ac){
+    ac = new ACtx();
+    // Nœud maître → compresseur → sortie haut-parleur
+    acMaster = ac.createGain();
+    acMaster.gain.value = soundVolume;
+    acComp = ac.createDynamicsCompressor();
+    acComp.threshold.value = -12;
+    acComp.knee.value      =  6;
+    acComp.ratio.value     =  4;
+    acComp.attack.value    =  0.003;
+    acComp.release.value   =  0.25;
+    acMaster.connect(acComp);
+    acComp.connect(ac.destination);
   }
+  // iOS/iPadOS suspend l'AudioContext après inactivité — on le relance
+  if(ac.state === 'suspended') ac.resume();
 }
 
+function setVolume(v){
+  soundVolume = Math.max(0.05, Math.min(1, v));
+  localStorage.setItem('bf_volume', soundVolume.toString());
+  if(acMaster) acMaster.gain.setTargetAtTime(soundVolume, ac.currentTime, 0.02);
+}
+
+function onVolumeChange(v){
+  setVolume(parseFloat(v));
+  const pct = document.getElementById('vol-pct');
+  if(pct) pct.textContent = Math.round(soundVolume*100)+'%';
+}
+
+function playSound(t){
+  ensureAC();
+  const ctx=ac, out=acMaster, now=ctx.currentTime;
+
+  // Helper : crée un bip simple
+  const tone=(freq,type,startD,vol,atk,dec)=>{
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(out);
+    o.frequency.value=freq; o.type=type;
+    g.gain.setValueAtTime(0, now+startD);
+    g.gain.linearRampToValueAtTime(vol, now+startD+atk);
+    g.gain.exponentialRampToValueAtTime(0.001, now+startD+atk+dec);
+    o.start(now+startD); o.stop(now+startD+atk+dec+0.05);
+  };
+
+  if(t==='new_order'){
+    // 5 bips forts et graves — fréquences basses portent dans le bruit de bar
+    [[0,920,'sine'],[.22,740,'sine'],[.44,820,'sine'],[.66,620,'square'],[.88,880,'sine']]
+      .forEach(([d,f,tp])=>tone(f,tp,d,0.90,0.015,0.38));
+
+  } else if(t==='ready'){
+    // Arpège ascendant 8 notes — plus fort, plus long, inratable
+    [0,.1,.2,.3,.5,.6,.7,.8].forEach((d,i)=>{
+      const f=[523,659,784,1047,1175,1047,784,1047][i];
+      tone(f,'triangle',d,0.85,0.015,0.32);
+    });
+
+  } else if(t==='payment'){
+    // Triple double-bip urgent — 3 répétitions pour ne pas manquer
+    [0,.20,.40].forEach(d=>{
+      tone(1400,'square',d,    0.82,0.01,0.12);
+      tone(1800,'square',d+.09,0.70,0.01,0.10);
+    });
+
+  } else if(t==='sent'){
+    // Confirmation douce — deux tons harmoniques
+    tone(523,'sine',0,   0.60,0.03,0.25);
+    tone(784,'sine',0.12,0.50,0.03,0.20);
+  }
+}
 // ══════════════════════════════════════════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════════════════════════════════════════
@@ -698,6 +757,10 @@ function initFB(cfg){
 }
 
 function logout(){ if(!confirm('Changer de rôle / reconfigurer ?')) return; location.reload(); }
+
+// Réveille l'AudioContext iOS sur n'importe quelle interaction utilisateur
+document.addEventListener('touchstart', ()=>{ if(ac && ac.state==='suspended') ac.resume(); }, {once:false, passive:true});
+document.addEventListener('click',      ()=>{ if(ac && ac.state==='suspended') ac.resume(); }, {once:false, passive:true});
 
 window.addEventListener('load',()=>{
   // Register Service Worker for background notifications
@@ -1508,6 +1571,11 @@ function initSettings(){
   }
 
   document.getElementById('print-toggle').checked=printEnabled;
+  // Init curseur volume
+  const vs = document.getElementById('vol-slider');
+  const vp = document.getElementById('vol-pct');
+  if(vs){ vs.value = soundVolume; }
+  if(vp){ vp.textContent = Math.round(soundVolume*100)+'%'; }
   if(printEnabled){
     document.getElementById('print-options').style.display='block';
     selPrintMethod(printMethod);
