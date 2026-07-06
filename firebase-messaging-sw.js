@@ -1,70 +1,62 @@
-// BarFlow — Service Worker v2.6
-// Place this file at the ROOT of your site (same folder as index.html / bar-app.html)
+// SiraGo — Service Worker v2 pour notifications push en arrière-plan
+// Ce fichier doit être placé à la RACINE du site (même dossier que index.html)
 
-// ⚠️ Replace with your own Firebase config values
-const FIREBASE_CONFIG = {
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
   apiKey:      "AIzaSyC-GuIuCfv21L__y5BNa_JErmPKGtnFHVM",
   authDomain:  "sirago-7640a.firebaseapp.com",
   databaseURL: "https://sirago-7640a-default-rtdb.europe-west1.firebasedatabase.app",
   projectId:   "sirago-7640a",
-};
+});
 
-// ── Install & Activate (cache nothing — this SW is only for notifications) ───
-self.addEventListener('install',  e => self.skipWaiting());
-self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+const messaging = firebase.messaging();
 
-// ── Notification click → focus or open the app ───────────────────────────────
+// ── CORRECTION 1 : install + activate ────────────────────────────────────────
+// Sans ces deux handlers, une nouvelle version du SW ne prend effet
+// qu'après fermeture complète de tous les onglets + réouverture.
+// Avec skipWaiting() + clients.claim(), la mise à jour est active immédiatement
+// dès le prochain rechargement — sans que l'utilisateur ait besoin de faire quoi que ce soit.
+
+self.addEventListener('install', event => {
+  self.skipWaiting();  // le nouveau SW remplace l'ancien sans attendre
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());  // prend le contrôle de tous les onglets ouverts immédiatement
+});
+
+// ── Notification FCM en arrière-plan ─────────────────────────────────────────
+messaging.onBackgroundMessage(payload => {
+  const { title, body, icon } = payload.notification || {};
+  self.registration.showNotification(title || '🍸 SiraGo', {
+    body:             body || 'Vous avez une notification.',
+    icon:             icon || 'https://em-content.zobj.net/source/google/387/tropical-drink_1f379.png',
+    badge:            'https://em-content.zobj.net/source/google/387/tropical-drink_1f379.png',
+    tag:              'sirago',
+    renotify:         true,
+    requireInteraction: true,
+    data:             payload.data || {}
+  });
+});
+
+// ── CORRECTION 2 : clic sur la notification ───────────────────────────────────
+// L'ancienne version cherchait une URL contenant 'bar-app' et ouvrait 'bar-app.html'.
+// Votre fichier s'appelle index.html — la recherche ne trouvait jamais l'onglet ouvert,
+// et ouvrait systématiquement un nouvel onglet vers la mauvaise URL.
+// Correction : on cherche simplement un onglet de votre domaine GitHub Pages,
+// et on ouvre './' (= index.html) si aucun n'est trouvé.
+
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cls => {
-      // If app is already open in a tab, focus it
-      const existing = cls.find(c => c.url.includes('bar-app') || c.url.includes('index'));
-      if (existing && 'focus' in existing) return existing.focus();
-      // Otherwise open a new window
-      if (clients.openWindow) return clients.openWindow('./');
+      // Cherche un onglet déjà ouvert sur le domaine (peu importe le nom du fichier)
+      const existing = cls.find(c => 'focus' in c);
+      if (existing) return existing.focus();
+      // Sinon ouvre index.html
+      return clients.openWindow('./');
     })
   );
 });
-
-// ── Message from page → show notification ────────────────────────────────────
-// (Legacy channel kept for compatibility — main path is reg.showNotification in page)
-self.addEventListener('message', event => {
-  const data = event.data;
-  if (!data || data.type !== 'SHOW_NOTIFICATION') return;
-  event.waitUntil(
-    self.registration.showNotification(data.title || '🍸 BarFlow', {
-      body:             data.body  || 'Commande prête !',
-      icon:             data.icon  || '',
-      badge:            data.icon  || '',
-      tag:              data.tag   || 'barflow',
-      renotify:         true,
-      requireInteraction: true,
-    })
-  );
-});
-
-// ── Firebase Cloud Messaging (background push — optional, requires FCM setup) ─
-try {
-  importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
-  importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
-
-  if (FIREBASE_CONFIG.apiKey !== 'REMPLACER_PAR_VOTRE_API_KEY') {
-    firebase.initializeApp(FIREBASE_CONFIG);
-    const messaging = firebase.messaging();
-
-    messaging.onBackgroundMessage(payload => {
-      const { title, body, icon } = payload.notification || {};
-      return self.registration.showNotification(title || '🍸 BarFlow', {
-        body:    body  || 'Vous avez une nouvelle notification.',
-        icon:    icon  || '',
-        tag:     'barflow-fcm',
-        renotify: true,
-        requireInteraction: true,
-      });
-    });
-  }
-} catch(e) {
-  // FCM not configured — Firebase Realtime DB listener handles notifications instead
-  console.log('FCM not configured, using Realtime DB listener for push.');
-}

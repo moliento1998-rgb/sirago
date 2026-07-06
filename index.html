@@ -1084,16 +1084,27 @@ function listenOrders(){
     }
 
     if(role==='serveur'){
-      // All payment modes trigger the ready banner — only skip payment-request type entries
+      // Seules les commandes qui viennent de passer à 'done' à cet instant
+      // (prev = pending, now = done) ET appartenant à CE serveur (serveurId)
       const justDone=Object.entries(data).filter(([k,v])=>
         v.status==='done' &&
         v.type!=='payment' &&
         v.serveurId===serveurId &&
-        (!prev[k]||prev[k].status==='pending')
+        prev[k] && prev[k].status==='pending'  // ← nouveau : était pending AVANT
       );
-      justDone.forEach(([k])=>{ if(!pickupKeys.includes(k)) pickupKeys.push(k); });
-      if(pickupKeys.length&&!bannerDismissed){ playSound('ready'); showReadyBanner(); }
-      else if(!pickupKeys.length) hideBanner();
+      // On n'ajoute que les clés vraiment nouvelles
+      const newKeys = justDone.map(([k])=>k).filter(k=>!pickupKeys.includes(k));
+      newKeys.forEach(k=>pickupKeys.push(k));
+
+      // Son et bannière UNIQUEMENT si de nouvelles commandes viennent d'arriver
+      if(newKeys.length){
+        playSound('ready');       // ← son déclenché UNE seule fois, uniquement pour le bon serveur
+        if(!bannerDismissed) showReadyBanner();
+      } else if(pickupKeys.length&&!bannerDismissed){
+        showReadyBanner();        // ← réaffiche la bannière silencieusement si elle était fermée
+      } else if(!pickupKeys.length){
+        hideBanner();
+      }
     }
 
     // Pending badge
